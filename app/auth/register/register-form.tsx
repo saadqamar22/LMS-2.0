@@ -18,10 +18,12 @@ export default function RegisterForm() {
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [studentClass, setStudentClass] = useState("");
   const [parentId, setParentId] = useState("");
+  const [studentSection, setStudentSection] = useState("");
   
   // Teacher fields
   const [employeeId, setEmployeeId] = useState("");
   const [department, setDepartment] = useState("");
+  const [designation, setDesignation] = useState("");
   
   // Parent fields
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -77,6 +79,11 @@ export default function RegisterForm() {
         setLoading(false);
         return;
       }
+      if (!studentSection.trim()) {
+        setError("Section is required for students");
+        setLoading(false);
+        return;
+      }
     }
 
     if (role === "teacher") {
@@ -87,6 +94,11 @@ export default function RegisterForm() {
       }
       if (!department.trim()) {
         setError("Department is required for teachers");
+        setLoading(false);
+        return;
+      }
+      if (!designation.trim()) {
+        setError("Designation is required for teachers");
         setLoading(false);
         return;
       }
@@ -115,11 +127,13 @@ export default function RegisterForm() {
       ...(role === "student" && {
         registration_number: registrationNumber,
         class: studentClass,
+        section: studentSection,
         parent_id: parentId || null,
       }),
       ...(role === "teacher" && {
         employee_id: employeeId,
         department: department,
+        designation: designation,
       }),
       ...(role === "parent" && {
         phone_number: phoneNumber,
@@ -292,6 +306,21 @@ export default function RegisterForm() {
               />
             </div>
             <div>
+              <label htmlFor="section" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Section *
+              </label>
+              <input
+                id="section"
+                name="section"
+                type="text"
+                required
+                value={studentSection}
+                onChange={(e) => setStudentSection(e.target.value)}
+                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
+                placeholder="e.g., Section B"
+              />
+            </div>
+            <div>
               <label htmlFor="parent-id" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Parent ID (Optional)
               </label>
@@ -339,6 +368,21 @@ export default function RegisterForm() {
                 onChange={(e) => setDepartment(e.target.value)}
                 className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
                 placeholder="e.g., Mathematics, Science"
+              />
+            </div>
+            <div>
+              <label htmlFor="designation" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Designation *
+              </label>
+              <input
+                id="designation"
+                name="designation"
+                type="text"
+                required
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
+                placeholder="e.g., Senior Lecturer"
               />
             </div>
           </>

@@ -7,10 +7,10 @@ import {
 } from "@/lib/auth/session";
 
 const ROLE_PATH_MAP: Record<Role, string> = {
-  student: "/dashboard/student",
-  teacher: "/dashboard/teacher",
-  parent: "/dashboard/parent",
-  admin: "/dashboard/admin",
+  student: "/student",
+  teacher: "/teacher",
+  parent: "/parent",
+  admin: "/admin",
 };
 
 async function handleProtectedRoute(request: NextRequest) {
@@ -40,21 +40,39 @@ async function handleProtectedRoute(request: NextRequest) {
     return response;
   }
 
-  const expectedPath = ROLE_PATH_MAP[session.role];
+  const expectedPrefix = ROLE_PATH_MAP[session.role];
+  const pathname = request.nextUrl.pathname;
+
   if (
-    expectedPath &&
-    request.nextUrl.pathname.startsWith("/dashboard") &&
-    !request.nextUrl.pathname.startsWith(expectedPath) &&
+    expectedPrefix &&
+    (pathname.startsWith("/student") ||
+      pathname.startsWith("/teacher") ||
+      pathname.startsWith("/parent") ||
+      pathname.startsWith("/admin")) &&
+    !pathname.startsWith(expectedPrefix) &&
     session.role !== "admin"
   ) {
-    return NextResponse.redirect(new URL(expectedPath, request.url));
+    return NextResponse.redirect(
+      new URL(`${expectedPrefix}/dashboard`, request.url),
+    );
   }
 
   return NextResponse.next();
 }
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+  const pathname = request.nextUrl.pathname;
+
+  const protectedPrefixes = [
+    "/dashboard",
+    "/student",
+    "/teacher",
+    "/parent",
+    "/admin",
+    "/ai",
+  ];
+
+  if (protectedPrefixes.some((prefix) => pathname.startsWith(prefix))) {
     return handleProtectedRoute(request);
   }
 
@@ -66,7 +84,8 @@ export async function middleware(request: NextRequest) {
     if (token) {
       const session = await verifySessionToken(token);
       if (session) {
-        const redirectPath = ROLE_PATH_MAP[session.role] ?? "/";
+        const redirectPath =
+          ROLE_PATH_MAP[session.role]?.concat("/dashboard") ?? "/";
         return NextResponse.redirect(new URL(redirectPath, request.url));
       }
     }
@@ -76,6 +95,15 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/login", "/auth/register"],
+  matcher: [
+    "/dashboard/:path*",
+    "/student/:path*",
+    "/teacher/:path*",
+    "/parent/:path*",
+    "/admin/:path*",
+    "/ai/:path*",
+    "/auth/login",
+    "/auth/register",
+  ],
 };
 

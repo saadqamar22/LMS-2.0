@@ -15,10 +15,10 @@ interface LoginPayload {
 }
 
 const ROLE_DASHBOARD_MAP: Record<Role, string> = {
-  student: "/dashboard/student",
-  teacher: "/dashboard/teacher",
-  parent: "/dashboard/parent",
-  admin: "/dashboard/admin",
+  student: "/student/dashboard",
+  teacher: "/teacher/dashboard",
+  parent: "/parent/dashboard",
+  admin: "/admin/dashboard",
 };
 
 function validateEmail(email: string) {

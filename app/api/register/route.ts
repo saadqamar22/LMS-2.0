@@ -13,8 +13,10 @@ interface RegisterPayload {
   registration_number?: string;
   class?: string;
   parent_id?: string | null;
+  section?: string;
   employee_id?: string;
   department?: string;
+  designation?: string;
   phone_number?: string;
   address?: string;
 }
@@ -59,8 +61,10 @@ export async function POST(request: Request) {
     registration_number,
     class: studentClass,
     parent_id,
+    section,
     employee_id,
     department,
+    designation,
     phone_number,
     address,
   } = body;
@@ -113,6 +117,12 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    if (!section?.trim()) {
+      return NextResponse.json(
+        { success: false, error: "Section is required for students." },
+        { status: 400 },
+      );
+    }
   }
 
   if (role === "teacher") {
@@ -126,6 +136,12 @@ export async function POST(request: Request) {
     if (!department?.trim()) {
       return NextResponse.json(
         { success: false, error: "Department is required for teachers." },
+        { status: 400 },
+      );
+    }
+    if (!designation?.trim()) {
+      return NextResponse.json(
+        { success: false, error: "Designation is required for teachers." },
         { status: 400 },
       );
     }
@@ -199,6 +215,7 @@ export async function POST(request: Request) {
           id: userId,
           registration_number,
           class: studentClass,
+          section,
           parent_id: parent_id || null,
         },
       ]);
@@ -222,6 +239,7 @@ export async function POST(request: Request) {
           id: userId,
           employee_id,
           department,
+          designation,
         },
       ]);
 
@@ -242,6 +260,7 @@ export async function POST(request: Request) {
       const { error: parentError } = await supabase.from("parents").insert([
         {
           id: userId,
+          full_name,
           phone_number,
           address,
         },
