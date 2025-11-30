@@ -1,6 +1,6 @@
 import { DashboardShell } from "@/components/dashboard-shell";
 import { EmptyState } from "@/components/empty-state";
-import { getStudentMarks } from "@/app/actions/marks";
+import { getStudentMarks, getStudentModuleStatistics } from "@/app/actions/marks";
 import { GraduationCap, TrendingUp } from "lucide-react";
 
 interface StudentMarksPageProps {
@@ -33,10 +33,30 @@ export default async function StudentMarksPage({
 
   const marks = result.marks;
 
-  // Group by course
-  const marksByCourse = marks.reduce(
+  // Fetch statistics for each unique module
+  const moduleStatsMap = new Map<string, ModuleStatistics | null>();
+  const uniqueModuleIds = [...new Set(marks.map((m) => m.module_id))];
+  
+  await Promise.all(
+    uniqueModuleIds.map(async (moduleId) => {
+      const statsResult = await getStudentModuleStatistics(moduleId);
+      moduleStatsMap.set(
+        moduleId,
+        statsResult.success ? statsResult.statistics : null,
+      );
+    }),
+  );
+
+  // Add statistics to each mark
+  const marksWithStats = marks.map((mark) => ({
+    ...mark,
+    moduleStatistics: moduleStatsMap.get(mark.module_id) || null,
+  }));
+
+  // Group by course - use course_code as key since course_id is not in marks table
+  const marksByCourse = marksWithStats.reduce(
     (acc, mark) => {
-      const courseKey = mark.course_id;
+      const courseKey = mark.course_code || "unknown";
       if (!acc[courseKey]) {
         acc[courseKey] = {
           course_name: mark.course_name || "Unknown Course",
@@ -52,15 +72,15 @@ export default async function StudentMarksPage({
       {
         course_name: string;
         course_code: string;
-        marks: typeof marks;
+        marks: Array<typeof marks[0] & { moduleStatistics: ModuleStatistics | null }>;
       }
     >,
   );
 
   // Calculate overall statistics
-  const totalMarks = marks.filter((m) => m.marks_obtained !== null && m.total_marks !== null);
-  const totalObtained = totalMarks.reduce((sum, m) => sum + (m.marks_obtained || 0), 0);
-  const totalPossible = totalMarks.reduce((sum, m) => sum + (m.total_marks || 0), 0);
+  const totalMarks = marks.filter((m) => m.obtained_marks !== null && m.module_total_marks !== null);
+  const totalObtained = totalMarks.reduce((sum, m) => sum + (m.obtained_marks || 0), 0);
+  const totalPossible = totalMarks.reduce((sum, m) => sum + (m.module_total_marks || 0), 0);
   const overallPercentage =
     totalPossible > 0 ? Math.round((totalObtained / totalPossible) * 100) : 0;
 
@@ -117,14 +137,14 @@ export default async function StudentMarksPage({
           <section className="mt-8 space-y-6">
             {Object.entries(marksByCourse).map(([courseId, courseData]) => {
               const courseMarks = courseData.marks.filter(
-                (m) => m.marks_obtained !== null && m.total_marks !== null,
+                (m) => m.obtained_marks !== null && m.module_total_marks !== null,
               );
               const courseObtained = courseMarks.reduce(
-                (sum, m) => sum + (m.marks_obtained || 0),
+                (sum, m) => sum + (m.obtained_marks || 0),
                 0,
               );
               const coursePossible = courseMarks.reduce(
-                (sum, m) => sum + (m.total_marks || 0),
+                (sum, m) => sum + (m.module_total_marks || 0),
                 0,
               );
               const coursePercentage =
@@ -157,54 +177,110 @@ export default async function StudentMarksPage({
                       </span>
                     </div>
                   </div>
+                  {/* Module Statistics */}
+                  {courseData.marks.length > 0 &&
+                    courseData.marks[0].moduleStatistics && (
+                      <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Class Statistics
+                        </p>
+                        <div className="grid grid-cols-5 gap-4 text-center text-xs font-medium text-slate-600">
+                          <div>
+                            <p>Average</p>
+                            <p className="text-sm font-semibold text-[#4F46E5]">
+                              {courseData.marks[0].moduleStatistics.average.toFixed(2)}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Std Dev</p>
+                            <p className="text-sm font-semibold text-[#F59E0B]">
+                              {courseData.marks[0].moduleStatistics.stdDeviation.toFixed(2)}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Min</p>
+                            <p className="text-sm font-semibold text-slate-700">
+                              {courseData.marks[0].moduleStatistics.minMarks}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Max</p>
+                            <p className="text-sm font-semibold text-slate-700">
+                              {courseData.marks[0].moduleStatistics.maxMarks}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Median</p>
+                            <p className="text-sm font-semibold text-slate-700">
+                              {courseData.marks[0].moduleStatistics.medianMarks.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                   <div className="space-y-3">
                     {courseData.marks.map((mark) => {
                       const percentage =
-                        mark.marks_obtained !== null &&
-                        mark.total_marks !== null &&
-                        mark.total_marks > 0
+                        mark.obtained_marks !== null &&
+                        mark.module_total_marks !== null &&
+                        mark.module_total_marks > 0
                           ? Math.round(
-                              ((mark.marks_obtained || 0) / mark.total_marks) * 100,
+                              ((mark.obtained_marks || 0) / mark.module_total_marks) * 100,
                             )
                           : null;
+                      const diffFromAverage =
+                        mark.moduleStatistics && mark.moduleStatistics.average > 0
+                          ? mark.obtained_marks - mark.moduleStatistics.average
+                          : null;
+
                       return (
                         <div
-                          key={mark.id}
-                          className="flex items-center justify-between rounded-xl border border-slate-100 p-4"
+                          key={mark.mark_id}
+                          className="rounded-xl border border-slate-100 bg-white p-4"
                         >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3">
-                              <div className="rounded-lg bg-slate-100 p-2">
-                                <GraduationCap className="h-4 w-4 text-slate-600" />
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-900">
-                                  {mark.module_name}
-                                </p>
-                                {mark.feedback && (
-                                  <p className="mt-1 text-xs text-slate-500">
-                                    {mark.feedback}
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <div className="rounded-lg bg-slate-100 p-2">
+                                  <GraduationCap className="h-4 w-4 text-slate-600" />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-slate-900">
+                                    {mark.module_name}
                                   </p>
-                                )}
+                                  {diffFromAverage !== null && (
+                                    <p
+                                      className={`mt-1 text-xs font-medium ${
+                                        diffFromAverage >= 0
+                                          ? "text-green-600"
+                                          : "text-red-600"
+                                      }`}
+                                    >
+                                      {diffFromAverage >= 0 ? "+" : ""}
+                                      {diffFromAverage.toFixed(2)} from class average
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            {mark.marks_obtained !== null &&
-                            mark.total_marks !== null ? (
-                              <>
-                                <p className="text-lg font-semibold text-slate-900">
-                                  {mark.marks_obtained} / {mark.total_marks}
-                                </p>
-                                {percentage !== null && (
-                                  <p className="text-xs text-slate-500">
-                                    {percentage}%
+                            <div className="text-right">
+                              {mark.obtained_marks !== null &&
+                              mark.module_total_marks !== null ? (
+                                <>
+                                  <p className="text-lg font-semibold text-slate-900">
+                                    {mark.obtained_marks} / {mark.module_total_marks}
                                   </p>
-                                )}
-                              </>
-                            ) : (
-                              <p className="text-sm text-slate-400">Not graded</p>
-                            )}
+                                  {percentage !== null && (
+                                    <p className="text-xs text-slate-500">
+                                      {percentage}%
+                                    </p>
+                                  )}
+                                </>
+                              ) : (
+                                <p className="text-sm text-slate-400">Not graded</p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );

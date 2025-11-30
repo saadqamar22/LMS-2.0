@@ -3,7 +3,8 @@ import Link from "next/link";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { getCourseById } from "@/app/actions/courses";
 import { getEnrolledStudentsForCourse } from "@/app/actions/enrollments";
-import { getModulesForCourse, getMarksForCourse } from "@/app/actions/marks";
+import { getModulesForCourse } from "@/app/actions/modules";
+import { getMarksForModule } from "@/app/actions/marks";
 import { MarksForm } from "./marks-form";
 
 interface MarksPageProps {
@@ -24,8 +25,8 @@ export default async function TeacherMarksPage({
       getEnrolledStudentsForCourse(courseId),
       getModulesForCourse(courseId),
       selectedModuleId
-        ? getMarksForCourse(courseId, selectedModuleId)
-        : Promise.resolve({ success: true, marks: [] }),
+        ? getMarksForModule(courseId, selectedModuleId)
+        : Promise.resolve({ success: true, marks: [], statistics: null }),
     ]);
 
   if (!courseResult.success) {
@@ -48,6 +49,7 @@ export default async function TeacherMarksPage({
   const students = studentsResult.success ? studentsResult.students : [];
   const modules = modulesResult.success ? modulesResult.modules : [];
   const existingMarks = marksResult.success ? marksResult.marks : [];
+  const statistics = marksResult.success ? marksResult.statistics : null;
 
   return (
     <DashboardShell role="teacher">
@@ -84,6 +86,7 @@ export default async function TeacherMarksPage({
           modules={modules}
           selectedModuleId={selectedModuleId}
           existingMarks={existingMarks}
+          statistics={statistics}
         />
       )}
     </DashboardShell>

@@ -49,10 +49,10 @@ export default async function ChildMarksPage({
 
   const marks = marksResult.marks;
 
-  // Group by course
+  // Group by course - use course_code as key since course_id is not in marks table
   const marksByCourse = marks.reduce(
     (acc, mark) => {
-      const courseKey = mark.course_id;
+      const courseKey = mark.course_code || "unknown";
       if (!acc[courseKey]) {
         acc[courseKey] = {
           course_name: mark.course_name || "Unknown Course",
@@ -75,14 +75,14 @@ export default async function ChildMarksPage({
 
   // Calculate overall statistics
   const totalMarks = marks.filter(
-    (m) => m.marks_obtained !== null && m.total_marks !== null,
+    (m) => m.obtained_marks !== null && m.module_total_marks !== null,
   );
   const totalObtained = totalMarks.reduce(
-    (sum, m) => sum + (m.marks_obtained || 0),
+    (sum, m) => sum + (m.obtained_marks || 0),
     0,
   );
   const totalPossible = totalMarks.reduce(
-    (sum, m) => sum + (m.total_marks || 0),
+    (sum, m) => sum + (m.module_total_marks || 0),
     0,
   );
   const overallPercentage =
@@ -145,14 +145,14 @@ export default async function ChildMarksPage({
           <section className="mt-8 space-y-6">
             {Object.entries(marksByCourse).map(([courseId, courseData]) => {
               const courseMarks = courseData.marks.filter(
-                (m) => m.marks_obtained !== null && m.total_marks !== null,
+                (m) => m.obtained_marks !== null && m.module_total_marks !== null,
               );
               const courseObtained = courseMarks.reduce(
-                (sum, m) => sum + (m.marks_obtained || 0),
+                (sum, m) => sum + (m.obtained_marks || 0),
                 0,
               );
               const coursePossible = courseMarks.reduce(
-                (sum, m) => sum + (m.total_marks || 0),
+                (sum, m) => sum + (m.module_total_marks || 0),
                 0,
               );
               const coursePercentage =
@@ -188,16 +188,16 @@ export default async function ChildMarksPage({
                   <div className="space-y-3">
                     {courseData.marks.map((mark) => {
                       const percentage =
-                        mark.marks_obtained !== null &&
-                        mark.total_marks !== null &&
-                        mark.total_marks > 0
+                        mark.obtained_marks !== null &&
+                        mark.module_total_marks !== null &&
+                        mark.module_total_marks > 0
                           ? Math.round(
-                              ((mark.marks_obtained || 0) / mark.total_marks) * 100,
+                              ((mark.obtained_marks || 0) / mark.module_total_marks) * 100,
                             )
                           : null;
                       return (
                         <div
-                          key={mark.id}
+                          key={mark.mark_id}
                           className="flex items-center justify-between rounded-xl border border-slate-100 p-4"
                         >
                           <div className="flex-1">
@@ -209,20 +209,15 @@ export default async function ChildMarksPage({
                                 <p className="font-medium text-slate-900">
                                   {mark.module_name}
                                 </p>
-                                {mark.feedback && (
-                                  <p className="mt-1 text-xs text-slate-500">
-                                    {mark.feedback}
-                                  </p>
-                                )}
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            {mark.marks_obtained !== null &&
-                            mark.total_marks !== null ? (
+                            {mark.obtained_marks !== null &&
+                            mark.module_total_marks !== null ? (
                               <>
                                 <p className="text-lg font-semibold text-slate-900">
-                                  {mark.marks_obtained} / {mark.total_marks}
+                                  {mark.obtained_marks} / {mark.module_total_marks}
                                 </p>
                                 {percentage !== null && (
                                   <p className="text-xs text-slate-500">

@@ -146,33 +146,39 @@ export interface Database {
       };
       marks: {
         Row: {
-          id: string;
+          mark_id: string;
           student_id: string;
           module_id: string;
-          course_id: string;
-          marks_obtained: number | null;
-          total_marks: number | null;
-          feedback: string | null;
+          obtained_marks: number;
+          average: number | null;
+          std_deviation: number | null;
+          min_marks: number | null;
+          max_marks: number | null;
+          median_marks: number | null;
           created_at: string | null;
         };
         Insert: {
-          id?: string;
+          mark_id?: string;
           student_id: string;
           module_id: string;
-          course_id: string;
-          marks_obtained?: number | null;
-          total_marks?: number | null;
-          feedback?: string | null;
+          obtained_marks: number;
+          average?: number | null;
+          std_deviation?: number | null;
+          min_marks?: number | null;
+          max_marks?: number | null;
+          median_marks?: number | null;
           created_at?: string | null;
         };
         Update: {
-          id?: string;
+          mark_id?: string;
           student_id?: string;
           module_id?: string;
-          course_id?: string;
-          marks_obtained?: number | null;
-          total_marks?: number | null;
-          feedback?: string | null;
+          obtained_marks?: number;
+          average?: number | null;
+          std_deviation?: number | null;
+          min_marks?: number | null;
+          max_marks?: number | null;
+          median_marks?: number | null;
           created_at?: string | null;
         };
       };

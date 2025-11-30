@@ -5,27 +5,119 @@ import { getCurrentSession } from "@/lib/auth/get-session";
 import { revalidatePath } from "next/cache";
 
 export interface MarkEntry {
-  id: string;
+  mark_id: string;
   student_id: string;
   module_id: string;
-  course_id: string;
-  marks_obtained: number | null;
-  total_marks: number | null;
-  feedback: string | null;
+  obtained_marks: number;
+  average: number | null;
+  std_deviation: number | null;
+  min_marks: number | null;
+  max_marks: number | null;
+  median_marks: number | null;
   student_name?: string;
   registration_number?: string | null;
   module_name?: string;
+  module_total_marks?: number;
   course_name?: string;
   course_code?: string;
 }
 
 export interface SaveMarkInput {
-  courseId: string;
   moduleId: string;
   studentId: string;
-  marksObtained: number;
+  obtainedMarks: number;
+}
+
+export interface ModuleStatistics {
+  module_id: string;
+  module_name: string;
+  average: number;
+  stdDeviation: number;
+  minMarks: number;
+  maxMarks: number;
+  medianMarks: number;
   totalMarks: number;
-  feedback?: string;
+}
+
+export interface CourseStatistics {
+  courseAverage: number;
+  courseStdDeviation: number;
+  moduleStats: ModuleStatistics[];
+}
+
+/**
+ * Calculate statistics for a module
+ */
+function calculateStatistics(marks: number[]): {
+  average: number;
+  stdDeviation: number;
+  minMarks: number;
+  maxMarks: number;
+  medianMarks: number;
+} {
+  if (marks.length === 0) {
+    return {
+      average: 0,
+      stdDeviation: 0,
+      minMarks: 0,
+      maxMarks: 0,
+      medianMarks: 0,
+    };
+  }
+
+  const sorted = [...marks].sort((a, b) => a - b);
+  const sum = marks.reduce((acc, val) => acc + val, 0);
+  const average = sum / marks.length;
+  const variance =
+    marks.reduce((acc, val) => acc + Math.pow(val - average, 2), 0) /
+    marks.length;
+  const stdDeviation = Math.sqrt(variance);
+  const minMarks = sorted[0];
+  const maxMarks = sorted[sorted.length - 1];
+  const medianMarks =
+    sorted.length % 2 === 0
+      ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+      : sorted[Math.floor(sorted.length / 2)];
+
+  return {
+    average: Math.round(average * 100) / 100,
+    stdDeviation: Math.round(stdDeviation * 100) / 100,
+    minMarks,
+    maxMarks,
+    medianMarks: Math.round(medianMarks * 100) / 100,
+  };
+}
+
+/**
+ * Update statistics for a module
+ */
+async function updateModuleStatistics(moduleId: string): Promise<void> {
+  const supabase = createAdminClient();
+
+  // Fetch all marks for this module
+  const { data: marks, error: marksError } = await supabase
+    .from("marks")
+    .select("obtained_marks")
+    .eq("module_id", moduleId);
+
+  if (marksError || !marks || marks.length === 0) {
+    return;
+  }
+
+  const marksArray = marks.map((m) => m.obtained_marks);
+  const stats = calculateStatistics(marksArray);
+
+  // Update all marks in this module with the same statistics
+  await supabase
+    .from("marks")
+    .update({
+      average: stats.average,
+      std_deviation: stats.stdDeviation,
+      min_marks: stats.minMarks,
+      max_marks: stats.maxMarks,
+      median_marks: stats.medianMarks,
+    })
+    .eq("module_id", moduleId);
 }
 
 /**
@@ -47,63 +139,50 @@ export async function saveMark(
     };
   }
 
-  if (!input.courseId || !input.moduleId || !input.studentId) {
+  if (!input.moduleId || !input.studentId) {
     return {
       success: false,
-      error: "Course, module, and student are required.",
+      error: "Module and student are required.",
     };
   }
 
-  if (input.marksObtained < 0 || input.totalMarks <= 0) {
+  if (input.obtainedMarks < 0) {
     return {
       success: false,
-      error: "Invalid marks. Marks obtained must be >= 0 and total marks must be > 0.",
-    };
-  }
-
-  if (input.marksObtained > input.totalMarks) {
-    return {
-      success: false,
-      error: "Marks obtained cannot exceed total marks.",
+      error: "Marks obtained must be >= 0.",
     };
   }
 
   try {
     const supabase = createAdminClient();
 
-    // Verify course exists and teacher owns it
-    const { data: course, error: courseError } = await supabase
-      .from("courses")
-      .select("course_id, teacher_id")
-      .eq("course_id", input.courseId)
-      .single();
-
-    if (courseError || !course) {
-      return {
-        success: false,
-        error: "Course not found.",
-      };
-    }
-
-    if (course.teacher_id !== session.userId) {
-      return {
-        success: false,
-        error: "You do not have permission to enter marks for this course.",
-      };
-    }
-
-    // Verify module belongs to course
+    // Verify module exists and get course info
     const { data: module, error: moduleError } = await supabase
       .from("modules")
-      .select("module_id, course_id")
+      .select("module_id, course_id, total_marks, courses!inner(teacher_id)")
       .eq("module_id", input.moduleId)
-      .eq("course_id", input.courseId)
       .single();
 
     if (moduleError || !module) {
       return {
         success: false,
-        error: "Module not found or does not belong to this course.",
+        error: "Module not found.",
+      };
+    }
+
+    const course = module.courses as { teacher_id: string };
+    if (course.teacher_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to enter marks for this module.",
+      };
+    }
+
+    // Verify obtained marks don't exceed total marks
+    if (input.obtainedMarks > module.total_marks) {
+      return {
+        success: false,
+        error: `Marks obtained (${input.obtainedMarks}) cannot exceed total marks (${module.total_marks}).`,
       };
     }
 
@@ -114,10 +193,7 @@ export async function saveMark(
         {
           student_id: input.studentId,
           module_id: input.moduleId,
-          course_id: input.courseId,
-          marks_obtained: input.marksObtained,
-          total_marks: input.totalMarks,
-          feedback: input.feedback?.trim() || null,
+          obtained_marks: input.obtainedMarks,
         },
         {
           onConflict: "student_id,module_id",
@@ -132,7 +208,10 @@ export async function saveMark(
       };
     }
 
-    revalidatePath(`/teacher/courses/${input.courseId}/marks`);
+    // Update statistics for this module
+    await updateModuleStatistics(input.moduleId);
+
+    revalidatePath(`/teacher/courses/${module.course_id}/marks`);
     revalidatePath(`/student/marks`);
     return { success: true };
   } catch (error) {
@@ -145,13 +224,13 @@ export async function saveMark(
 }
 
 /**
- * Get marks for a course and module (teacher only)
+ * Get marks for a module (teacher only)
  */
 export async function getMarksForModule(
   courseId: string,
   moduleId: string,
 ): Promise<
-  | { success: true; marks: MarkEntry[] }
+  | { success: true; marks: MarkEntry[]; statistics: ModuleStatistics | null }
   | { success: false; error: string }
 > {
   const session = await getCurrentSession();
@@ -195,13 +274,10 @@ export async function getMarksForModule(
     const { data: marks, error: marksError } = await supabase
       .from("marks")
       .select(`
-        id,
+        mark_id,
         student_id,
         module_id,
-        course_id,
-        marks_obtained,
-        total_marks,
-        feedback,
+        obtained_marks,
         students!marks_student_id_fkey (
           id,
           registration_number,
@@ -211,10 +287,10 @@ export async function getMarksForModule(
         ),
         modules!marks_module_id_fkey (
           module_id,
-          module_name
+          module_name,
+          total_marks
         )
       `)
-      .eq("course_id", courseId)
       .eq("module_id", moduleId);
 
     if (marksError) {
@@ -228,13 +304,10 @@ export async function getMarksForModule(
     // Transform the data
     const marksList: MarkEntry[] = (marks || []).map(
       (mark: {
-        id: string;
+        mark_id: string;
         student_id: string;
         module_id: string;
-        course_id: string;
-        marks_obtained: number | null;
-        total_marks: number | null;
-        feedback: string | null;
+        obtained_marks: number;
         students?: {
           id: string;
           registration_number: string | null;
@@ -245,20 +318,47 @@ export async function getMarksForModule(
         modules?: {
           module_id: string;
           module_name: string;
+          total_marks: number;
         } | null;
       }) => ({
-        id: mark.id,
+        mark_id: mark.mark_id,
         student_id: mark.student_id,
         module_id: mark.module_id,
-        course_id: mark.course_id,
-        marks_obtained: mark.marks_obtained,
-        total_marks: mark.total_marks,
-        feedback: mark.feedback,
+        obtained_marks: mark.obtained_marks,
+        average: null,
+        std_deviation: null,
+        min_marks: null,
+        max_marks: null,
+        median_marks: null,
         student_name: mark.students?.users?.full_name || "Unknown",
         registration_number: mark.students?.registration_number || null,
         module_name: mark.modules?.module_name || "Unknown Module",
+        module_total_marks: mark.modules?.total_marks,
       }),
     );
+
+    // Calculate statistics from marks data
+    const marksArray = marksList.map((m) => m.obtained_marks);
+    const stats = calculateStatistics(marksArray);
+    
+    // Update statistics in database
+    if (marksList.length > 0) {
+      await updateModuleStatistics(moduleId);
+    }
+
+    const statistics: ModuleStatistics | null =
+      marksList.length > 0
+        ? {
+            module_id: moduleId,
+            module_name: marksList[0].module_name || "Unknown",
+            average: stats.average,
+            stdDeviation: stats.stdDeviation,
+            minMarks: stats.minMarks,
+            maxMarks: stats.maxMarks,
+            medianMarks: stats.medianMarks,
+            totalMarks: marksList[0].module_total_marks || 0,
+          }
+        : null;
 
     return {
       success: true,
@@ -267,9 +367,213 @@ export async function getMarksForModule(
         const nameB = b.student_name || "";
         return nameA.localeCompare(nameB);
       }),
+      statistics,
     };
   } catch (error) {
     console.error("Unexpected error fetching marks:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+/**
+ * Get course-wide statistics
+ */
+export async function getCourseStatistics(
+  courseId: string,
+): Promise<
+  | { success: true; statistics: CourseStatistics }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "teacher") {
+    return {
+      success: false,
+      error: "Only teachers can view course statistics.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify course exists and teacher owns it
+    const { data: course, error: courseError } = await supabase
+      .from("courses")
+      .select("course_id, teacher_id")
+      .eq("course_id", courseId)
+      .single();
+
+    if (courseError || !course) {
+      return {
+        success: false,
+        error: "Course not found.",
+      };
+    }
+
+    if (course.teacher_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to view statistics for this course.",
+      };
+    }
+
+    // Get all modules for this course
+    const { data: courseModules, error: modulesError } = await supabase
+      .from("modules")
+      .select("module_id, module_name, total_marks")
+      .eq("course_id", courseId);
+
+    if (modulesError) {
+      return {
+        success: false,
+        error: "Failed to fetch modules.",
+      };
+    }
+
+    const moduleStats: ModuleStatistics[] = [];
+    const allMarks: number[] = [];
+
+    // Get statistics for each module
+    for (const courseModule of courseModules || []) {
+      const { data: marks } = await supabase
+        .from("marks")
+        .select("obtained_marks, average, std_deviation, min_marks, max_marks, median_marks")
+        .eq("module_id", courseModule.module_id)
+        .limit(1);
+
+      if (marks && marks.length > 0 && marks[0].average !== null) {
+        const mark = marks[0];
+        moduleStats.push({
+          module_id: courseModule.module_id,
+          module_name: courseModule.module_name,
+          average: mark.average,
+          stdDeviation: mark.std_deviation || 0,
+          minMarks: mark.min_marks || 0,
+          maxMarks: mark.max_marks || 0,
+          medianMarks: mark.median_marks || 0,
+          totalMarks: courseModule.total_marks,
+        });
+
+        // Collect all marks for course-wide average
+        const { data: allModuleMarks } = await supabase
+          .from("marks")
+          .select("obtained_marks")
+          .eq("module_id", courseModule.module_id);
+
+        if (allModuleMarks) {
+          allMarks.push(...allModuleMarks.map((m) => m.obtained_marks));
+        }
+      }
+    }
+
+    // Calculate course-wide statistics
+    const courseStats = calculateStatistics(allMarks);
+
+    return {
+      success: true,
+      statistics: {
+        courseAverage: courseStats.average,
+        courseStdDeviation: courseStats.stdDeviation,
+        moduleStats,
+      },
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching course statistics:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+/**
+ * Get module statistics for a student (student only)
+ */
+export async function getStudentModuleStatistics(
+  moduleId: string,
+): Promise<
+  | { success: true; statistics: ModuleStatistics | null }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "student") {
+    return {
+      success: false,
+      error: "Only students can view module statistics.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Fetch all marks for this module
+    const { data: marks, error: marksError } = await supabase
+      .from("marks")
+      .select(`
+        obtained_marks,
+        modules!marks_module_id_fkey (
+          module_id,
+          module_name,
+          total_marks
+        )
+      `)
+      .eq("module_id", moduleId);
+
+    if (marksError) {
+      console.error(
+        "Error fetching module statistics:",
+        JSON.stringify(marksError, null, 2),
+      );
+      return {
+        success: false,
+        error: marksError.message || "Failed to fetch statistics.",
+      };
+    }
+
+    if (!marks || marks.length === 0) {
+      return {
+        success: true,
+        statistics: null,
+      };
+    }
+
+    const marksArray = marks.map((m) => m.obtained_marks);
+    const stats = calculateStatistics(marksArray);
+    const moduleData = marks[0].modules as {
+      module_id: string;
+      module_name: string;
+      total_marks: number;
+    } | null;
+
+    return {
+      success: true,
+      statistics: moduleData
+        ? {
+            module_id: moduleId,
+            module_name: moduleData.module_name,
+            average: stats.average,
+            stdDeviation: stats.stdDeviation,
+            minMarks: stats.minMarks,
+            maxMarks: stats.maxMarks,
+            medianMarks: stats.medianMarks,
+            totalMarks: moduleData.total_marks,
+          }
+        : null,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching module statistics:", error);
     return {
       success: false,
       error: "An unexpected error occurred. Please try again.",
@@ -306,27 +610,25 @@ export async function getStudentMarks(
     let query = supabase
       .from("marks")
       .select(`
-        id,
+        mark_id,
         student_id,
         module_id,
-        course_id,
-        marks_obtained,
-        total_marks,
-        feedback,
+        obtained_marks,
         modules!marks_module_id_fkey (
           module_id,
-          module_name
-        ),
-        courses!marks_course_id_fkey (
-          course_id,
-          course_name,
-          course_code
+          module_name,
+          total_marks,
+          courses!inner (
+            course_id,
+            course_name,
+            course_code
+          )
         )
       `)
       .eq("student_id", session.userId);
 
     if (courseId) {
-      query = query.eq("course_id", courseId);
+      query = query.eq("modules.courses.course_id", courseId);
     }
 
     const { data: marks, error: marksError } = await query;
@@ -345,33 +647,29 @@ export async function getStudentMarks(
     // Transform the data
     const marksList: MarkEntry[] = (marks || []).map(
       (mark: {
-        id: string;
+        mark_id: string;
         student_id: string;
         module_id: string;
-        course_id: string;
-        marks_obtained: number | null;
-        total_marks: number | null;
-        feedback: string | null;
+        obtained_marks: number;
         modules?: {
           module_id: string;
           module_name: string;
-        } | null;
-        courses?: {
-          course_id: string;
-          course_name: string;
-          course_code: string;
+          total_marks: number;
+          courses?: {
+            course_id: string;
+            course_name: string;
+            course_code: string;
+          } | null;
         } | null;
       }) => ({
-        id: mark.id,
+        mark_id: mark.mark_id,
         student_id: mark.student_id,
         module_id: mark.module_id,
-        course_id: mark.course_id,
-        marks_obtained: mark.marks_obtained,
-        total_marks: mark.total_marks,
-        feedback: mark.feedback,
+        obtained_marks: mark.obtained_marks,
         module_name: mark.modules?.module_name || "Unknown Module",
-        course_name: mark.courses?.course_name,
-        course_code: mark.courses?.course_code,
+        module_total_marks: mark.modules?.total_marks,
+        course_name: mark.modules?.courses?.course_name,
+        course_code: mark.modules?.courses?.course_code,
       }),
     );
 
@@ -438,25 +736,22 @@ export async function getChildMarks(
     const { data: marks, error: marksError } = await supabase
       .from("marks")
       .select(`
-        id,
+        mark_id,
         student_id,
         module_id,
-        course_id,
-        marks_obtained,
-        total_marks,
-        feedback,
+        obtained_marks,
         modules!marks_module_id_fkey (
           module_id,
-          module_name
-        ),
-        courses!marks_course_id_fkey (
-          course_id,
-          course_name,
-          course_code
+          module_name,
+          total_marks,
+          courses!inner (
+            course_id,
+            course_name,
+            course_code
+          )
         )
       `)
-      .eq("student_id", childId)
-      .order("course_id", { ascending: true });
+      .eq("student_id", childId);
 
     if (marksError) {
       console.error(
@@ -472,33 +767,29 @@ export async function getChildMarks(
     // Transform the data
     const marksList: MarkEntry[] = (marks || []).map(
       (mark: {
-        id: string;
+        mark_id: string;
         student_id: string;
         module_id: string;
-        course_id: string;
-        marks_obtained: number | null;
-        total_marks: number | null;
-        feedback: string | null;
+        obtained_marks: number;
         modules?: {
           module_id: string;
           module_name: string;
-        } | null;
-        courses?: {
-          course_id: string;
-          course_name: string;
-          course_code: string;
+          total_marks: number;
+          courses?: {
+            course_id: string;
+            course_name: string;
+            course_code: string;
+          } | null;
         } | null;
       }) => ({
-        id: mark.id,
+        mark_id: mark.mark_id,
         student_id: mark.student_id,
         module_id: mark.module_id,
-        course_id: mark.course_id,
-        marks_obtained: mark.marks_obtained,
-        total_marks: mark.total_marks,
-        feedback: mark.feedback,
+        obtained_marks: mark.obtained_marks,
         module_name: mark.modules?.module_name || "Unknown Module",
-        course_name: mark.courses?.course_name,
-        course_code: mark.courses?.course_code,
+        module_total_marks: mark.modules?.total_marks,
+        course_name: mark.modules?.courses?.course_name,
+        course_code: mark.modules?.courses?.course_code,
       }),
     );
 
@@ -516,95 +807,7 @@ export async function getChildMarks(
 }
 
 /**
- * Get modules for a course
- */
-export async function getModulesForCourse(
-  courseId: string,
-): Promise<
-  | {
-      success: true;
-      modules: Array<{
-        module_id: string;
-        module_name: string;
-        total_marks: number;
-      }>;
-    }
-  | { success: false; error: string }
-> {
-  const session = await getCurrentSession();
-
-  if (!session) {
-    return { success: false, error: "You must be logged in." };
-  }
-
-  try {
-    const supabase = createAdminClient();
-
-    // Verify course exists and teacher owns it (if teacher)
-    if (session.role === "teacher") {
-      const { data: course, error: courseError } = await supabase
-        .from("courses")
-        .select("course_id, teacher_id")
-        .eq("course_id", courseId)
-        .single();
-
-      if (courseError || !course) {
-        return {
-          success: false,
-          error: "Course not found.",
-        };
-      }
-
-      if (course.teacher_id !== session.userId) {
-        return {
-          success: false,
-          error: "You do not have permission to view modules for this course.",
-        };
-      }
-    }
-
-    const { data: modules, error: modulesError } = await supabase
-      .from("modules")
-      .select("module_id, module_name, total_marks")
-      .eq("course_id", courseId)
-      .order("created_at", { ascending: true });
-
-    if (modulesError) {
-      console.error(
-        "Error fetching modules:",
-        JSON.stringify(modulesError, null, 2),
-      );
-      return {
-        success: false,
-        error: modulesError.message || "Failed to fetch modules.",
-      };
-    }
-
-    return {
-      success: true,
-      modules: (modules || []).map(
-        (m: {
-          module_id: string;
-          module_name: string;
-          total_marks: number;
-        }) => ({
-          module_id: m.module_id,
-          module_name: m.module_name,
-          total_marks: m.total_marks,
-        }),
-      ),
-    };
-  } catch (error) {
-    console.error("Unexpected error fetching modules:", error);
-    return {
-      success: false,
-      error: "An unexpected error occurred. Please try again.",
-    };
-  }
-}
-
-/**
- * Get marks for a course (all modules, teacher only)
+ * Get marks for a course (all modules, teacher only) - for compatibility
  */
 export async function getMarksForCourse(
   courseId: string,
@@ -613,127 +816,20 @@ export async function getMarksForCourse(
   | { success: true; marks: MarkEntry[] }
   | { success: false; error: string }
 > {
-  const session = await getCurrentSession();
-
-  if (!session) {
-    return { success: false, error: "You must be logged in." };
-  }
-
-  if (session.role !== "teacher") {
-    return {
-      success: false,
-      error: "Only teachers can view marks for a course.",
-    };
-  }
-
-  try {
-    const supabase = createAdminClient();
-
-    // Verify course exists and teacher owns it
-    const { data: course, error: courseError } = await supabase
-      .from("courses")
-      .select("course_id, teacher_id")
-      .eq("course_id", courseId)
-      .single();
-
-    if (courseError || !course) {
-      return {
-        success: false,
-        error: "Course not found.",
-      };
+  if (moduleId) {
+    const result = await getMarksForModule(courseId, moduleId);
+    if (!result.success) {
+      return result;
     }
-
-    if (course.teacher_id !== session.userId) {
-      return {
-        success: false,
-        error: "You do not have permission to view marks for this course.",
-      };
-    }
-
-    // Build query
-    let query = supabase
-      .from("marks")
-      .select(`
-        id,
-        student_id,
-        module_id,
-        course_id,
-        marks_obtained,
-        total_marks,
-        feedback,
-        students!marks_student_id_fkey (
-          id,
-          registration_number,
-          users!students_id_fkey (
-            full_name
-          )
-        ),
-        modules!marks_module_id_fkey (
-          module_id,
-          module_name
-        )
-      `)
-      .eq("course_id", courseId);
-
-    if (moduleId) {
-      query = query.eq("module_id", moduleId);
-    }
-
-    const { data: marks, error: marksError } = await query;
-
-    if (marksError) {
-      console.error("Error fetching marks:", JSON.stringify(marksError, null, 2));
-      return {
-        success: false,
-        error: marksError.message || "Failed to fetch marks.",
-      };
-    }
-
-    // Transform the data
-    const marksList: MarkEntry[] = (marks || []).map(
-      (mark: {
-        id: string;
-        student_id: string;
-        module_id: string;
-        course_id: string;
-        marks_obtained: number | null;
-        total_marks: number | null;
-        feedback: string | null;
-        students?: {
-          id: string;
-          registration_number: string | null;
-          users?: {
-            full_name: string | null;
-          } | null;
-        } | null;
-        modules?: {
-          module_id: string;
-          module_name: string;
-        } | null;
-      }) => ({
-        id: mark.id,
-        student_id: mark.student_id,
-        module_id: mark.module_id,
-        course_id: mark.course_id,
-        marks_obtained: mark.marks_obtained,
-        total_marks: mark.total_marks,
-        feedback: mark.feedback,
-        student_name: mark.students?.users?.full_name || "Unknown",
-        registration_number: mark.students?.registration_number || null,
-        module_name: mark.modules?.module_name || "Unknown Module",
-      }),
-    );
-
     return {
       success: true,
-      marks: marksList,
-    };
-  } catch (error) {
-    console.error("Unexpected error fetching marks:", error);
-    return {
-      success: false,
-      error: "An unexpected error occurred. Please try again.",
+      marks: result.marks,
     };
   }
-}
 
+  // If no moduleId, return empty array
+  return {
+    success: true,
+    marks: [],
+  };
+}
