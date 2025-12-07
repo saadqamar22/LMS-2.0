@@ -1,8 +1,12 @@
 import { DashboardShell } from "@/components/dashboard-shell";
 import { EmptyState } from "@/components/empty-state";
 import { getStudentAttendance } from "@/app/actions/attendance";
+import { getStudentEnrollments } from "@/app/actions/enrollments";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import type { AttendanceStatus } from "@/app/actions/attendance";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { CourseFilter } from "./course-filter";
 
 interface StudentAttendancePageProps {
   searchParams: Promise<{ course?: string }>;
@@ -35,10 +39,19 @@ const STATUS_CONFIG: Record<
 export default async function StudentAttendancePage({
   searchParams,
 }: StudentAttendancePageProps) {
-  const { course } = await searchParams;
-  const result = await getStudentAttendance(course);
+  const currentUser = await getCurrentUser();
 
-  if (!result.success) {
+  if (!currentUser) {
+    redirect("/auth/login");
+  }
+
+  const { course: selectedCourseId } = await searchParams;
+  const [attendanceResult, enrollmentsResult] = await Promise.all([
+    getStudentAttendance(selectedCourseId),
+    getStudentEnrollments(),
+  ]);
+
+  if (!attendanceResult.success) {
     return (
       <DashboardShell role="student">
         <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -52,13 +65,14 @@ export default async function StudentAttendancePage({
           </div>
         </section>
         <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
-          {result.error}
+          {attendanceResult.error}
         </div>
       </DashboardShell>
     );
   }
 
-  const attendance = result.attendance;
+  const attendance = attendanceResult.attendance;
+  const enrollments = enrollmentsResult.success ? enrollmentsResult.courses : [];
 
   // Group by course
   const attendanceByCourse = attendance.reduce(
@@ -96,21 +110,22 @@ export default async function StudentAttendancePage({
 
   return (
     <DashboardShell role="student">
-      <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Attendance
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            My Attendance
-          </h1>
-          <p className="text-sm text-slate-500">
-            {course
-              ? "Viewing attendance for selected course"
-              : "View all your attendance records"}
-          </p>
-        </div>
+      <section className="mb-6">
+        <p className="text-xs uppercase tracking-wide text-slate-400">
+          Attendance
+        </p>
+        <h1 className="text-3xl font-semibold text-slate-900">
+          My Attendance
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          View your attendance records for all enrolled courses
+        </p>
       </section>
+
+      {/* Course Filter */}
+      {enrollments.length > 0 && (
+        <CourseFilter courses={enrollments} selectedCourseId={selectedCourseId} />
+      )}
 
       {totalRecords === 0 ? (
         <EmptyState

@@ -182,6 +182,73 @@ export interface Database {
           created_at?: string | null;
         };
       };
+      assignments: {
+        Row: {
+          assignment_id: string;
+          course_id: string;
+          teacher_id: string;
+          title: string;
+          description: string | null;
+          deadline: string;
+          file_url: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          assignment_id?: string;
+          course_id: string;
+          teacher_id: string;
+          title: string;
+          description?: string | null;
+          deadline: string;
+          file_url?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          assignment_id?: string;
+          course_id?: string;
+          teacher_id?: string;
+          title?: string;
+          description?: string | null;
+          deadline?: string;
+          file_url?: string | null;
+          created_at?: string | null;
+        };
+      };
+      submissions: {
+        Row: {
+          submission_id: string;
+          assignment_id: string;
+          student_id: string;
+          file_url: string | null;
+          text_answer: string | null;
+          marks: number | null;
+          feedback: string | null;
+          submitted_at: string | null;
+          graded_at: string | null;
+        };
+        Insert: {
+          submission_id?: string;
+          assignment_id: string;
+          student_id: string;
+          file_url?: string | null;
+          text_answer?: string | null;
+          marks?: number | null;
+          feedback?: string | null;
+          submitted_at?: string;
+          graded_at?: string | null;
+        };
+        Update: {
+          submission_id?: string;
+          assignment_id?: string;
+          student_id?: string;
+          file_url?: string | null;
+          text_answer?: string | null;
+          marks?: number | null;
+          feedback?: string | null;
+          submitted_at?: string | null;
+          graded_at?: string | null;
+        };
+      };
     };
   };
 }

@@ -58,7 +58,16 @@ export default async function TeacherCourseDetailPage({
         </div>
       </section>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-3">
+      <section className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
+        <Link
+          href={`/teacher/courses/${courseId}/assignments`}
+          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+        >
+          <h3 className="text-lg font-semibold text-slate-900">Assignments</h3>
+          <p className="mt-2 text-sm text-slate-500">
+            Create and manage assignments
+          </p>
+        </Link>
         <Link
           href={`/teacher/courses/${courseId}/attendance`}
           className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"

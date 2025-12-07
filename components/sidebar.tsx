@@ -32,6 +32,7 @@ const ROLE_NAV: Record<
   teacher: [
     { label: "Dashboard", href: "/teacher/dashboard", icon: LayoutDashboard },
     { label: "Courses", href: "/teacher/courses", icon: BookOpen },
+    { label: "Assignments", href: "/teacher/assignments", icon: ClipboardList },
     { label: "Students", href: "/teacher/students", icon: Users },
     { label: "Attendance", href: "/teacher/attendance", icon: ChartLine },
     { label: "Marks", href: "/teacher/marks", icon: FileText },

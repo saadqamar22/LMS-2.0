@@ -13,6 +13,8 @@ interface AttendanceFormProps {
   selectedDate: string;
   existingAttendance: AttendanceEntry[];
   history: Array<{ date: string; count: number }>;
+  onDateChange?: (date: string) => void;
+  onAttendanceSaved?: () => void;
 }
 
 const STATUS_OPTIONS: Array<{ value: AttendanceStatus; label: string; icon: React.ReactNode; color: string }> = [
@@ -27,6 +29,8 @@ export function AttendanceForm({
   selectedDate: initialDate,
   existingAttendance,
   history,
+  onDateChange,
+  onAttendanceSaved,
 }: AttendanceFormProps) {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(initialDate);
@@ -53,7 +57,11 @@ export function AttendanceForm({
   // Reload when date changes
   const handleDateChange = (newDate: string) => {
     setSelectedDate(newDate);
-    router.push(`/teacher/courses/${courseId}/attendance?date=${newDate}`);
+    if (onDateChange) {
+      onDateChange(newDate);
+    } else {
+      router.push(`/teacher/courses/${courseId}/attendance?date=${newDate}`);
+    }
   };
 
   const handleStatusChange = (studentId: string, status: AttendanceStatus) => {
@@ -90,7 +98,11 @@ export function AttendanceForm({
 
     setSuccess(true);
     setLoading(false);
-    router.refresh();
+    if (onAttendanceSaved) {
+      onAttendanceSaved();
+    } else {
+      router.refresh();
+    }
   };
 
   return (
