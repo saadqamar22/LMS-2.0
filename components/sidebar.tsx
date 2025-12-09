@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import type { Role } from "@/lib/auth/session";
+import { getRoleColorScheme } from "@/lib/utils/role-colors";
 
 const ROLE_NAV: Record<
   Role | "ai",
@@ -64,11 +65,17 @@ interface SidebarProps {
 
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
+  const colors = getRoleColorScheme(role);
 
   return (
     <aside className="sticky top-0 hidden h-screen w-72 flex-col border-r border-slate-200 bg-white/90 px-6 py-8 shadow-sm lg:flex">
       <Link href="/" className="mb-10 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#6366F1] text-white shadow-md">
+        <div 
+          className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md"
+          style={{
+            background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.primaryHover})`,
+          }}
+        >
           <Home className="h-6 w-6" />
         </div>
         <div>
@@ -96,15 +103,20 @@ export function Sidebar({ role }: SidebarProps) {
                 className={clsx(
                   "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
                   isActive
-                    ? "bg-[#EEF2FF] text-[#4F46E5]"
+                    ? `text-[${colors.primary}]`
                     : "text-slate-500 hover:bg-slate-50",
                 )}
+                style={isActive ? {
+                  backgroundColor: colors.primaryLight,
+                  color: colors.primary,
+                } : {}}
               >
                 <Icon
                   className={clsx(
                     "h-4 w-4",
-                    isActive ? "text-[#4F46E5]" : "text-slate-400",
+                    isActive ? "" : "text-slate-400",
                   )}
+                  style={isActive ? { color: colors.primary } : {}}
                 />
                 {item.label}
               </Link>
@@ -124,15 +136,20 @@ export function Sidebar({ role }: SidebarProps) {
                 className={clsx(
                   "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
                   isActive
-                    ? "bg-[#EEF2FF] text-[#4F46E5]"
+                    ? `text-[${colors.primary}]`
                     : "text-slate-500 hover:bg-slate-50",
                 )}
+                style={isActive ? {
+                  backgroundColor: colors.primaryLight,
+                  color: colors.primary,
+                } : {}}
               >
                 <Icon
                   className={clsx(
                     "h-4 w-4",
-                    isActive ? "text-[#4F46E5]" : "text-slate-400",
+                    isActive ? "" : "text-slate-400",
                   )}
+                  style={isActive ? { color: colors.primary } : {}}
                 />
                 {item.label}
               </Link>

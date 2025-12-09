@@ -15,9 +15,7 @@ export default function RegisterForm() {
   const [role, setRole] = useState<Role>("student");
   
   // Student fields
-  const [registrationNumber, setRegistrationNumber] = useState("");
   const [studentClass, setStudentClass] = useState("");
-  const [parentId, setParentId] = useState("");
   const [studentSection, setStudentSection] = useState("");
   
   // Teacher fields
@@ -26,6 +24,7 @@ export default function RegisterForm() {
   const [designation, setDesignation] = useState("");
   
   // Parent fields
+  const [parentId, setParentId] = useState(""); // Parent ID from student record
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   
@@ -69,11 +68,7 @@ export default function RegisterForm() {
 
     // Role-specific validation
     if (role === "student") {
-      if (!registrationNumber.trim()) {
-        setError("Registration number is required for students");
-        setLoading(false);
-        return;
-      }
+      // Registration number is auto-assigned by database trigger
       if (!studentClass.trim()) {
         setError("Class is required for students");
         setLoading(false);
@@ -105,6 +100,11 @@ export default function RegisterForm() {
     }
 
     if (role === "parent") {
+      if (!parentId.trim()) {
+        setError("Parent ID is required. You must have a valid parent ID from your child's student record.");
+        setLoading(false);
+        return;
+      }
       if (!phoneNumber.trim()) {
         setError("Phone number is required for parents");
         setLoading(false);
@@ -125,10 +125,9 @@ export default function RegisterForm() {
       role: role,
       // Role-specific data
       ...(role === "student" && {
-        registration_number: registrationNumber,
         class: studentClass,
         section: studentSection,
-        parent_id: parentId || null,
+        // registration_number and parent_id are auto-assigned by database triggers
       }),
       ...(role === "teacher" && {
         employee_id: employeeId,
@@ -136,6 +135,7 @@ export default function RegisterForm() {
         designation: designation,
       }),
       ...(role === "parent" && {
+        parent_id: parentId, // Required: must exist in students table
         phone_number: phoneNumber,
         address: address,
       }),
@@ -275,20 +275,10 @@ export default function RegisterForm() {
         {/* Student-specific fields */}
         {role === "student" && (
           <>
-            <div>
-              <label htmlFor="registration-number" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Registration Number *
-              </label>
-              <input
-                id="registration-number"
-                name="registration-number"
-                type="text"
-                required
-                value={registrationNumber}
-                onChange={(e) => setRegistrationNumber(e.target.value)}
-                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
-                placeholder="Enter registration number"
-              />
+            <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-900/20">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                Note: Registration number will be automatically assigned when your account is created.
+              </p>
             </div>
             <div>
               <label htmlFor="class" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -318,20 +308,6 @@ export default function RegisterForm() {
                 onChange={(e) => setStudentSection(e.target.value)}
                 className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
                 placeholder="e.g., Section B"
-              />
-            </div>
-            <div>
-              <label htmlFor="parent-id" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Parent ID (Optional)
-              </label>
-              <input
-                id="parent-id"
-                name="parent-id"
-                type="text"
-                value={parentId}
-                onChange={(e) => setParentId(e.target.value)}
-                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
-                placeholder="Parent user ID (optional)"
               />
             </div>
           </>
@@ -391,6 +367,24 @@ export default function RegisterForm() {
         {/* Parent-specific fields */}
         {role === "parent" && (
           <>
+            <div>
+              <label htmlFor="parent-id" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Parent ID *
+              </label>
+              <input
+                id="parent-id"
+                name="parent-id"
+                type="text"
+                required
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
+                placeholder="Enter your parent ID from your child's student record"
+              />
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                This ID is automatically generated when your child's student account is created.
+              </p>
+            </div>
             <div>
               <label htmlFor="phone-number" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Phone Number *

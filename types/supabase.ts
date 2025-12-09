@@ -12,24 +12,73 @@ export interface Database {
       users: {
         Row: {
           id: string;
-          full_name: string | null;
+          password: string;
           email: string;
-          role: "student" | "teacher" | "parent" | "admin";
           created_at: string | null;
+          role: "student" | "teacher" | "parent" | "admin";
+          full_name: string | null;
         };
         Insert: {
           id?: string;
-          full_name?: string | null;
+          password: string;
           email: string;
+          created_at?: string;
           role?: "student" | "teacher" | "parent" | "admin";
+          full_name?: string | null;
+        };
+        Update: {
+          id?: string;
+          password?: string;
+          email?: string;
+          created_at?: string;
+          role?: "student" | "teacher" | "parent" | "admin";
+          full_name?: string | null;
+        };
+      };
+      teachers: {
+        Row: {
+          id: string;
+          employee_id: string;
+          department: string;
+          designation: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id: string;
+          employee_id: string;
+          department: string;
+          designation: string;
           created_at?: string;
         };
         Update: {
           id?: string;
+          employee_id?: string;
+          department?: string;
+          designation?: string;
+          created_at?: string | null;
+        };
+      };
+      parents: {
+        Row: {
+          id: string;
+          phone_number: string;
+          address: string;
+          full_name: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id: string;
+          phone_number: string;
+          address: string;
           full_name?: string | null;
-          email?: string;
-          role?: "student" | "teacher" | "parent" | "admin";
           created_at?: string;
+        };
+        Update: {
+          id?: string;
+          phone_number?: string;
+          address?: string;
+          full_name?: string | null;
+          created_at?: string | null;
         };
       };
       courses: {
@@ -100,24 +149,24 @@ export interface Database {
           id: string;
           registration_number: string | null;
           class: string | null;
-          section: string | null;
           parent_id: string | null;
+          section: string | null;
           created_at: string | null;
         };
         Insert: {
           id: string;
           registration_number?: string | null;
           class?: string | null;
-          section?: string | null;
           parent_id?: string | null;
+          section?: string | null;
           created_at?: string | null;
         };
         Update: {
           id?: string;
           registration_number?: string | null;
           class?: string | null;
-          section?: string | null;
           parent_id?: string | null;
+          section?: string | null;
           created_at?: string | null;
         };
       };

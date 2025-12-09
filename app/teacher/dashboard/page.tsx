@@ -95,7 +95,6 @@ export default async function TeacherDashboardPage() {
                 code={course.course_code}
                 teacher={""}
                 students={course.student_count}
-                progress={0}
                 tags={[]}
                 href={`/teacher/courses/${course.course_id}`}
               />

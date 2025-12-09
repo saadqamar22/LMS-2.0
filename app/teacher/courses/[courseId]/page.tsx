@@ -5,7 +5,9 @@ import { EmptyState } from "@/components/empty-state";
 import { UploadMaterialModal } from "@/components/modals/upload-material-modal";
 import { getCourseById } from "@/app/actions/courses";
 import { getEnrolledStudentsForCourse } from "@/app/actions/enrollments";
-import { Users } from "lucide-react";
+import { getAllMarksForCourse } from "@/app/actions/marks";
+import { StudentsWithGPA } from "./students-with-gpa";
+import type { MarkEntry } from "@/app/actions/marks";
 
 interface CourseManagementPageProps {
   params: Promise<{ courseId: string }>;
@@ -15,9 +17,10 @@ export default async function TeacherCourseDetailPage({
   params,
 }: CourseManagementPageProps) {
   const { courseId } = await params;
-  const [courseResult, studentsResult] = await Promise.all([
+  const [courseResult, studentsResult, marksResult] = await Promise.all([
     getCourseById(courseId),
     getEnrolledStudentsForCourse(courseId),
+    getAllMarksForCourse(courseId),
   ]);
 
   if (!courseResult.success) {
@@ -38,6 +41,16 @@ export default async function TeacherCourseDetailPage({
 
   const course = courseResult.course;
   const students = studentsResult.success ? studentsResult.students : [];
+  const marks = marksResult.success ? marksResult.marks : [];
+
+  // Group marks by student_id
+  const studentMarks: Record<string, MarkEntry[]> = {};
+  marks.forEach((mark) => {
+    if (!studentMarks[mark.student_id]) {
+      studentMarks[mark.student_id] = [];
+    }
+    studentMarks[mark.student_id].push(mark);
+  });
 
   return (
     <DashboardShell role="teacher">
@@ -115,57 +128,10 @@ export default async function TeacherCourseDetailPage({
             description="No students have enrolled in this course yet."
           />
         ) : (
-          <div className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Student Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Registration Number
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {students.map((student) => (
-                    <tr
-                      key={student.student_id}
-                      className="transition hover:bg-slate-50"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4F46E5]">
-                            <Users className="h-5 w-5" />
-                          </div>
-                          <span className="text-sm font-medium text-slate-900">
-                            {student.full_name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-slate-600">
-                          {student.registration_number || "N/A"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          href={`/teacher/students/${student.student_id}`}
-                          className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
-                        >
-                          View Details →
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <StudentsWithGPA
+            students={students}
+            studentMarks={studentMarks}
+          />
         )}
       </section>
 

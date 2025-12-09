@@ -55,18 +55,23 @@ export async function getTeacherStats(): Promise<
     const totalCourses = courseIds.length;
 
     // Get total unique students across all courses
-    const { data: enrollments, error: enrollmentsError } = await supabase
-      .from("enrollments")
-      .select("student_id")
-      .in("course_id", courseIds.length > 0 ? courseIds : ["dummy"]);
+    let enrollments: any[] = [];
+    if (courseIds.length > 0) {
+      const { data: enrollmentsData, error: enrollmentsError } = await supabase
+        .from("enrollments")
+        .select("student_id")
+        .in("course_id", courseIds);
 
-    if (enrollmentsError && enrollmentsError.code !== "PGRST116") {
-      console.error("Error fetching enrollments:", enrollmentsError);
-      // Continue even if error, just set to 0
+      if (enrollmentsError) {
+        console.error("Error fetching enrollments:", JSON.stringify(enrollmentsError, null, 2));
+        // Continue even if error, just set to empty array
+      } else {
+        enrollments = enrollmentsData || [];
+      }
     }
 
     const uniqueStudents = new Set(
-      (enrollments || []).map((e) => e.student_id),
+      enrollments.map((e) => e.student_id),
     );
     const totalStudents = uniqueStudents.size;
 
@@ -86,13 +91,18 @@ export async function getTeacherStats(): Promise<
       (recentCoursesData || []).map((c) => c.course_id) || [];
 
     // Get student counts for each course
-    const { data: enrollmentCounts } = await supabase
-      .from("enrollments")
-      .select("course_id")
-      .in("course_id", recentCourseIds.length > 0 ? recentCourseIds : ["dummy"]);
+    let enrollmentCounts: any[] = [];
+    if (recentCourseIds.length > 0) {
+      const { data: enrollmentCountsData } = await supabase
+        .from("enrollments")
+        .select("course_id")
+        .in("course_id", recentCourseIds);
+      
+      enrollmentCounts = enrollmentCountsData || [];
+    }
 
     const countsByCourse = new Map<string, number>();
-    (enrollmentCounts || []).forEach((e) => {
+    enrollmentCounts.forEach((e) => {
       const count = countsByCourse.get(e.course_id) || 0;
       countsByCourse.set(e.course_id, count + 1);
     });

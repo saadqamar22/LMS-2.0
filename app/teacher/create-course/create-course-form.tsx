@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import clsx from "clsx";
 import type { CreateCourseActionState } from "./types";
 
@@ -19,7 +20,7 @@ export function CreateCourseForm({
   teacherName,
   action,
 }: CreateCourseFormProps) {
-  const [state, formAction] = useFormState(action, initialState);
+  const [state, formAction] = useActionState(action, initialState);
 
   return (
     <form

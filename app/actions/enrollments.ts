@@ -590,3 +590,53 @@ export async function getEnrolledStudentsForCourse(
   }
 }
 
+/**
+ * Get enrollment count for a course (public - anyone can see how many students are enrolled)
+ */
+export async function getCourseEnrollmentCount(
+  courseId: string,
+): Promise<{ success: true; count: number } | { success: false; error: string }> {
+  try {
+    const supabase = createAdminClient();
+
+    // Verify course exists
+    const { data: course, error: courseError } = await supabase
+      .from("courses")
+      .select("course_id")
+      .eq("course_id", courseId)
+      .single();
+
+    if (courseError || !course) {
+      return {
+        success: false,
+        error: "Course not found.",
+      };
+    }
+
+    // Count enrollments
+    const { count, error: countError } = await supabase
+      .from("enrollments")
+      .select("*", { count: "exact", head: true })
+      .eq("course_id", courseId);
+
+    if (countError) {
+      console.error("Error counting enrollments:", countError);
+      return {
+        success: false,
+        error: countError.message || "Failed to count enrollments.",
+      };
+    }
+
+    return {
+      success: true,
+      count: count || 0,
+    };
+  } catch (error) {
+    console.error("Unexpected error counting enrollments:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+

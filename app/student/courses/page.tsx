@@ -4,6 +4,7 @@ import { CourseCard } from "@/components/course-card";
 import {
   getAvailableCourses,
   getStudentEnrollments,
+  getCourseEnrollmentCount,
 } from "@/app/actions/enrollments";
 import { EnrollButton } from "./enroll-button";
 
@@ -44,6 +45,27 @@ export default async function StudentCoursesPage() {
   const enrolledCourses =
     enrollmentsResult.success ? enrollmentsResult.courses : [];
 
+  // Fetch enrollment counts for all courses (both enrolled and available)
+  const allCourseIds = [
+    ...enrolledCourses.map((c) => c.course_id),
+    ...courses.map((c) => c.course_id),
+  ];
+  const uniqueCourseIds = Array.from(new Set(allCourseIds));
+
+  const enrollmentCounts = await Promise.all(
+    uniqueCourseIds.map(async (courseId) => {
+      const countResult = await getCourseEnrollmentCount(courseId);
+      return {
+        courseId,
+        count: countResult.success ? countResult.count : 0,
+      };
+    }),
+  );
+
+  const enrollmentCountMap = new Map(
+    enrollmentCounts.map(({ courseId, count }) => [courseId, count]),
+  );
+
   return (
     <DashboardShell role="student">
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -80,8 +102,7 @@ export default async function StudentCoursesPage() {
                 title={course.course_name}
                 code={course.course_code}
                 teacher={course.teacher_name || "TBA"}
-                students={0}
-                progress={0}
+                students={enrollmentCountMap.get(course.course_id) || 0}
                 tags={[]}
                 href={`/student/courses/${course.course_id}`}
               />
@@ -116,8 +137,7 @@ export default async function StudentCoursesPage() {
                     title={course.course_name}
                     code={course.course_code}
                     teacher={course.teacher_name || "TBA"}
-                    students={0}
-                    progress={0}
+                    students={enrollmentCountMap.get(course.course_id) || 0}
                     tags={[]}
                     href={`/student/courses/${course.course_id}`}
                   />

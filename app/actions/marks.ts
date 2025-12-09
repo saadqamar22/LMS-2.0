@@ -827,9 +827,166 @@ export async function getMarksForCourse(
     };
   }
 
-  // If no moduleId, return empty array
-  return {
-    success: true,
-    marks: [],
-  };
+  // If no moduleId, get all marks for the course
+  return getAllMarksForCourse(courseId);
+}
+
+/**
+ * Get all marks for a course (teacher only)
+ */
+export async function getAllMarksForCourse(
+  courseId: string,
+): Promise<
+  | { success: true; marks: MarkEntry[] }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "teacher") {
+    return {
+      success: false,
+      error: "Only teachers can view marks.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify course exists and teacher owns it
+    const { data: course, error: courseError } = await supabase
+      .from("courses")
+      .select("course_id, teacher_id")
+      .eq("course_id", courseId)
+      .single();
+
+    if (courseError || !course) {
+      return {
+        success: false,
+        error: "Course not found.",
+      };
+    }
+
+    if (course.teacher_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to view marks for this course.",
+      };
+    }
+
+    // Get all modules for this course
+    const { data: modules, error: modulesError } = await supabase
+      .from("modules")
+      .select("module_id")
+      .eq("course_id", courseId);
+
+    if (modulesError) {
+      return {
+        success: false,
+        error: "Failed to fetch modules.",
+      };
+    }
+
+    if (!modules || modules.length === 0) {
+      return {
+        success: true,
+        marks: [],
+      };
+    }
+
+    const moduleIds = modules.map((m) => m.module_id);
+
+    // Fetch all marks for all modules in this course
+    const { data: marks, error: marksError } = await supabase
+      .from("marks")
+      .select(`
+        mark_id,
+        student_id,
+        module_id,
+        obtained_marks,
+        students!marks_student_id_fkey (
+          id,
+          registration_number,
+          users!students_id_fkey (
+            full_name
+          )
+        ),
+        modules!marks_module_id_fkey (
+          module_id,
+          module_name,
+          total_marks,
+          courses!inner (
+            course_id,
+            course_name,
+            course_code
+          )
+        )
+      `)
+      .in("module_id", moduleIds);
+
+    if (marksError) {
+      console.error("Error fetching marks:", JSON.stringify(marksError, null, 2));
+      return {
+        success: false,
+        error: marksError.message || "Failed to fetch marks.",
+      };
+    }
+
+    // Transform the data
+    const marksList: MarkEntry[] = (marks || []).map(
+      (mark: {
+        mark_id: string;
+        student_id: string;
+        module_id: string;
+        obtained_marks: number;
+        students?: {
+          id: string;
+          registration_number: string | null;
+          users?: {
+            full_name: string | null;
+          } | null;
+        } | null;
+        modules?: {
+          module_id: string;
+          module_name: string;
+          total_marks: number;
+          courses?: {
+            course_id: string;
+            course_name: string;
+            course_code: string;
+          } | null;
+        } | null;
+      }) => ({
+        mark_id: mark.mark_id,
+        student_id: mark.student_id,
+        module_id: mark.module_id,
+        obtained_marks: mark.obtained_marks,
+        average: null,
+        std_deviation: null,
+        min_marks: null,
+        max_marks: null,
+        median_marks: null,
+        student_name: mark.students?.users?.full_name || "Unknown",
+        registration_number: mark.students?.registration_number || null,
+        module_name: mark.modules?.module_name || "Unknown Module",
+        module_total_marks: mark.modules?.total_marks,
+        course_name: mark.modules?.courses?.course_name,
+        course_code: mark.modules?.courses?.course_code,
+      }),
+    );
+
+    return {
+      success: true,
+      marks: marksList,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching marks:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
 }

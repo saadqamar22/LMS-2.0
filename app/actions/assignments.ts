@@ -536,3 +536,122 @@ export async function getAssignmentById(
     };
   }
 }
+
+/**
+ * Get all upcoming assignments for a student (across all enrolled courses)
+ */
+export async function getUpcomingAssignmentsForStudent(
+  limit?: number,
+): Promise<
+  | { success: true; assignments: Assignment[] }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "student") {
+    return {
+      success: false,
+      error: "Only students can view upcoming assignments.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Get all enrolled course IDs
+    const { data: enrollments, error: enrollmentsError } = await supabase
+      .from("enrollments")
+      .select("course_id")
+      .eq("student_id", session.userId);
+
+    if (enrollmentsError) {
+      console.error(
+        "Error fetching enrollments:",
+        JSON.stringify(enrollmentsError, null, 2),
+      );
+      return {
+        success: false,
+        error: enrollmentsError.message || "Failed to fetch enrollments.",
+      };
+    }
+
+    if (!enrollments || enrollments.length === 0) {
+      return {
+        success: true,
+        assignments: [],
+      };
+    }
+
+    const courseIds = enrollments.map((e) => e.course_id);
+    const now = new Date().toISOString();
+
+    // Fetch upcoming assignments (deadline in the future)
+    const baseQuery = supabase
+      .from("assignments")
+      .select(
+        `
+        assignment_id,
+        course_id,
+        teacher_id,
+        title,
+        description,
+        deadline,
+        file_url,
+        created_at,
+        courses!assignments_course_id_fkey (
+          course_name,
+          course_code
+        )
+      `,
+      )
+      .in("course_id", courseIds)
+      .gte("deadline", now)
+      .order("deadline", { ascending: true });
+
+    const query = limit ? baseQuery.limit(limit) : baseQuery;
+    const { data: assignments, error: assignmentsError } = await query;
+
+    if (assignmentsError) {
+      console.error(
+        "Error fetching upcoming assignments:",
+        JSON.stringify(assignmentsError, null, 2),
+      );
+      return {
+        success: false,
+        error: assignmentsError.message || "Failed to fetch assignments.",
+      };
+    }
+
+    const assignmentsList = (assignments || []).map((assignment) => ({
+      assignment_id: assignment.assignment_id,
+      course_id: assignment.course_id,
+      teacher_id: assignment.teacher_id,
+      title: assignment.title,
+      description: assignment.description,
+      deadline: assignment.deadline,
+      file_url: assignment.file_url,
+      created_at: assignment.created_at,
+      course_name:
+        (assignment.courses as { course_name: string } | null)?.course_name ||
+        null,
+      course_code:
+        (assignment.courses as { course_code: string } | null)?.course_code ||
+        null,
+    }));
+
+    return {
+      success: true,
+      assignments: assignmentsList,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching upcoming assignments:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}

@@ -3,6 +3,7 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { EmptyState } from "@/components/empty-state";
 import { CourseCard } from "@/components/course-card";
 import { getTeacherCourses } from "@/app/actions/courses";
+import { getEnrolledStudentsForCourse } from "@/app/actions/enrollments";
 
 export default async function TeacherCoursesPage() {
   const result = await getTeacherCourses();
@@ -35,6 +36,20 @@ export default async function TeacherCoursesPage() {
 
   const courses = result.courses;
 
+  // Fetch enrolled students count for each course
+  const coursesWithStudentCount = await Promise.all(
+    courses.map(async (course) => {
+      const studentsResult = await getEnrolledStudentsForCourse(course.course_id);
+      const studentCount = studentsResult.success
+        ? studentsResult.students.length
+        : 0;
+      return {
+        ...course,
+        studentCount,
+      };
+    }),
+  );
+
   return (
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -66,15 +81,14 @@ export default async function TeacherCoursesPage() {
         />
       ) : (
         <section className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {courses.map((course) => (
+          {coursesWithStudentCount.map((course) => (
             <CourseCard
               key={course.course_id}
               courseId={course.course_id}
               title={course.course_name}
               code={course.course_code}
               teacher={""}
-              students={0}
-              progress={0}
+              students={course.studentCount}
               tags={[]}
               href={`/teacher/courses/${course.course_id}`}
             />

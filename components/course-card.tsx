@@ -7,7 +7,7 @@ interface CourseCardProps {
   code: string;
   teacher?: string;
   students?: number;
-  progress?: number;
+  progress?: number; // Deprecated, kept for backward compatibility
   tags?: string[];
   href?: string;
 }
@@ -39,19 +39,11 @@ export function CourseCard({
         <p className="mt-4 text-sm text-slate-500">Instructor: {teacher}</p>
       )}
 
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
+      <div className="mt-4 flex items-center text-sm text-slate-500">
         <span className="inline-flex items-center gap-1">
           <Users className="h-4 w-4" />
-          {students} students
+          {students} {students === 1 ? "student" : "students"}
         </span>
-        <span>{progress}% complete</span>
-      </div>
-
-      <div className="mt-4 h-2 rounded-full bg-slate-100">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-[#4F46E5] to-[#6366F1]"
-          style={{ width: `${progress}%` }}
-        />
       </div>
 
       {!!tags.length && (

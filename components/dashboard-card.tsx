@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 interface DashboardCardProps {
   title: string;
-  value: string | number;
+  value: string | number | ReactNode;
   subtitle?: string;
   icon?: ReactNode;
   trend?: {
@@ -32,7 +32,9 @@ export function DashboardCard({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{value}</p>
+          <div className="mt-2 text-3xl font-semibold text-slate-900">
+            {typeof value === "string" || typeof value === "number" ? value : value}
+          </div>
           {subtitle && (
             <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
           )}

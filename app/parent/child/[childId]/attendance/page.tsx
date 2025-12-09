@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { EmptyState } from "@/components/empty-state";
-import { getStudentAttendance } from "@/app/actions/attendance";
+import { getChildAttendance } from "@/app/actions/attendance";
 import { verifyChildAccess } from "@/app/actions/parents";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import type { AttendanceStatus } from "@/app/actions/attendance";
@@ -41,7 +41,7 @@ export default async function ChildAttendancePage({
   const { childId } = await params;
   const [accessResult, attendanceResult] = await Promise.all([
     verifyChildAccess(childId),
-    getStudentAttendance(childId),
+    getChildAttendance(childId),
   ]);
 
   if (!accessResult.hasAccess) {

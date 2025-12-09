@@ -458,3 +458,125 @@ export async function getStudentAttendance(
   }
 }
 
+/**
+ * Get attendance for a child (parent only)
+ */
+export async function getChildAttendance(
+  childId: string,
+  courseId?: string,
+): Promise<
+  | { success: true; attendance: AttendanceEntry[] }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "parent") {
+    return {
+      success: false,
+      error: "Only parents can view their children's attendance.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify the child belongs to this parent
+    const { data: student, error: studentError } = await supabase
+      .from("students")
+      .select("id, parent_id")
+      .eq("id", childId)
+      .single();
+
+    if (studentError || !student) {
+      return {
+        success: false,
+        error: "Student not found.",
+      };
+    }
+
+    if (student.parent_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to view this student's attendance.",
+      };
+    }
+
+    // Build query
+    let query = supabase
+      .from("attendance")
+      .select(`
+        attendance_id,
+        student_id,
+        course_id,
+        date,
+        status,
+        courses!attendance_course_id_fkey (
+          course_id,
+          course_name,
+          course_code
+        )
+      `)
+      .eq("student_id", childId)
+      .order("date", { ascending: false });
+
+    // Filter by course if provided
+    if (courseId) {
+      query = query.eq("course_id", courseId);
+    }
+
+    const { data: attendance, error: attendanceError } = await query;
+
+    if (attendanceError) {
+      console.error(
+        "Error fetching child attendance:",
+        JSON.stringify(attendanceError, null, 2),
+      );
+      return {
+        success: false,
+        error: attendanceError.message || "Failed to fetch attendance.",
+      };
+    }
+
+    // Transform the data
+    const attendanceList: AttendanceEntry[] = (attendance || []).map(
+      (entry: {
+        attendance_id: string;
+        student_id: string;
+        course_id: string;
+        date: string;
+        status: AttendanceStatus;
+        courses?: {
+          course_id: string;
+          course_name: string;
+          course_code: string;
+        } | null;
+      }) => ({
+        attendance_id: entry.attendance_id,
+        student_id: entry.student_id,
+        course_id: entry.course_id,
+        date: entry.date,
+        status: entry.status,
+        course_name: entry.courses?.course_name,
+        course_code: entry.courses?.course_code,
+        student_name: undefined, // Not needed for parent view
+        registration_number: undefined, // Not needed for parent view
+      }),
+    );
+
+    return {
+      success: true,
+      attendance: attendanceList,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching child attendance:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+

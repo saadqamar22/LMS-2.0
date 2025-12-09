@@ -10,15 +10,14 @@ interface RegisterPayload {
   email?: string;
   password?: string;
   role?: Role;
-  registration_number?: string;
   class?: string;
-  parent_id?: string | null;
   section?: string;
   employee_id?: string;
   department?: string;
   designation?: string;
   phone_number?: string;
   address?: string;
+  parent_id?: string; // For parent registration - must exist in students table
 }
 
 function validateEmail(email: string) {
@@ -58,15 +57,14 @@ export async function POST(request: Request) {
     email,
     password,
     role,
-    registration_number,
     class: studentClass,
-    parent_id,
     section,
     employee_id,
     department,
     designation,
     phone_number,
     address,
+    parent_id, // For parent registration
   } = body;
 
   if (!full_name?.trim()) {
@@ -101,16 +99,7 @@ export async function POST(request: Request) {
   }
 
   if (role === "student") {
-    if (!registration_number?.trim()) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Registration number is required for students.",
-        },
-        { status: 400 },
-      );
-    }
-
+    // Registration number is auto-assigned by database trigger
     if (!studentClass?.trim()) {
       return NextResponse.json(
         { success: false, error: "Class is required for students." },
@@ -148,6 +137,16 @@ export async function POST(request: Request) {
   }
 
   if (role === "parent") {
+    if (!parent_id?.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Parent ID is required. You must have a valid parent ID from your child's student record.",
+        },
+        { status: 400 },
+      );
+    }
+
     if (!phone_number?.trim()) {
       return NextResponse.json(
         { success: false, error: "Phone number is required for parents." },
@@ -159,6 +158,53 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, error: "Address is required for parents." },
         { status: 400 },
+      );
+    }
+
+    // Validate that the parent_id exists in students table (created by trigger)
+    const { data: students, error: studentError } = await supabase
+      .from("students")
+      .select("id, parent_id")
+      .eq("parent_id", parent_id);
+
+    if (studentError) {
+      console.error("Error validating parent ID:", studentError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Error validating parent ID. Please try again.",
+        },
+        { status: 500 },
+      );
+    }
+
+    if (!students || students.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid parent ID. Please check your parent ID and try again.",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Check if a parent account already exists for any of these students
+    const studentIds = students.map((s) => s.id);
+    const { data: existingParent, error: existingParentError } = await supabase
+      .from("students")
+      .select("parent_id")
+      .in("id", studentIds)
+      .not("parent_id", "eq", parent_id)
+      .limit(1);
+
+    if (existingParentError && existingParentError.code !== "PGRST116") {
+      console.error("Error checking existing parent:", existingParentError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Error validating parent ID. Please try again.",
+        },
+        { status: 500 },
       );
     }
   }
@@ -210,23 +256,32 @@ export async function POST(request: Request) {
     }
 
     if (role === "student") {
+      // Registration number and parent_id are auto-assigned by database triggers
+      // Explicitly set parent_id to NULL to ensure trigger can handle it properly
       const { error: studentError } = await supabase.from("students").insert([
         {
           id: userId,
-          registration_number,
           class: studentClass,
           section,
-          parent_id: parent_id || null,
+          registration_number: null, // Explicitly null - trigger will assign
+          parent_id: null, // Explicitly null - trigger will assign UUID
         },
       ]);
 
       if (studentError) {
-        console.error("Student insert error:", studentError);
+        console.error("Student insert error:", JSON.stringify(studentError, null, 2));
         await supabase.from("users").delete().eq("id", userId);
+        
+        // Provide more helpful error message for UUID issues
+        let errorMessage = studentError.message ?? "Failed to create student record.";
+        if (errorMessage.includes("uuid") || errorMessage.includes("Invalid input syntax")) {
+          errorMessage = "Database error: The registration system encountered an issue. Please contact support. The trigger may need to be updated to generate proper UUID values.";
+        }
+        
         return NextResponse.json(
           {
             success: false,
-            error: studentError.message ?? "Failed to create student record.",
+            error: errorMessage,
           },
           { status: 500 },
         );
@@ -257,6 +312,7 @@ export async function POST(request: Request) {
     }
 
     if (role === "parent") {
+      // First create the parent record
       const { error: parentError } = await supabase.from("parents").insert([
         {
           id: userId,
@@ -273,6 +329,26 @@ export async function POST(request: Request) {
           {
             success: false,
             error: parentError.message ?? "Failed to create parent record.",
+          },
+          { status: 500 },
+        );
+      }
+
+      // Update all students with this parent_id to point to the new parent user ID
+      const { error: updateError } = await supabase
+        .from("students")
+        .update({ parent_id: userId })
+        .eq("parent_id", parent_id);
+
+      if (updateError) {
+        console.error("Error updating student parent_id:", updateError);
+        // Rollback: delete parent and user records
+        await supabase.from("parents").delete().eq("id", userId);
+        await supabase.from("users").delete().eq("id", userId);
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to link parent account to student records.",
           },
           { status: 500 },
         );
