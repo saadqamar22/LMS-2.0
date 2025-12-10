@@ -381,8 +381,8 @@ export async function POST(request: Request) {
         ? parent_ids.filter(id => id?.trim()) 
         : (parent_id?.trim() ? [parent_id.trim()] : []);
       
-      const { error: updateError } = await supabase
-        .from("students")
+      const updateQuery = supabase.from("students") as any;
+      const { error: updateError } = await updateQuery
         .update({ parent_id: userId })
         .in("parent_id", parentIdList);
 
