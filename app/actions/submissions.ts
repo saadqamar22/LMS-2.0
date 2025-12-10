@@ -103,6 +103,7 @@ export async function submitAssignment(
 
     let submission;
     if (existingSubmission) {
+      const existingSubmissionData = existingSubmission as { submission_id: string };
       // Update existing submission
       const updateQuery = supabase.from("submissions") as any;
       const { data: updated, error: updateError } = await updateQuery
@@ -111,7 +112,7 @@ export async function submitAssignment(
           file_url: input.fileUrl?.trim() || null,
           submitted_at: new Date().toISOString(),
         })
-        .eq("submission_id", existingSubmission.submission_id)
+        .eq("submission_id", existingSubmissionData.submission_id)
         .select()
         .single();
 
