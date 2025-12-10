@@ -488,7 +488,7 @@ export async function getTeacherAnnouncements(): Promise<
       .eq("id", session.userId)
       .single();
 
-    const teacherName = teacher?.full_name || "Unknown Teacher";
+    const teacherName = (teacher as { id: string; full_name: string | null } | null)?.full_name || "Unknown Teacher";
 
     // Get course names for course-specific announcements
     const courseIds = [...new Set((announcements || [])
