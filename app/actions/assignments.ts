@@ -170,8 +170,8 @@ export async function createAssignment(
     }
 
     // Create assignment
-    const { data: assignment, error: assignmentError } = await supabase
-      .from("assignments")
+    const insertQuery = supabase.from("assignments") as any;
+    const { data: assignment, error: assignmentError } = await insertQuery
       .insert({
         course_id: input.courseId,
         teacher_id: session.userId,
