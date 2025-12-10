@@ -448,7 +448,12 @@ export async function getCourseStatistics(
     const allMarks: number[] = [];
 
     // Get statistics for each module
-    for (const courseModule of courseModules || []) {
+    const modulesList = ((courseModules || []) as Array<{
+      module_id: string;
+      module_name: string;
+      total_marks: number;
+    }>);
+    for (const courseModule of modulesList) {
       const { data: marks } = await supabase
         .from("marks")
         .select("obtained_marks, average, std_deviation, min_marks, max_marks, median_marks")
