@@ -104,7 +104,7 @@ async function updateModuleStatistics(moduleId: string): Promise<void> {
     return;
   }
 
-  const marksArray = marks.map((m) => m.obtained_marks);
+  const marksArray = ((marks || []) as Array<{ obtained_marks: number }>).map((m) => m.obtained_marks);
   const stats = calculateStatistics(marksArray);
 
   // Update all marks in this module with the same statistics
