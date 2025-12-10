@@ -78,9 +78,9 @@ export async function updateAssignmentFileUrl(
       .single();
 
     // Update assignment with file URL
-    const { error: updateError } = await supabase
-      .from("assignments")
-      .update({ file_url: fileUrl } as any)
+    const updateQuery = supabase.from("assignments") as any;
+    const { error: updateError } = await updateQuery
+      .update({ file_url: fileUrl })
       .eq("assignment_id", assignmentId);
 
     if (updateError) {
