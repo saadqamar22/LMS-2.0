@@ -21,7 +21,8 @@ export async function getCurrentUser(): Promise<CurrentUserProfile | null> {
     .eq("id", session.userId)
     .maybeSingle();
 
-  const fullNameFromDb = data?.full_name;
+  const dataTyped = data as { full_name: string | null } | null;
+  const fullNameFromDb = dataTyped?.full_name;
 
   return {
     id: session.userId,
