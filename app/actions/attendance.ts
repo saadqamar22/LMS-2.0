@@ -79,7 +79,8 @@ export async function saveAttendance(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to mark attendance for this course.",
@@ -187,7 +188,8 @@ export async function getAttendanceForDate(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view attendance for this course.",
@@ -309,7 +311,8 @@ export async function getAttendanceHistory(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view attendance history for this course.",
