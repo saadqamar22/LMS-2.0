@@ -19,6 +19,10 @@ export default async function ChildMarksPage({
     getChildMarks(childId),
   ]);
 
+  if ("success" in accessResult) {
+    notFound();
+  }
+
   if (!accessResult.hasAccess) {
     notFound();
   }
