@@ -52,15 +52,22 @@ export async function getUserProfile(): Promise<
       };
     }
 
+    const userData = user as {
+      id: string;
+      full_name: string | null;
+      email: string;
+      role: string;
+    };
+
     const profile: UserProfile = {
-      id: user.id,
-      full_name: user.full_name,
-      email: user.email,
-      role: user.role as "student" | "teacher" | "parent" | "admin",
+      id: userData.id,
+      full_name: userData.full_name,
+      email: userData.email,
+      role: userData.role as "student" | "teacher" | "parent" | "admin",
     };
 
     // Get role-specific information
-    if (user.role === "student") {
+    if (userData.role === "student") {
       const { data: student } = await supabase
         .from("students")
         .select("registration_number, class, section, parent_id")
@@ -73,7 +80,7 @@ export async function getUserProfile(): Promise<
         profile.section = student.section;
         profile.parent_id = student.parent_id;
       }
-    } else if (user.role === "teacher") {
+    } else if (userData.role === "teacher") {
       const { data: teacher } = await supabase
         .from("teachers")
         .select("employee_id, department, designation")
@@ -85,7 +92,7 @@ export async function getUserProfile(): Promise<
         profile.department = teacher.department;
         profile.designation = teacher.designation;
       }
-    } else if (user.role === "parent") {
+    } else if (userData.role === "parent") {
       const { data: parent } = await supabase
         .from("parents")
         .select("phone_number, address, full_name")
