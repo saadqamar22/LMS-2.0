@@ -126,8 +126,8 @@ export async function submitAssignment(
       submission = updated;
     } else {
       // Create new submission
-      const { data: created, error: createError } = await supabase
-        .from("submissions")
+      const insertQuery = supabase.from("submissions") as any;
+      const { data: created, error: createError } = await insertQuery
         .insert({
           assignment_id: input.assignmentId,
           student_id: session.userId,
@@ -215,7 +215,8 @@ export async function getAssignmentSubmissions(
       };
     }
 
-    if (assignment.teacher_id !== session.userId) {
+    const assignmentData = assignment as { assignment_id: string; course_id: string; teacher_id: string };
+    if (assignmentData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view submissions for this assignment.",
@@ -259,7 +260,22 @@ export async function getAssignmentSubmissions(
       };
     }
 
-    const submissionsList = (submissions || []).map((submission) => ({
+    const submissionsList = ((submissions || []) as Array<{
+      submission_id: string;
+      assignment_id: string;
+      student_id: string;
+      file_url: string | null;
+      text_answer: string | null;
+      marks: number | null;
+      feedback: string | null;
+      submitted_at: string | null;
+      graded_at: string | null;
+      students?: {
+        id: string;
+        registration_number: string | null;
+        users?: { full_name: string | null } | null;
+      } | null;
+    }>).map((submission) => ({
       submission_id: submission.submission_id,
       assignment_id: submission.assignment_id,
       student_id: submission.student_id,
@@ -269,13 +285,8 @@ export async function getAssignmentSubmissions(
       feedback: submission.feedback,
       submitted_at: submission.submitted_at,
       graded_at: submission.graded_at,
-      student_name:
-        (submission.students as {
-          users: { full_name: string | null } | null;
-        } | null)?.users?.full_name || "Unknown",
-      registration_number:
-        (submission.students as { registration_number: string | null } | null)
-          ?.registration_number || null,
+      student_name: submission.students?.users?.full_name || "Unknown",
+      registration_number: submission.students?.registration_number || null,
     }));
 
     return {

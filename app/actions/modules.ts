@@ -121,7 +121,8 @@ export async function createModule(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to create modules for this course.",
@@ -129,8 +130,8 @@ export async function createModule(
     }
 
     // Create module
-    const { data: module, error: moduleError } = await supabase
-      .from("modules")
+    const insertQuery = supabase.from("modules") as any;
+    const { data: module, error: moduleError } = await insertQuery
       .insert({
         course_id: courseId,
         module_name: moduleName.trim(),

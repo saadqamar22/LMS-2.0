@@ -44,8 +44,8 @@ export async function createCourse(
   try {
     const supabase = createAdminClient();
 
-    const { data: course, error } = await supabase
-      .from("courses")
+    const insertQuery = supabase.from("courses") as any;
+    const { data: course, error } = await insertQuery
       .insert([
         {
           teacher_id: session.userId,
@@ -162,7 +162,8 @@ export async function getCourseById(
       return { success: false, error: "Course not found." };
     }
 
-    if (session.role === "teacher" && course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (session.role === "teacher" && courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view this course.",
@@ -171,7 +172,7 @@ export async function getCourseById(
 
     return {
       success: true,
-      course: course as Course,
+      course: courseData as Course,
     };
   } catch (error) {
     console.error("Unexpected error fetching course:", error);

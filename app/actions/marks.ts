@@ -170,8 +170,8 @@ export async function saveMark(
       };
     }
 
-    const course = module.courses as { teacher_id: string };
-    if (course.teacher_id !== session.userId) {
+    const courseData = module.courses as { teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to enter marks for this module.",
@@ -187,18 +187,17 @@ export async function saveMark(
     }
 
     // Upsert mark
-    const { error: markError } = await supabase
-      .from("marks")
-      .upsert(
-        {
-          student_id: input.studentId,
-          module_id: input.moduleId,
-          obtained_marks: input.obtainedMarks,
-        },
-        {
-          onConflict: "student_id,module_id",
-        },
-      );
+    const upsertQuery = supabase.from("marks") as any;
+    const { error: markError } = await upsertQuery.upsert(
+      {
+        student_id: input.studentId,
+        module_id: input.moduleId,
+        obtained_marks: input.obtainedMarks,
+      },
+      {
+        onConflict: "student_id,module_id",
+      },
+    );
 
     if (markError) {
       console.error("Error saving mark:", JSON.stringify(markError, null, 2));
@@ -263,7 +262,8 @@ export async function getMarksForModule(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view marks for this course.",
@@ -417,7 +417,8 @@ export async function getCourseStatistics(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view statistics for this course.",
@@ -870,7 +871,8 @@ export async function getAllMarksForCourse(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view marks for this course.",

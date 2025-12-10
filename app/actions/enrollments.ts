@@ -313,7 +313,8 @@ export async function enrollInCourse(
     }
 
     // Create enrollment
-    const { error: enrollError } = await supabase.from("enrollments").insert([
+    const insertQuery = supabase.from("enrollments") as any;
+    const { error: enrollError } = await insertQuery.insert([
       {
         student_id: session.userId,
         course_id: courseId,
@@ -519,7 +520,8 @@ export async function getEnrolledStudentsForCourse(
     }
 
     // Access control: ensure the teacher owns this course
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view students for this course.",

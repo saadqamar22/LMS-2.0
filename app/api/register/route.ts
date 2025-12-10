@@ -249,11 +249,11 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
+    const insertQuery = supabase.from("users") as any;
     const {
       data: userData,
       error: userError,
-    } = await supabase
-      .from("users")
+    } = await insertQuery
       .insert([
         {
           full_name,
@@ -295,7 +295,8 @@ export async function POST(request: Request) {
     if (role === "student") {
       // Registration number and parent_id are auto-assigned by database triggers
       // Explicitly set parent_id to NULL to ensure trigger can handle it properly
-      const { error: studentError } = await supabase.from("students").insert([
+      const studentInsertQuery = supabase.from("students") as any;
+      const { error: studentError } = await studentInsertQuery.insert([
         {
           id: userId,
           class: studentClass,
@@ -326,7 +327,8 @@ export async function POST(request: Request) {
     }
 
     if (role === "teacher") {
-      const { error: teacherError } = await supabase.from("teachers").insert([
+      const teacherInsertQuery = supabase.from("teachers") as any;
+      const { error: teacherError } = await teacherInsertQuery.insert([
         {
           id: userId,
           employee_id,
@@ -350,7 +352,8 @@ export async function POST(request: Request) {
 
     if (role === "parent") {
       // First create the parent record
-      const { error: parentError } = await supabase.from("parents").insert([
+      const parentInsertQuery = supabase.from("parents") as any;
+      const { error: parentError } = await parentInsertQuery.insert([
         {
           id: userId,
           full_name,
