@@ -299,7 +299,17 @@ export async function getCourseAssignments(
       };
     }
 
-    const assignmentsList = (assignments || []).map((assignment) => ({
+    const assignmentsList = ((assignments || []) as Array<{
+      assignment_id: string;
+      course_id: string;
+      teacher_id: string;
+      title: string;
+      description: string | null;
+      deadline: string;
+      file_url: string | null;
+      created_at: string | null;
+      courses?: { course_name: string; course_code: string } | null;
+    }>).map((assignment) => ({
       assignment_id: assignment.assignment_id,
       course_id: assignment.course_id,
       teacher_id: assignment.teacher_id,
@@ -308,12 +318,8 @@ export async function getCourseAssignments(
       deadline: assignment.deadline,
       file_url: assignment.file_url,
       created_at: assignment.created_at,
-      course_name:
-        (assignment.courses as { course_name: string } | null)?.course_name ||
-        null,
-      course_code:
-        (assignment.courses as { course_code: string } | null)?.course_code ||
-        null,
+      course_name: assignment.courses?.course_name || undefined,
+      course_code: assignment.courses?.course_code || undefined,
     }));
 
     return {
@@ -402,7 +408,17 @@ export async function getStudentCourseAssignments(
       };
     }
 
-    const assignmentsList = (assignments || []).map((assignment) => ({
+    const assignmentsList = ((assignments || []) as Array<{
+      assignment_id: string;
+      course_id: string;
+      teacher_id: string;
+      title: string;
+      description: string | null;
+      deadline: string;
+      file_url: string | null;
+      created_at: string | null;
+      courses?: { course_name: string; course_code: string } | null;
+    }>).map((assignment) => ({
       assignment_id: assignment.assignment_id,
       course_id: assignment.course_id,
       teacher_id: assignment.teacher_id,
@@ -411,12 +427,8 @@ export async function getStudentCourseAssignments(
       deadline: assignment.deadline,
       file_url: assignment.file_url,
       created_at: assignment.created_at,
-      course_name:
-        (assignment.courses as { course_name: string } | null)?.course_name ||
-        null,
-      course_code:
-        (assignment.courses as { course_code: string } | null)?.course_code ||
-        null,
+      course_name: assignment.courses?.course_name || undefined,
+      course_code: assignment.courses?.course_code || undefined,
     }));
 
     return {
@@ -478,15 +490,28 @@ export async function getAssignmentById(
       };
     }
 
+    const assignmentData = assignment as {
+      assignment_id: string;
+      course_id: string;
+      teacher_id: string;
+      title: string;
+      description: string | null;
+      deadline: string;
+      file_url: string | null;
+      created_at: string | null;
+      courses?: { course_name: string; course_code: string } | null;
+    };
+
     // Verify access: teacher must own the course, student must be enrolled
     if (session.role === "teacher") {
       const { data: course } = await supabase
         .from("courses")
         .select("teacher_id")
-        .eq("course_id", assignment.course_id)
+        .eq("course_id", assignmentData.course_id)
         .single();
 
-      if (course?.teacher_id !== session.userId) {
+      const courseData = course as { teacher_id: string } | null;
+      if (courseData?.teacher_id !== session.userId) {
         return {
           success: false,
           error: "You do not have permission to view this assignment.",
@@ -496,7 +521,7 @@ export async function getAssignmentById(
       const { data: enrollment } = await supabase
         .from("enrollments")
         .select("enrollment_id")
-        .eq("course_id", assignment.course_id)
+        .eq("course_id", assignmentData.course_id)
         .eq("student_id", session.userId)
         .maybeSingle();
 
@@ -516,20 +541,16 @@ export async function getAssignmentById(
     return {
       success: true,
       assignment: {
-        assignment_id: assignment.assignment_id,
-        course_id: assignment.course_id,
-        teacher_id: assignment.teacher_id,
-        title: assignment.title,
-        description: assignment.description,
-        deadline: assignment.deadline,
-        file_url: assignment.file_url,
-        created_at: assignment.created_at,
-        course_name:
-          (assignment.courses as { course_name: string } | null)?.course_name ||
-          null,
-        course_code:
-          (assignment.courses as { course_code: string } | null)?.course_code ||
-          null,
+        assignment_id: assignmentData.assignment_id,
+        course_id: assignmentData.course_id,
+        teacher_id: assignmentData.teacher_id,
+        title: assignmentData.title,
+        description: assignmentData.description,
+        deadline: assignmentData.deadline,
+        file_url: assignmentData.file_url,
+        created_at: assignmentData.created_at,
+        course_name: assignmentData.courses?.course_name || undefined,
+        course_code: assignmentData.courses?.course_code || undefined,
       },
     };
   } catch (error) {
@@ -590,7 +611,7 @@ export async function getUpcomingAssignmentsForStudent(
       };
     }
 
-    const courseIds = enrollments.map((e) => e.course_id);
+    const courseIds = ((enrollments || []) as Array<{ course_id: string }>).map((e) => e.course_id);
     const now = new Date().toISOString();
 
     // Fetch upcoming assignments (deadline in the future)
@@ -630,7 +651,17 @@ export async function getUpcomingAssignmentsForStudent(
       };
     }
 
-    const assignmentsList = (assignments || []).map((assignment) => ({
+    const assignmentsList = ((assignments || []) as Array<{
+      assignment_id: string;
+      course_id: string;
+      teacher_id: string;
+      title: string;
+      description: string | null;
+      deadline: string;
+      file_url: string | null;
+      created_at: string | null;
+      courses?: { course_name: string; course_code: string } | null;
+    }>).map((assignment) => ({
       assignment_id: assignment.assignment_id,
       course_id: assignment.course_id,
       teacher_id: assignment.teacher_id,
@@ -639,12 +670,8 @@ export async function getUpcomingAssignmentsForStudent(
       deadline: assignment.deadline,
       file_url: assignment.file_url,
       created_at: assignment.created_at,
-      course_name:
-        (assignment.courses as { course_name: string } | null)?.course_name ||
-        null,
-      course_code:
-        (assignment.courses as { course_code: string } | null)?.course_code ||
-        null,
+      course_name: assignment.courses?.course_name || undefined,
+      course_code: assignment.courses?.course_code || undefined,
     }));
 
     return {
