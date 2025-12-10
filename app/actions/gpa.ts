@@ -107,7 +107,17 @@ export async function calculateStudentGPA(
 
     // Filter marks: only include those with valid obtained_marks and total_marks
     // If teacher, filter by their courses
-    const validMarks = marks
+    const validMarks = ((marks || []) as Array<{
+      obtained_marks: number | null;
+      modules?: {
+        total_marks: number;
+        course_id: string;
+        courses?: {
+          course_id: string;
+          teacher_id: string;
+        } | null;
+      } | null;
+    }>)
       .filter((mark) => {
         if (!mark.obtained_marks || !mark.modules?.total_marks) return false;
         if (session.role === "teacher" && studentId) {
@@ -193,7 +203,8 @@ export async function calculateCourseGPA(
         };
       }
 
-      if (course.teacher_id !== session.userId) {
+      const courseData = course as { course_id: string; teacher_id: string };
+      if (courseData.teacher_id !== session.userId) {
         return {
           success: false,
           error: "You do not have permission to view GPA for this course.",
@@ -231,7 +242,13 @@ export async function calculateCourseGPA(
     }
 
     // Filter valid marks
-    const validMarks = marks
+    const validMarks = ((marks || []) as Array<{
+      obtained_marks: number | null;
+      modules?: {
+        total_marks: number;
+        course_id: string;
+      } | null;
+    }>)
       .filter((mark) => mark.obtained_marks && mark.modules?.total_marks)
       .map((mark) => ({
         obtained: mark.obtained_marks!,
