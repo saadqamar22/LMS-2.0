@@ -83,7 +83,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const userData = user as {
+      id: string;
+      full_name: string | null;
+      email: string;
+      password: string;
+      role: string;
+    };
+    const passwordMatch = await bcrypt.compare(password, userData.password);
 
     if (!passwordMatch) {
       return NextResponse.json(
@@ -92,14 +99,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const role = (user.role ?? "student") as Role;
+    const role = (userData.role ?? "student") as Role;
     const redirectPath = ROLE_DASHBOARD_MAP[role] ?? "/";
 
     const token = await createSessionToken({
-      userId: user.id,
+      userId: userData.id,
       role,
-      email: user.email,
-      fullName: user.full_name ?? "",
+      email: userData.email,
+      fullName: userData.full_name ?? "",
     });
 
     const response = NextResponse.json({
