@@ -240,8 +240,8 @@ export async function getStudentAnnouncements(): Promise<
         course_id: announcement.course_id,
         title: announcement.title,
         content: announcement.content,
-        audience: announcement.audience,
-        created_at: announcement.created_at,
+        audience: announcement.audience as AnnouncementAudience,
+        created_at: announcement.created_at || "",
         teacher_name: teacherMap.get(announcement.teacher_id) || "Unknown Teacher",
         course_name: announcement.course_id
           ? courseMap.get(announcement.course_id)?.name
@@ -407,8 +407,8 @@ export async function getParentAnnouncements(): Promise<
         course_id: announcement.course_id,
         title: announcement.title,
         content: announcement.content,
-        audience: announcement.audience,
-        created_at: announcement.created_at,
+        audience: announcement.audience as AnnouncementAudience,
+        created_at: announcement.created_at || "",
         teacher_name: teacherMap.get(announcement.teacher_id) || "Unknown Teacher",
         course_name: announcement.course_id
           ? courseMap.get(announcement.course_id)?.name
@@ -516,8 +516,8 @@ export async function getTeacherAnnouncements(): Promise<
         course_id: announcement.course_id,
         title: announcement.title,
         content: announcement.content,
-        audience: announcement.audience,
-        created_at: announcement.created_at,
+        audience: announcement.audience as AnnouncementAudience,
+        created_at: announcement.created_at || "",
         teacher_name: teacherName,
         course_name: announcement.course_id
           ? courseMap.get(announcement.course_id)?.name
