@@ -338,7 +338,7 @@ export async function getAttendanceHistory(
 
     // Group by date and count
     const dateMap = new Map<string, number>();
-    (attendance || []).forEach((entry) => {
+    ((attendance || []) as Array<{ date: string }>).forEach((entry) => {
       const count = dateMap.get(entry.date) || 0;
       dateMap.set(entry.date, count + 1);
     });
