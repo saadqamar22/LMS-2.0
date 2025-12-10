@@ -302,7 +302,7 @@ export async function getParentAnnouncements(): Promise<
       };
     }
 
-    const childIds = (children || []).map(c => c.id);
+    const childIds = ((children || []) as Array<{ id: string }>).map(c => c.id);
 
     if (childIds.length === 0) {
       // No children, return empty list
