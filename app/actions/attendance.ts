@@ -500,7 +500,8 @@ export async function getChildAttendance(
       };
     }
 
-    if (student.parent_id !== session.userId) {
+    const studentData = student as { id: string; parent_id: string | null };
+    if (studentData.parent_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view this student's attendance.",
