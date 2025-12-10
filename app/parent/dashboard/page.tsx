@@ -3,10 +3,8 @@ import { DashboardCard } from "@/components/dashboard-card";
 import { EmptyState } from "@/components/empty-state";
 import { getParentChildren } from "@/app/actions/parents";
 import { getChildMarks } from "@/app/actions/marks";
-import { calculateGPAFromMarks } from "@/lib/utils/gpa-calculator";
-import { GPADisplay } from "@/components/gpa-display";
 import Link from "next/link";
-import { BookOpenCheck, Calendar, GraduationCap } from "lucide-react";
+import { BookOpenCheck, Calendar } from "lucide-react";
 import { ChildCard } from "./child-card";
 import { getParentAnnouncements } from "@/app/actions/announcements";
 import { AnnouncementCard } from "@/components/announcement-card";
@@ -58,9 +56,6 @@ export default async function ParentDashboardPage() {
   const totalPresentCount = 0;
   const totalLateCount = 0;
 
-  // Calculate overall GPA from all children's marks
-  const { gpa, percentage } = calculateGPAFromMarks(allMarks);
-
   // Calculate attendance rate
   const attendanceRate =
     totalAttendanceRecords > 0
@@ -80,15 +75,7 @@ export default async function ParentDashboardPage() {
         </h2>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard
-          title="Overall GPA"
-          value={
-            <GPADisplay gpa={gpa} percentage={percentage} size="lg" showToggle={true} />
-          }
-          subtitle="Click to switch between GPA and percentage"
-          icon={<GraduationCap className="h-5 w-5" />}
-        />
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <Link href="/parent/children">
           <DashboardCard
             title="Attendance"

@@ -139,95 +139,139 @@ export default async function ChildAttendancePage({
         />
       ) : (
         <>
-          <section className="mt-8 grid gap-6 md:grid-cols-4">
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+          <section className="mt-8">
+            <div className="mb-4">
               <p className="text-xs uppercase tracking-wide text-slate-400">
-                Total Records
+                Combined Statistics
               </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
-                {totalRecords}
-              </p>
+              <h2 className="text-xl font-semibold text-slate-900">
+                Overall Attendance
+              </h2>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Attendance Rate
-              </p>
-              <p className={`mt-2 text-3xl font-semibold ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
-                {attendanceRate}%
-              </p>
-            </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Present
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-green-600">
-                {presentCount}
-              </p>
-            </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Absent
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-red-600">
-                {absentCount}
-              </p>
+            <div className="grid gap-6 md:grid-cols-4">
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  Total Records
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900">
+                  {totalRecords}
+                </p>
+              </div>
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  Attendance Rate
+                </p>
+                <p className={`mt-2 text-3xl font-semibold ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
+                  {attendanceRate}%
+                </p>
+              </div>
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  Present
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-green-600">
+                  {presentCount}
+                </p>
+              </div>
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  Absent
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-red-600">
+                  {absentCount}
+                </p>
+              </div>
             </div>
           </section>
 
           <section className="mt-8 space-y-6">
-            {Object.entries(attendanceByCourse).map(([courseId, courseData]) => (
-              <div
-                key={courseId}
-                className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
-              >
-                <div className="mb-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    {courseData.course_code}
-                  </p>
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    {courseData.course_name}
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    {courseData.records.length} record
-                    {courseData.records.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {courseData.records.map((record) => {
-                    const config = STATUS_CONFIG[record.status];
-                    return (
-                      <div
-                        key={record.attendance_id}
-                        className="flex items-center justify-between rounded-xl border border-slate-100 p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`flex h-8 w-8 items-center justify-center rounded-lg ${config.bgColor} ${config.color}`}
-                          >
-                            {config.icon}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-slate-900">
-                              {new Date(record.date).toLocaleDateString("en-US", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${config.bgColor} ${config.color}`}
+            {Object.entries(attendanceByCourse).map(([courseId, courseData]) => {
+              // Calculate course-specific statistics
+              const courseRecords = courseData.records;
+              const coursePresentCount = courseRecords.filter((a) => a.status === "present").length;
+              const courseAbsentCount = courseRecords.filter((a) => a.status === "absent").length;
+              const courseLateCount = courseRecords.filter((a) => a.status === "late").length;
+              const courseAttendanceRate =
+                courseRecords.length > 0
+                  ? Math.round(((coursePresentCount + courseLateCount) / courseRecords.length) * 100)
+                  : 0;
+
+              return (
+                <div
+                  key={courseId}
+                  className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-slate-400">
+                        {courseData.course_code}
+                      </p>
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        {courseData.course_name}
+                      </h3>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-2xl font-semibold ${courseAttendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
+                        {courseAttendanceRate}%
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {coursePresentCount + courseLateCount} / {courseRecords.length} present
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4 grid grid-cols-3 gap-3">
+                    <div className="rounded-xl border border-slate-100 bg-green-50 p-3">
+                      <p className="text-xs text-slate-500">Present</p>
+                      <p className="text-lg font-semibold text-green-700">{coursePresentCount}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-yellow-50 p-3">
+                      <p className="text-xs text-slate-500">Late</p>
+                      <p className="text-lg font-semibold text-yellow-700">{courseLateCount}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-red-50 p-3">
+                      <p className="text-xs text-slate-500">Absent</p>
+                      <p className="text-lg font-semibold text-red-700">{courseAbsentCount}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {courseData.records.map((record) => {
+                      const config = STATUS_CONFIG[record.status];
+                      return (
+                        <div
+                          key={record.attendance_id}
+                          className="flex items-center justify-between rounded-xl border border-slate-100 p-3"
                         >
-                          {config.label}
-                        </span>
-                      </div>
-                    );
-                  })}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`flex h-8 w-8 items-center justify-center rounded-lg ${config.bgColor} ${config.color}`}
+                            >
+                              {config.icon}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-slate-900">
+                                {new Date(record.date).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${config.bgColor} ${config.color}`}
+                          >
+                            {config.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </section>
         </>
       )}

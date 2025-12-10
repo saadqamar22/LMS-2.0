@@ -5,6 +5,8 @@ import { EmptyState } from "@/components/empty-state";
 import { getChildMarks } from "@/app/actions/marks";
 import { verifyChildAccess } from "@/app/actions/parents";
 import { GraduationCap, TrendingUp } from "lucide-react";
+import { calculateGPAFromMarks } from "@/lib/utils/gpa-calculator";
+import { GPADisplay } from "@/components/gpa-display";
 
 interface ChildMarksPageProps {
   params: Promise<{ childId: string }>;
@@ -77,20 +79,8 @@ export default async function ChildMarksPage({
     >,
   );
 
-  // Calculate overall statistics
-  const totalMarks = marks.filter(
-    (m) => m.obtained_marks !== null && m.module_total_marks !== null,
-  );
-  const totalObtained = totalMarks.reduce(
-    (sum, m) => sum + (m.obtained_marks || 0),
-    0,
-  );
-  const totalPossible = totalMarks.reduce(
-    (sum, m) => sum + (m.module_total_marks || 0),
-    0,
-  );
-  const overallPercentage =
-    totalPossible > 0 ? Math.round((totalObtained / totalPossible) * 100) : 0;
+  // Calculate overall GPA and percentage
+  const { gpa: overallGPA, percentage: overallPercentage } = calculateGPAFromMarks(marks);
 
   return (
     <DashboardShell role="parent">
@@ -130,11 +120,11 @@ export default async function ChildMarksPage({
             </div>
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
               <p className="text-xs uppercase tracking-wide text-slate-400">
-                Overall Percentage
+                Overall GPA / Percentage
               </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
-                {overallPercentage}%
-              </p>
+              <div className="mt-2">
+                <GPADisplay gpa={overallGPA} percentage={overallPercentage} size="lg" showToggle={true} />
+              </div>
             </div>
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
               <p className="text-xs uppercase tracking-wide text-slate-400">
@@ -148,21 +138,8 @@ export default async function ChildMarksPage({
 
           <section className="mt-8 space-y-6">
             {Object.entries(marksByCourse).map(([courseId, courseData]) => {
-              const courseMarks = courseData.marks.filter(
-                (m) => m.obtained_marks !== null && m.module_total_marks !== null,
-              );
-              const courseObtained = courseMarks.reduce(
-                (sum, m) => sum + (m.obtained_marks || 0),
-                0,
-              );
-              const coursePossible = courseMarks.reduce(
-                (sum, m) => sum + (m.module_total_marks || 0),
-                0,
-              );
-              const coursePercentage =
-                coursePossible > 0
-                  ? Math.round((courseObtained / coursePossible) * 100)
-                  : 0;
+              // Calculate course-specific GPA and percentage
+              const { gpa: courseGPA, percentage: coursePercentage } = calculateGPAFromMarks(courseData.marks);
 
               return (
                 <div
@@ -179,14 +156,11 @@ export default async function ChildMarksPage({
                       </h3>
                       <p className="text-sm text-slate-500">
                         {courseData.marks.length} module
-                        {courseData.marks.length !== 1 ? "s" : ""} • {coursePercentage}%
+                        {courseData.marks.length !== 1 ? "s" : ""}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] px-4 py-2">
-                      <TrendingUp className="h-5 w-5 text-[#4F46E5]" />
-                      <span className="text-lg font-semibold text-[#4F46E5]">
-                        {coursePercentage}%
-                      </span>
+                      <GPADisplay gpa={courseGPA} percentage={coursePercentage} size="md" showToggle={true} />
                     </div>
                   </div>
                   <div className="space-y-3">
