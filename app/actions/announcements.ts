@@ -203,17 +203,6 @@ export async function getStudentAnnouncements(): Promise<
         (enrolledCourseIds.length > 0 && enrolledCourseIds.includes(announcement.course_id))
     );
 
-    if (announcementsError) {
-      console.error(
-        "Error fetching student announcements:",
-        JSON.stringify(announcementsError, null, 2),
-      );
-      return {
-        success: false,
-        error: announcementsError.message || "Failed to fetch announcements.",
-      };
-    }
-
     // Get teacher names and course names
     const teacherIds = [...new Set((announcements || []).map(a => a.teacher_id))];
     const courseIds = [...new Set((announcements || [])
@@ -380,17 +369,6 @@ export async function getParentAnnouncements(): Promise<
         announcement.course_id === null ||
         (enrolledCourseIds.length > 0 && enrolledCourseIds.includes(announcement.course_id))
     );
-
-    if (announcementsError) {
-      console.error(
-        "Error fetching parent announcements:",
-        JSON.stringify(announcementsError, null, 2),
-      );
-      return {
-        success: false,
-        error: announcementsError.message || "Failed to fetch announcements.",
-      };
-    }
 
     // Get teacher names and course names
     const teacherIds = [...new Set((announcements || []).map(a => a.teacher_id))];
