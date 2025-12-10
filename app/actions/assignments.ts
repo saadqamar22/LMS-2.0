@@ -161,7 +161,8 @@ export async function createAssignment(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to create assignments for this course.",
@@ -257,7 +258,8 @@ export async function getCourseAssignments(
       };
     }
 
-    if (course.teacher_id !== session.userId) {
+    const courseData = course as { course_id: string; teacher_id: string };
+    if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view assignments for this course.",
