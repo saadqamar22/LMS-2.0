@@ -223,11 +223,11 @@ export async function getStudentAnnouncements(): Promise<
     ]);
 
     const teacherMap = new Map(
-      (teachersResult.data || []).map(t => [t.id, t.full_name || "Unknown Teacher"])
+      ((teachersResult.data || []) as Array<{ id: string; full_name: string | null }>).map(t => [t.id, t.full_name || "Unknown Teacher"])
     );
 
     const courseMap = new Map(
-      (coursesResult.data || []).map(c => [
+      ((coursesResult.data || []) as Array<{ course_id: string; course_name: string; course_code: string }>).map(c => [
         c.course_id,
         { name: c.course_name, code: c.course_code },
       ])
@@ -390,11 +390,11 @@ export async function getParentAnnouncements(): Promise<
     ]);
 
     const teacherMap = new Map(
-      (teachersResult.data || []).map(t => [t.id, t.full_name || "Unknown Teacher"])
+      ((teachersResult.data || []) as Array<{ id: string; full_name: string | null }>).map(t => [t.id, t.full_name || "Unknown Teacher"])
     );
 
     const courseMap = new Map(
-      (coursesResult.data || []).map(c => [
+      ((coursesResult.data || []) as Array<{ course_id: string; course_name: string; course_code: string }>).map(c => [
         c.course_id,
         { name: c.course_name, code: c.course_code },
       ])
