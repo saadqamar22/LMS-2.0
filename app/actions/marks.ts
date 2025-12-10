@@ -170,7 +170,13 @@ export async function saveMark(
       };
     }
 
-    const courseData = module.courses as { teacher_id: string };
+    const moduleData = module as {
+      module_id: string;
+      course_id: string;
+      total_marks: number;
+      courses: { teacher_id: string };
+    };
+    const courseData = moduleData.courses;
     if (courseData.teacher_id !== session.userId) {
       return {
         success: false,
@@ -179,10 +185,10 @@ export async function saveMark(
     }
 
     // Verify obtained marks don't exceed total marks
-    if (input.obtainedMarks > module.total_marks) {
+    if (input.obtainedMarks > moduleData.total_marks) {
       return {
         success: false,
-        error: `Marks obtained (${input.obtainedMarks}) cannot exceed total marks (${module.total_marks}).`,
+        error: `Marks obtained (${input.obtainedMarks}) cannot exceed total marks (${moduleData.total_marks}).`,
       };
     }
 
@@ -210,7 +216,7 @@ export async function saveMark(
     // Update statistics for this module
     await updateModuleStatistics(input.moduleId);
 
-    revalidatePath(`/teacher/courses/${module.course_id}/marks`);
+    revalidatePath(`/teacher/courses/${moduleData.course_id}/marks`);
     revalidatePath(`/student/marks`);
     return { success: true };
   } catch (error) {
