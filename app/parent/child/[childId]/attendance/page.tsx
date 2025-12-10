@@ -44,6 +44,10 @@ export default async function ChildAttendancePage({
     getChildAttendance(childId),
   ]);
 
+  if ("success" in accessResult) {
+    notFound();
+  }
+
   if (!accessResult.hasAccess) {
     notFound();
   }
