@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import LoginForm from "@/app/auth/login/login-form";
 
 export const metadata = {
@@ -23,7 +24,9 @@ export default function LoginPage() {
             </a>
           </p>
         </div>
-        <LoginForm />
+        <Suspense fallback={<div className="text-center">Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
