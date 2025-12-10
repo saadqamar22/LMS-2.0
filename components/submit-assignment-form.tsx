@@ -77,7 +77,7 @@ export function SubmitAssignmentForm({
 
         if (uploadResult.fileUrl) {
           uploadedFileUrl = uploadResult.fileUrl;
-          setFileUrl(uploadedFileUrl);
+          setFileUrl(uploadResult.fileUrl);
         }
       } catch {
         setError("Failed to upload file. Please try again.");
