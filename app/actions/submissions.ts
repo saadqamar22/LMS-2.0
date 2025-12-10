@@ -104,8 +104,8 @@ export async function submitAssignment(
     let submission;
     if (existingSubmission) {
       // Update existing submission
-      const { data: updated, error: updateError } = await supabase
-        .from("submissions")
+      const updateQuery = supabase.from("submissions") as any;
+      const { data: updated, error: updateError } = await updateQuery
         .update({
           text_answer: input.textAnswer?.trim() || null,
           file_url: input.fileUrl?.trim() || null,
