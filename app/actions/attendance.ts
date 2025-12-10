@@ -124,9 +124,8 @@ export async function saveAttendance(
       .eq("date", input.date);
 
     // Then insert new records
-    const { error: insertError } = await supabase
-      .from("attendance")
-      .insert(attendanceData);
+    const insertQuery = supabase.from("attendance") as any;
+    const { error: insertError } = await insertQuery.insert(attendanceData);
 
     if (insertError) {
       console.error("Error saving attendance:", JSON.stringify(insertError, null, 2));
