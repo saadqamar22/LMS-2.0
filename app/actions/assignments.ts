@@ -62,7 +62,8 @@ export async function updateAssignmentFileUrl(
       };
     }
 
-    if (assignment.teacher_id !== session.userId) {
+    const assignmentInfo = assignment as { assignment_id: string; teacher_id: string };
+    if (assignmentInfo.teacher_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to update this assignment.",
@@ -79,7 +80,7 @@ export async function updateAssignmentFileUrl(
     // Update assignment with file URL
     const { error: updateError } = await supabase
       .from("assignments")
-      .update({ file_url: fileUrl })
+      .update({ file_url: fileUrl } as any)
       .eq("assignment_id", assignmentId);
 
     if (updateError) {
@@ -94,11 +95,12 @@ export async function updateAssignmentFileUrl(
     }
 
     // Revalidate all relevant paths
-    if (assignmentData?.course_id) {
-      revalidatePath(`/teacher/courses/${assignmentData.course_id}/assignments`);
-      revalidatePath(`/teacher/courses/${assignmentData.course_id}/assignments/${assignmentId}`);
-      revalidatePath(`/student/courses/${assignmentData.course_id}/assignments`);
-      revalidatePath(`/student/courses/${assignmentData.course_id}/assignments/${assignmentId}`);
+    const courseId = (assignmentData as { course_id: string } | null)?.course_id;
+    if (courseId) {
+      revalidatePath(`/teacher/courses/${courseId}/assignments`);
+      revalidatePath(`/teacher/courses/${courseId}/assignments/${assignmentId}`);
+      revalidatePath(`/student/courses/${courseId}/assignments`);
+      revalidatePath(`/student/courses/${courseId}/assignments/${assignmentId}`);
       revalidatePath(`/teacher/assignments`);
     }
 
