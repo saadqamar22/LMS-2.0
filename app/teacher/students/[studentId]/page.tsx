@@ -57,13 +57,21 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
     );
   }
 
+  const studentDataTyped = studentData as {
+    id: string;
+    registration_number: string | null;
+    class: string | null;
+    section: string | null;
+    users: { full_name: string | null; email: string | null } | null;
+  };
+
   const student = {
-    id: studentData.id,
-    full_name: (studentData.users as { full_name: string | null })?.full_name || "Unknown",
-    email: (studentData.users as { email: string | null })?.email || "",
-    registration_number: studentData.registration_number,
-    class: studentData.class,
-    section: studentData.section,
+    id: studentDataTyped.id,
+    full_name: studentDataTyped.users?.full_name || "Unknown",
+    email: studentDataTyped.users?.email || "",
+    registration_number: studentDataTyped.registration_number,
+    class: studentDataTyped.class,
+    section: studentDataTyped.section,
   };
 
   // Get teacher's courses
