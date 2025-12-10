@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/empty-state";
 import { getParentChildren } from "@/app/actions/parents";
 import { getChildMarks } from "@/app/actions/marks";
 import Link from "next/link";
-import { BookOpenCheck, Calendar } from "lucide-react";
+import { BookOpenCheck } from "lucide-react";
 import { ChildCard } from "./child-card";
 import { getParentAnnouncements } from "@/app/actions/announcements";
 import { AnnouncementCard } from "@/components/announcement-card";
@@ -50,18 +50,6 @@ export default async function ParentDashboardPage() {
   );
   totalCourses = uniqueCourseIds.size;
 
-  // For attendance, we'll show a link to children page since individual child pages have detailed attendance
-  // In a production app, you'd aggregate attendance here too
-  const totalAttendanceRecords = 0;
-  const totalPresentCount = 0;
-  const totalLateCount = 0;
-
-  // Calculate attendance rate
-  const attendanceRate =
-    totalAttendanceRecords > 0
-      ? Math.round(((totalPresentCount + totalLateCount) / totalAttendanceRecords) * 100)
-      : 0;
-
   // Get announcements
   const announcements = announcementsResult.success
     ? announcementsResult.announcements.slice(0, 3) // Show latest 3 announcements
@@ -75,27 +63,7 @@ export default async function ParentDashboardPage() {
         </h2>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <Link href="/parent/children">
-          <DashboardCard
-            title="Attendance"
-            value={
-              totalAttendanceRecords > 0 ? (
-                <span className={attendanceRate < 80 ? "text-red-600" : ""}>
-                  {attendanceRate}%
-                </span>
-              ) : (
-                "N/A"
-              )
-            }
-            subtitle={
-              totalAttendanceRecords > 0
-                ? `${totalPresentCount + totalLateCount} / ${totalAttendanceRecords} present`
-                : "View individual child pages for details"
-            }
-            icon={<Calendar className="h-5 w-5" />}
-          />
-        </Link>
+      <section className="grid gap-6 md:grid-cols-2">
         <Link href="/parent/children">
           <DashboardCard
             title="Enrolled Courses"

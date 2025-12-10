@@ -11,9 +11,9 @@ import {
   ClipboardList,
   FileText,
   GraduationCap,
-  Home,
   LayoutDashboard,
   Megaphone,
+  PenTool,
   Settings,
   Users,
 } from "lucide-react";
@@ -46,7 +46,6 @@ const ROLE_NAV: Record<
     { label: "Dashboard", href: "/parent/dashboard", icon: LayoutDashboard },
     { label: "Children", href: "/parent/children", icon: Users },
     { label: "Announcements", href: "/parent/announcements", icon: Megaphone },
-    { label: "Reports", href: "/parent/reports", icon: FileText },
   ],
   admin: [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -60,6 +59,7 @@ const ROLE_NAV: Record<
     { label: "Quiz Generator (Coming Soon)", href: "/ai/quiz-generator", icon: ClipboardList },
     { label: "Summarizer (Coming Soon)", href: "/ai/summarizer", icon: FileText },
     { label: "Parent Reports (Coming Soon)", href: "/ai/parent-report", icon: GraduationCap },
+    { label: "Reports", href: "/parent/reports", icon: FileText },
   ],
 };
 
@@ -80,7 +80,7 @@ export function Sidebar({ role }: SidebarProps) {
             background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.primaryHover})`,
           }}
         >
-          <Home className="h-6 w-6" />
+          <PenTool className="h-6 w-6" />
         </div>
         <div>
           <p className="text-lg font-semibold text-slate-900">
