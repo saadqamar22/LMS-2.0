@@ -491,7 +491,15 @@ export async function getTeacherAnnouncements(): Promise<
     const teacherName = (teacher as { id: string; full_name: string | null } | null)?.full_name || "Unknown Teacher";
 
     // Get course names for course-specific announcements
-    const courseIds = [...new Set((announcements || [])
+    const courseIds = [...new Set(((announcements || []) as Array<{
+      announcement_id: string;
+      teacher_id: string;
+      course_id: string | null;
+      title: string;
+      content: string;
+      audience: string;
+      created_at: string | null;
+    }>)
       .map(a => a.course_id)
       .filter((id): id is string => id !== null))];
 
