@@ -128,16 +128,18 @@ export async function verifyChildAccess(
       return { hasAccess: false };
     }
 
-    if (student.parent_id !== session.userId) {
+    const studentData = student as {
+      id: string;
+      parent_id: string | null;
+      users?: { full_name: string | null } | null;
+    };
+    if (studentData.parent_id !== session.userId) {
       return { hasAccess: false };
     }
 
     return {
       hasAccess: true,
-      childName:
-        (student as {
-          users?: { full_name: string | null } | null;
-        }).users?.full_name || "Unknown",
+      childName: studentData.users?.full_name || "Unknown",
     };
   } catch (error) {
     console.error("Unexpected error verifying child access:", error);
