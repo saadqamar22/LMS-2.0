@@ -472,7 +472,12 @@ export async function gradeSubmission(
       };
     }
 
-    const assignment = submission.assignments as { teacher_id: string } | null;
+    const submissionData = submission as {
+      submission_id: string;
+      assignment_id: string;
+      assignments?: { teacher_id: string } | null;
+    };
+    const assignment = submissionData.assignments as { teacher_id: string } | null;
     if (assignment?.teacher_id !== session.userId) {
       return {
         success: false,
@@ -481,8 +486,8 @@ export async function gradeSubmission(
     }
 
     // Update submission with grade
-    const { data: updated, error: updateError } = await supabase
-      .from("submissions")
+    const updateQuery = supabase.from("submissions") as any;
+    const { data: updated, error: updateError } = await updateQuery
       .update({
         marks: input.marks,
         feedback: input.feedback?.trim() || null,
@@ -503,21 +508,33 @@ export async function gradeSubmission(
       };
     }
 
-    revalidatePath(`/teacher/courses/${submission.assignment_id}/assignments/${submission.assignment_id}`);
-    revalidatePath(`/student/courses/*/assignments/${submission.assignment_id}`);
+    const updatedData = updated as {
+      submission_id: string;
+      assignment_id: string;
+      student_id: string;
+      file_url: string | null;
+      text_answer: string | null;
+      marks: number | null;
+      feedback: string | null;
+      submitted_at: string | null;
+      graded_at: string | null;
+    };
+
+    revalidatePath(`/teacher/courses/${submissionData.assignment_id}/assignments/${submissionData.assignment_id}`);
+    revalidatePath(`/student/courses/*/assignments/${submissionData.assignment_id}`);
 
     return {
       success: true,
       submission: {
-        submission_id: updated.submission_id,
-        assignment_id: updated.assignment_id,
-        student_id: updated.student_id,
-        file_url: updated.file_url,
-        text_answer: updated.text_answer,
-        marks: updated.marks,
-        feedback: updated.feedback,
-        submitted_at: updated.submitted_at,
-        graded_at: updated.graded_at,
+        submission_id: updatedData.submission_id,
+        assignment_id: updatedData.assignment_id,
+        student_id: updatedData.student_id,
+        file_url: updatedData.file_url,
+        text_answer: updatedData.text_answer,
+        marks: updatedData.marks,
+        feedback: updatedData.feedback,
+        submitted_at: updatedData.submitted_at,
+        graded_at: updatedData.graded_at,
       },
     };
   } catch (error) {
