@@ -503,12 +503,13 @@ export async function getTeacherAnnouncements(): Promise<
       .map(a => a.course_id)
       .filter((id): id is string => id !== null))];
 
-    const { data: courses } = courseIds.length > 0
+    const coursesResult = courseIds.length > 0
       ? await supabase
           .from("courses")
           .select("course_id, course_name, course_code")
           .in("course_id", courseIds)
       : { data: [], error: null };
+    const courses = coursesResult.data || [];
 
     const courseMap = new Map(
       (courses || []).map(c => [
