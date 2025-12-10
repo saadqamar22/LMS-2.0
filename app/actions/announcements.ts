@@ -91,15 +91,13 @@ export async function createAnnouncement(
 
     const { error: insertError } = await supabase
       .from("announcements")
-      .insert([
-        {
-          teacher_id: session.userId,
-          course_id: input.is_all_students ? null : input.course_id || null,
-          title: input.title.trim(),
-          content: input.content.trim(),
-          audience: input.audience,
-        },
-      ]);
+      .insert({
+        teacher_id: session.userId,
+        course_id: input.is_all_students ? null : input.course_id || null,
+        title: input.title.trim(),
+        content: input.content.trim(),
+        audience: input.audience,
+      });
 
     if (insertError) {
       console.error("Error creating announcement:", JSON.stringify(insertError, null, 2));
