@@ -76,11 +76,13 @@ export async function submitAssignment(
       };
     }
 
+    const assignmentData = assignment as { assignment_id: string; course_id: string };
+
     // Verify student is enrolled
     const { data: enrollment, error: enrollmentError } = await supabase
       .from("enrollments")
       .select("enrollment_id")
-      .eq("course_id", assignment.course_id)
+      .eq("course_id", assignmentData.course_id)
       .eq("student_id", session.userId)
       .maybeSingle();
 
@@ -150,8 +152,8 @@ export async function submitAssignment(
       submission = created;
     }
 
-    revalidatePath(`/student/courses/${assignment.course_id}/assignments/${input.assignmentId}`);
-    revalidatePath(`/teacher/courses/${assignment.course_id}/assignments/${input.assignmentId}`);
+    revalidatePath(`/student/courses/${assignmentData.course_id}/assignments/${input.assignmentId}`);
+    revalidatePath(`/teacher/courses/${assignmentData.course_id}/assignments/${input.assignmentId}`);
 
     return {
       success: true,
@@ -341,11 +343,13 @@ export async function getStudentSubmission(
       };
     }
 
+    const assignmentData = assignment as { assignment_id: string; course_id: string };
+
     // Verify student is enrolled
     const { data: enrollment, error: enrollmentError } = await supabase
       .from("enrollments")
       .select("enrollment_id")
-      .eq("course_id", assignment.course_id)
+      .eq("course_id", assignmentData.course_id)
       .eq("student_id", session.userId)
       .maybeSingle();
 
