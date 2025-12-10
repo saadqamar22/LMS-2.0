@@ -10,7 +10,7 @@ import {
 import { AttendanceForm } from "../courses/[courseId]/attendance/attendance-form";
 import { EmptyState } from "@/components/empty-state";
 import type { Course } from "@/app/actions/courses";
-import type { Student } from "@/app/actions/enrollments";
+import type { EnrolledStudent } from "@/app/actions/enrollments";
 import type { AttendanceEntry } from "@/app/actions/attendance";
 
 interface AttendanceClientProps {
@@ -26,7 +26,7 @@ export function AttendanceClient({
   const [selectedCourseId, setSelectedCourseId] = useState(
     initialSelectedCourseId || "",
   );
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<EnrolledStudent[]>([]);
   const [existingAttendance, setExistingAttendance] = useState<
     AttendanceEntry[]
   >([]);
