@@ -8,9 +8,14 @@ import { GPADisplay } from "@/components/gpa-display";
 import Link from "next/link";
 import { BookOpenCheck, Calendar, GraduationCap } from "lucide-react";
 import { ChildCard } from "./child-card";
+import { getParentAnnouncements } from "@/app/actions/announcements";
+import { AnnouncementCard } from "@/components/announcement-card";
 
 export default async function ParentDashboardPage() {
-  const childrenResult = await getParentChildren();
+  const [childrenResult, announcementsResult] = await Promise.all([
+    getParentChildren(),
+    getParentAnnouncements(),
+  ]);
 
   if (!childrenResult.success || childrenResult.children.length === 0) {
     return (
@@ -61,6 +66,11 @@ export default async function ParentDashboardPage() {
     totalAttendanceRecords > 0
       ? Math.round(((totalPresentCount + totalLateCount) / totalAttendanceRecords) * 100)
       : 0;
+
+  // Get announcements
+  const announcements = announcementsResult.success
+    ? announcementsResult.announcements.slice(0, 3) // Show latest 3 announcements
+    : [];
 
   return (
     <DashboardShell role="parent">
@@ -115,6 +125,50 @@ export default async function ParentDashboardPage() {
             icon={<BookOpenCheck className="h-5 w-5" />}
           />
         </Link>
+      </section>
+
+      <section className="mt-8">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-slate-400">
+              Announcements
+            </p>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Recent Announcements
+            </h2>
+          </div>
+          <Link
+            href="/parent/announcements"
+            className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+          >
+            View All →
+          </Link>
+        </div>
+        {announcements.length === 0 ? (
+          <EmptyState
+            title="No announcements yet"
+            description="You don't have any announcements at the moment. Check back later for updates."
+          />
+        ) : (
+          <div className="space-y-4">
+            {announcements.map((announcement) => (
+              <AnnouncementCard
+                key={announcement.announcement_id}
+                announcement={announcement}
+              />
+            ))}
+            {announcementsResult.success && announcementsResult.announcements.length > 3 && (
+              <div className="text-center">
+                <Link
+                  href="/parent/announcements"
+                  className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+                >
+                  View all {announcementsResult.announcements.length} announcements →
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="mt-8">
