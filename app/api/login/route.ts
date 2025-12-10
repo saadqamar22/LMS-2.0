@@ -114,10 +114,10 @@ export async function POST(request: Request) {
       message: "Login successful.",
       redirectTo: redirectPath,
       data: {
-        userId: user.id,
+        userId: userData.id,
         role,
-        fullName: user.full_name,
-        email: user.email,
+        fullName: userData.full_name,
+        email: userData.email,
       },
     });
 
