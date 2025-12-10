@@ -189,7 +189,15 @@ export async function getStudentAnnouncements(): Promise<
     }
 
     // Filter announcements: course_id is null (all students) OR course_id is in enrolled courses
-    const announcements = (allAnnouncements || []).filter(
+    const announcements = ((allAnnouncements || []) as Array<{
+      announcement_id: string;
+      teacher_id: string;
+      course_id: string | null;
+      title: string;
+      content: string;
+      audience: string;
+      created_at: string | null;
+    }>).filter(
       (announcement) =>
         announcement.course_id === null ||
         (enrolledCourseIds.length > 0 && enrolledCourseIds.includes(announcement.course_id))
@@ -359,7 +367,15 @@ export async function getParentAnnouncements(): Promise<
     }
 
     // Filter announcements: course_id is null (all students) OR course_id is in enrolled courses
-    const announcements = (allAnnouncements || []).filter(
+    const announcements = ((allAnnouncements || []) as Array<{
+      announcement_id: string;
+      teacher_id: string;
+      course_id: string | null;
+      title: string;
+      content: string;
+      audience: string;
+      created_at: string | null;
+    }>).filter(
       (announcement) =>
         announcement.course_id === null ||
         (enrolledCourseIds.length > 0 && enrolledCourseIds.includes(announcement.course_id))
