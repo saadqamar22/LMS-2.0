@@ -194,8 +194,8 @@ export default async function ChildMarksPage({
                       const obtainedMarks = mark.obtained_marks;
                       const totalMarks = mark.module_total_marks;
                       const percentage =
-                        obtainedMarks !== null &&
-                        totalMarks !== null &&
+                        typeof obtainedMarks === "number" &&
+                        typeof totalMarks === "number" &&
                         totalMarks > 0
                           ? Math.round((obtainedMarks / totalMarks) * 100)
                           : null;
