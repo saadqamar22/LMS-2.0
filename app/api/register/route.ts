@@ -196,7 +196,8 @@ export async function POST(request: Request) {
     }
 
     // Check if all parent IDs were found
-    const foundParentIds = new Set(students.map((s) => s.parent_id));
+    const studentsList = (students || []) as Array<{ id: string; parent_id: string | null }>;
+    const foundParentIds = new Set(studentsList.map((s) => s.parent_id));
     const missingParentIds = parentIdList.filter(id => !foundParentIds.has(id));
     
     if (missingParentIds.length > 0) {
@@ -210,7 +211,7 @@ export async function POST(request: Request) {
     }
 
     // Check if a parent account already exists for any of these students
-    const studentIds = students.map((s) => s.id);
+    const studentIds = studentsList.map((s) => s.id);
     const { data: existingStudents, error: existingParentError } = await supabase
       .from("students")
       .select("parent_id")
@@ -229,8 +230,9 @@ export async function POST(request: Request) {
     }
 
     // Check if any student already has a different parent_id (UUID) assigned
-    if (existingStudents && existingStudents.length > 0) {
-      const hasDifferentParent = existingStudents.some(
+    const existingStudentsList = ((existingStudents || []) as Array<{ parent_id: string | null }>);
+    if (existingStudentsList.length > 0) {
+      const hasDifferentParent = existingStudentsList.some(
         (s) => s.parent_id && s.parent_id !== parentIdList[0] && s.parent_id.length === 36 // UUIDs are 36 chars
       );
       
