@@ -460,12 +460,21 @@ export async function getCourseStatistics(
         .eq("module_id", courseModule.module_id)
         .limit(1);
 
-      if (marks && marks.length > 0 && marks[0].average !== null) {
-        const mark = marks[0];
+      const marksList = ((marks || []) as Array<{
+        obtained_marks: number;
+        average: number | null;
+        std_deviation: number | null;
+        min_marks: number | null;
+        max_marks: number | null;
+        median_marks: number | null;
+      }>);
+
+      if (marksList.length > 0 && marksList[0].average !== null) {
+        const mark = marksList[0];
         moduleStats.push({
           module_id: courseModule.module_id,
           module_name: courseModule.module_name,
-          average: mark.average,
+          average: mark.average!,
           stdDeviation: mark.std_deviation || 0,
           minMarks: mark.min_marks || 0,
           maxMarks: mark.max_marks || 0,
@@ -480,7 +489,8 @@ export async function getCourseStatistics(
           .eq("module_id", courseModule.module_id);
 
         if (allModuleMarks) {
-          allMarks.push(...allModuleMarks.map((m) => m.obtained_marks));
+          const marksArray = ((allModuleMarks || []) as Array<{ obtained_marks: number }>);
+          allMarks.push(...marksArray.map((m) => m.obtained_marks));
         }
       }
     }
@@ -561,9 +571,17 @@ export async function getStudentModuleStatistics(
       };
     }
 
-    const marksArray = marks.map((m) => m.obtained_marks);
+    const marksList = ((marks || []) as Array<{
+      obtained_marks: number;
+      modules?: {
+        module_id: string;
+        module_name: string;
+        total_marks: number;
+      } | null;
+    }>);
+    const marksArray = marksList.map((m) => m.obtained_marks);
     const stats = calculateStatistics(marksArray);
-    const moduleData = marks[0].modules as {
+    const moduleData = marksList[0]?.modules as {
       module_id: string;
       module_name: string;
       total_marks: number;
@@ -678,6 +696,11 @@ export async function getStudentMarks(
         student_id: mark.student_id,
         module_id: mark.module_id,
         obtained_marks: mark.obtained_marks,
+        average: null,
+        std_deviation: null,
+        min_marks: null,
+        max_marks: null,
+        median_marks: null,
         module_name: mark.modules?.module_name || "Unknown Module",
         module_total_marks: mark.modules?.total_marks,
         course_name: mark.modules?.courses?.course_name,
@@ -737,7 +760,8 @@ export async function getChildMarks(
       };
     }
 
-    if (student.parent_id !== session.userId) {
+    const studentData = student as { id: string; parent_id: string | null };
+    if (studentData.parent_id !== session.userId) {
       return {
         success: false,
         error: "You do not have permission to view this student's marks.",
@@ -798,6 +822,11 @@ export async function getChildMarks(
         student_id: mark.student_id,
         module_id: mark.module_id,
         obtained_marks: mark.obtained_marks,
+        average: null,
+        std_deviation: null,
+        min_marks: null,
+        max_marks: null,
+        median_marks: null,
         module_name: mark.modules?.module_name || "Unknown Module",
         module_total_marks: mark.modules?.total_marks,
         course_name: mark.modules?.courses?.course_name,
@@ -910,7 +939,8 @@ export async function getAllMarksForCourse(
       };
     }
 
-    const moduleIds = modules.map((m) => m.module_id);
+    const modulesList = ((modules || []) as Array<{ module_id: string }>);
+    const moduleIds = modulesList.map((m) => m.module_id);
 
     // Fetch all marks for all modules in this course
     const { data: marks, error: marksError } = await supabase
