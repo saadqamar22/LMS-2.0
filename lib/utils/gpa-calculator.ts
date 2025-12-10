@@ -38,10 +38,15 @@ export function gpaToPercentage(gpa: number): number {
  * Takes an array of marks with obtained_marks and module_total_marks
  */
 export function calculateGPAFromMarks(
-  marks: Array<{ obtained_marks: number | null; module_total_marks: number | null }>,
+  marks: Array<{ obtained_marks: number | null | undefined; module_total_marks: number | null | undefined }>,
 ): { gpa: number; percentage: number } {
   const validMarks = marks.filter(
-    (m) => m.obtained_marks !== null && m.module_total_marks !== null && m.module_total_marks > 0,
+    (m) => 
+      m.obtained_marks !== null && 
+      m.obtained_marks !== undefined &&
+      m.module_total_marks !== null && 
+      m.module_total_marks !== undefined && 
+      m.module_total_marks > 0,
   );
 
   if (validMarks.length === 0) {
