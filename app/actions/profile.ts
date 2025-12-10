@@ -75,10 +75,16 @@ export async function getUserProfile(): Promise<
         .single();
 
       if (student) {
-        profile.registration_number = student.registration_number;
-        profile.class = student.class;
-        profile.section = student.section;
-        profile.parent_id = student.parent_id;
+        const studentData = student as {
+          registration_number: string | null;
+          class: string | null;
+          section: string | null;
+          parent_id: string | null;
+        };
+        profile.registration_number = studentData.registration_number;
+        profile.class = studentData.class;
+        profile.section = studentData.section;
+        profile.parent_id = studentData.parent_id;
       }
     } else if (userData.role === "teacher") {
       const { data: teacher } = await supabase
@@ -88,9 +94,14 @@ export async function getUserProfile(): Promise<
         .single();
 
       if (teacher) {
-        profile.employee_id = teacher.employee_id;
-        profile.department = teacher.department;
-        profile.designation = teacher.designation;
+        const teacherData = teacher as {
+          employee_id: string | null;
+          department: string | null;
+          designation: string | null;
+        };
+        profile.employee_id = teacherData.employee_id;
+        profile.department = teacherData.department;
+        profile.designation = teacherData.designation;
       }
     } else if (userData.role === "parent") {
       const { data: parent } = await supabase
@@ -100,11 +111,16 @@ export async function getUserProfile(): Promise<
         .single();
 
       if (parent) {
-        profile.phone_number = parent.phone_number;
-        profile.address = parent.address;
+        const parentData = parent as {
+          phone_number: string | null;
+          address: string | null;
+          full_name: string | null;
+        };
+        profile.phone_number = parentData.phone_number;
+        profile.address = parentData.address;
         // Use parent's full_name if available (from parents table)
-        if (parent.full_name) {
-          profile.full_name = parent.full_name;
+        if (parentData.full_name) {
+          profile.full_name = parentData.full_name;
         }
       }
     }
