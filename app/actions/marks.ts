@@ -108,8 +108,8 @@ async function updateModuleStatistics(moduleId: string): Promise<void> {
   const stats = calculateStatistics(marksArray);
 
   // Update all marks in this module with the same statistics
-  await supabase
-    .from("marks")
+  const updateQuery = supabase.from("marks") as any;
+  await updateQuery
     .update({
       average: stats.average,
       std_deviation: stats.stdDeviation,
