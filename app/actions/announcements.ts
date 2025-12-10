@@ -509,16 +509,24 @@ export async function getTeacherAnnouncements(): Promise<
           .select("course_id, course_name, course_code")
           .in("course_id", courseIds)
       : { data: [], error: null };
-    const courses = coursesResult.data || [];
+    const courses = (coursesResult.data || []) as Array<{ course_id: string; course_name: string; course_code: string }>;
 
     const courseMap = new Map(
-      (courses || []).map(c => [
+      courses.map(c => [
         c.course_id,
         { name: c.course_name, code: c.course_code },
       ])
     );
 
-    const announcementsList: Announcement[] = (announcements || []).map(
+    const announcementsList: Announcement[] = ((announcements || []) as Array<{
+      announcement_id: string;
+      teacher_id: string;
+      course_id: string | null;
+      title: string;
+      content: string;
+      audience: string;
+      created_at: string | null;
+    }>).map(
       (announcement) => ({
         announcement_id: announcement.announcement_id,
         teacher_id: announcement.teacher_id,
