@@ -24,7 +24,8 @@ export default function RegisterForm() {
   const [designation, setDesignation] = useState("");
   
   // Parent fields
-  const [parentId, setParentId] = useState(""); // Parent ID from student record
+  const [numberOfChildren, setNumberOfChildren] = useState(1);
+  const [parentIds, setParentIds] = useState<string[]>([""]); // Array of parent IDs from student records
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   
@@ -100,8 +101,15 @@ export default function RegisterForm() {
     }
 
     if (role === "parent") {
-      if (!parentId.trim()) {
-        setError("Parent ID is required. You must have a valid parent ID from your child's student record.");
+      // Validate all parent IDs are filled
+      const validParentIds = parentIds.filter(id => id.trim() !== "");
+      if (validParentIds.length === 0) {
+        setError("At least one Parent ID is required. You must have valid parent IDs from your children's student records.");
+        setLoading(false);
+        return;
+      }
+      if (validParentIds.length !== numberOfChildren) {
+        setError(`Please enter Parent IDs for all ${numberOfChildren} child${numberOfChildren > 1 ? 'ren' : ''}.`);
         setLoading(false);
         return;
       }
@@ -135,7 +143,7 @@ export default function RegisterForm() {
         designation: designation,
       }),
       ...(role === "parent" && {
-        parent_id: parentId, // Required: must exist in students table
+        parent_ids: parentIds.filter(id => id.trim() !== ""), // Array of parent IDs: must exist in students table
         phone_number: phoneNumber,
         address: address,
       }),
@@ -367,24 +375,62 @@ export default function RegisterForm() {
         {/* Parent-specific fields */}
         {role === "parent" && (
           <>
-            <div>
-              <label htmlFor="parent-id" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Parent ID *
-              </label>
-              <input
-                id="parent-id"
-                name="parent-id"
-                type="text"
-                required
-                value={parentId}
-                onChange={(e) => setParentId(e.target.value)}
-                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
-                placeholder="Enter your parent ID from your child's student record"
-              />
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                This ID is automatically generated when your child's student account is created.
+            <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-900/20">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                You can register with multiple children. Enter the Parent ID from each child's student record.
               </p>
             </div>
+            <div>
+              <label htmlFor="number-of-children" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Number of Children *
+              </label>
+              <select
+                id="number-of-children"
+                name="number-of-children"
+                required
+                value={numberOfChildren}
+                onChange={(e) => {
+                  const num = parseInt(e.target.value);
+                  setNumberOfChildren(num);
+                  // Adjust parentIds array to match the number
+                  const newParentIds = Array(num).fill("").map((_, i) => parentIds[i] || "");
+                  setParentIds(newParentIds);
+                }}
+                className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                  <option key={num} value={num}>
+                    {num} {num === 1 ? "Child" : "Children"}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {parentIds.map((parentId, index) => (
+              <div key={index}>
+                <label htmlFor={`parent-id-${index}`} className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Parent ID for Child {index + 1} *
+                </label>
+                <input
+                  id={`parent-id-${index}`}
+                  name={`parent-id-${index}`}
+                  type="text"
+                  required
+                  value={parentId}
+                  onChange={(e) => {
+                    const newParentIds = [...parentIds];
+                    newParentIds[index] = e.target.value;
+                    setParentIds(newParentIds);
+                  }}
+                  className="mt-1 block w-full rounded-md border-0 px-3 py-2 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-800 dark:text-zinc-50 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-500 sm:text-sm"
+                  placeholder={`Enter Parent ID for child ${index + 1}`}
+                />
+                {index === 0 && (
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    This ID is automatically generated when your child's student account is created.
+                  </p>
+                )}
+              </div>
+            ))}
             <div>
               <label htmlFor="phone-number" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Phone Number *

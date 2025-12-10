@@ -17,7 +17,8 @@ interface RegisterPayload {
   designation?: string;
   phone_number?: string;
   address?: string;
-  parent_id?: string; // For parent registration - must exist in students table
+  parent_id?: string; // Deprecated: use parent_ids instead
+  parent_ids?: string[]; // For parent registration - array of parent IDs that must exist in students table
 }
 
 function validateEmail(email: string) {
@@ -64,7 +65,8 @@ export async function POST(request: Request) {
     designation,
     phone_number,
     address,
-    parent_id, // For parent registration
+    parent_id, // Deprecated: kept for backward compatibility
+    parent_ids, // For parent registration - array of parent IDs
   } = body;
 
   if (!full_name?.trim()) {
@@ -137,11 +139,16 @@ export async function POST(request: Request) {
   }
 
   if (role === "parent") {
-    if (!parent_id?.trim()) {
+    // Support both old single parent_id and new parent_ids array
+    const parentIdList = parent_ids && parent_ids.length > 0 
+      ? parent_ids.filter(id => id?.trim()) 
+      : (parent_id?.trim() ? [parent_id.trim()] : []);
+
+    if (parentIdList.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: "Parent ID is required. You must have a valid parent ID from your child's student record.",
+          error: "At least one Parent ID is required. You must have valid parent IDs from your children's student records.",
         },
         { status: 400 },
       );
@@ -161,18 +168,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate that the parent_id exists in students table (created by trigger)
+    // Validate that all parent_ids exist in students table
     const { data: students, error: studentError } = await supabase
       .from("students")
       .select("id, parent_id")
-      .eq("parent_id", parent_id);
+      .in("parent_id", parentIdList);
 
     if (studentError) {
-      console.error("Error validating parent ID:", studentError);
+      console.error("Error validating parent IDs:", studentError);
       return NextResponse.json(
         {
           success: false,
-          error: "Error validating parent ID. Please try again.",
+          error: "Error validating parent IDs. Please try again.",
         },
         { status: 500 },
       );
@@ -182,7 +189,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid parent ID. Please check your parent ID and try again.",
+          error: "Invalid parent ID(s). Please check your parent IDs and try again.",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Check if all parent IDs were found
+    const foundParentIds = new Set(students.map((s) => s.parent_id));
+    const missingParentIds = parentIdList.filter(id => !foundParentIds.has(id));
+    
+    if (missingParentIds.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid parent ID(s): ${missingParentIds.join(", ")}. Please check and try again.`,
         },
         { status: 400 },
       );
@@ -190,22 +211,38 @@ export async function POST(request: Request) {
 
     // Check if a parent account already exists for any of these students
     const studentIds = students.map((s) => s.id);
-    const { data: existingParent, error: existingParentError } = await supabase
+    const { data: existingStudents, error: existingParentError } = await supabase
       .from("students")
       .select("parent_id")
       .in("id", studentIds)
-      .not("parent_id", "eq", parent_id)
-      .limit(1);
+      .not("parent_id", "is", null);
 
     if (existingParentError && existingParentError.code !== "PGRST116") {
       console.error("Error checking existing parent:", existingParentError);
       return NextResponse.json(
         {
           success: false,
-          error: "Error validating parent ID. Please try again.",
+          error: "Error validating parent IDs. Please try again.",
         },
         { status: 500 },
       );
+    }
+
+    // Check if any student already has a different parent_id (UUID) assigned
+    if (existingStudents && existingStudents.length > 0) {
+      const hasDifferentParent = existingStudents.some(
+        (s) => s.parent_id && s.parent_id !== parentIdList[0] && s.parent_id.length === 36 // UUIDs are 36 chars
+      );
+      
+      if (hasDifferentParent) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "One or more of these children already have a parent account linked. Please contact support.",
+          },
+          { status: 400 },
+        );
+      }
     }
   }
 
@@ -334,11 +371,15 @@ export async function POST(request: Request) {
         );
       }
 
-      // Update all students with this parent_id to point to the new parent user ID
+      // Update all students with any of the provided parent_ids to point to the new parent user ID
+      const parentIdList = parent_ids && parent_ids.length > 0 
+        ? parent_ids.filter(id => id?.trim()) 
+        : (parent_id?.trim() ? [parent_id.trim()] : []);
+      
       const { error: updateError } = await supabase
         .from("students")
         .update({ parent_id: userId })
-        .eq("parent_id", parent_id);
+        .in("parent_id", parentIdList);
 
       if (updateError) {
         console.error("Error updating student parent_id:", updateError);

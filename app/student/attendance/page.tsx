@@ -147,7 +147,7 @@ export default async function StudentAttendancePage({
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 Attendance Rate
               </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className={`mt-2 text-3xl font-semibold ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
                 {attendanceRate}%
               </p>
             </div>

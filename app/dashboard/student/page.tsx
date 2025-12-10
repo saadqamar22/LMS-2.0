@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Student Dashboard | AI LMS",
-  description: "Student dashboard for AI LMS",
+  title: "Student Dashboard | ILMS",
+  description: "Student dashboard for ILMS",
 };
 
 export default function LegacyStudentDashboard() {

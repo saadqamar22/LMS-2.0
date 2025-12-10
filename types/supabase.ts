@@ -298,6 +298,35 @@ export interface Database {
           graded_at?: string | null;
         };
       };
+      announcements: {
+        Row: {
+          announcement_id: string;
+          teacher_id: string;
+          course_id: string | null;
+          title: string;
+          content: string;
+          audience: "students" | "parents" | "both";
+          created_at: string | null;
+        };
+        Insert: {
+          announcement_id?: string;
+          teacher_id: string;
+          course_id?: string | null;
+          title: string;
+          content: string;
+          audience: "students" | "parents" | "both";
+          created_at?: string;
+        };
+        Update: {
+          announcement_id?: string;
+          teacher_id?: string;
+          course_id?: string | null;
+          title?: string;
+          content?: string;
+          audience?: "students" | "parents" | "both";
+          created_at?: string | null;
+        };
+      };
     };
   };
 }

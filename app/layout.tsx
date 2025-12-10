@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI LMS",
+  title: "ILMS",
   description:
     "Modern AI-powered learning management system for students, teachers, parents, and admins.",
 };

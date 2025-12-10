@@ -6,7 +6,7 @@ import type { CreateCourseActionState } from "./types";
 import { createCourse } from "@/app/actions/courses";
 
 export const metadata = {
-  title: "Create Course | AI LMS",
+  title: "Create Course | ILMS",
 };
 
 export default async function CreateCoursePage() {

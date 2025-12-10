@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Verify Email | AI LMS",
+  title: "Verify Email | ILMS",
   description: "Verify your email address",
 };
 

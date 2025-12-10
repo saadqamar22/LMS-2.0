@@ -1,7 +1,6 @@
 import { BookOpenCheck, Calendar, GraduationCap } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { DashboardCard } from "@/components/dashboard-card";
-import { ChatbotWidget } from "@/components/chatbot-widget";
 import { EmptyState } from "@/components/empty-state";
 import { getStudentEnrollments } from "@/app/actions/enrollments";
 import { getStudentMarks } from "@/app/actions/marks";
@@ -14,6 +13,8 @@ import { getStudentAttendance } from "@/app/actions/attendance";
 import { getUpcomingAssignmentsForStudent } from "@/app/actions/assignments";
 import { getStudentSubmission } from "@/app/actions/submissions";
 import { AssignmentCard } from "@/components/assignment-card";
+import { getStudentAnnouncements } from "@/app/actions/announcements";
+import { AnnouncementCard } from "@/components/announcement-card";
 
 export default async function StudentDashboardPage() {
   const currentUser = await getCurrentUser();
@@ -22,12 +23,13 @@ export default async function StudentDashboardPage() {
     redirect("/auth/login");
   }
 
-  const [enrollmentsResult, marksResult, attendanceResult, assignmentsResult] =
+  const [enrollmentsResult, marksResult, attendanceResult, assignmentsResult, announcementsResult] =
     await Promise.all([
       getStudentEnrollments(),
       getStudentMarks(),
       getStudentAttendance(),
       getUpcomingAssignmentsForStudent(5), // Get top 5 upcoming assignments
+      getStudentAnnouncements(),
     ]);
 
   const enrolledCourses = enrollmentsResult.success ? enrollmentsResult.courses : [];
@@ -35,6 +37,9 @@ export default async function StudentDashboardPage() {
   const attendance = attendanceResult.success ? attendanceResult.attendance : [];
   const upcomingAssignments = assignmentsResult.success
     ? assignmentsResult.assignments
+    : [];
+  const announcements = announcementsResult.success
+    ? announcementsResult.announcements.slice(0, 3) // Show latest 3 announcements
     : [];
 
   // Fetch submission status for each assignment
@@ -100,7 +105,11 @@ export default async function StudentDashboardPage() {
         <Link href="/student/attendance">
           <DashboardCard
             title="Attendance"
-            value={`${attendanceRate}%`}
+            value={
+              <span className={attendanceRate < 80 ? "text-red-600" : ""}>
+                {attendanceRate}%
+              </span>
+            }
             subtitle={`${presentCount + lateCount} / ${totalAttendanceRecords} present`}
             icon={<Calendar className="h-5 w-5" />}
           />
@@ -113,12 +122,48 @@ export default async function StudentDashboardPage() {
         />
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-        <EmptyState
-          title="No announcements yet"
-          description="Once Supabase tables are connected, course announcements will display in this space."
-        />
-        <ChatbotWidget />
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-slate-400">
+              Announcements
+            </p>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Recent Announcements
+            </h2>
+          </div>
+          <Link
+            href="/student/announcements"
+            className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+          >
+            View All →
+          </Link>
+        </div>
+        {announcements.length === 0 ? (
+          <EmptyState
+            title="No announcements yet"
+            description="You don't have any announcements at the moment. Check back later for updates."
+          />
+        ) : (
+          <div className="space-y-4">
+            {announcements.map((announcement) => (
+              <AnnouncementCard
+                key={announcement.announcement_id}
+                announcement={announcement}
+              />
+            ))}
+            {announcementsResult.success && announcementsResult.announcements.length > 3 && (
+              <div className="text-center">
+                <Link
+                  href="/student/announcements"
+                  className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+                >
+                  View all {announcementsResult.announcements.length} announcements →
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="mt-8">

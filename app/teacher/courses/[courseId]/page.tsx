@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { EmptyState } from "@/components/empty-state";
-import { UploadMaterialModal } from "@/components/modals/upload-material-modal";
 import { getCourseById } from "@/app/actions/courses";
 import { getEnrolledStudentsForCourse } from "@/app/actions/enrollments";
 import { getAllMarksForCourse } from "@/app/actions/marks";
@@ -54,7 +53,7 @@ export default async function TeacherCourseDetailPage({
 
   return (
     <DashboardShell role="teacher">
-      <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <section>
         <div>
           <p className="text-xs uppercase tracking-wide text-slate-400">
             {course.course_code}
@@ -65,9 +64,6 @@ export default async function TeacherCourseDetailPage({
           <p className="mt-1 text-xs text-slate-400">
             Created {new Date(course.created_at).toLocaleDateString()}
           </p>
-        </div>
-        <div className="flex gap-3">
-          <UploadMaterialModal />
         </div>
       </section>
 

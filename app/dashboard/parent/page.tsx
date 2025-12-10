@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Parent Dashboard | AI LMS",
-  description: "Parent dashboard for AI LMS",
+  title: "Parent Dashboard | ILMS",
+  description: "Parent dashboard for ILMS",
 };
 
 export default function LegacyParentDashboard() {

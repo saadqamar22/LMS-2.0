@@ -38,23 +38,12 @@ export function AssignmentsDashboardClient({
     <div className="space-y-6">
       {/* Course Selection */}
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-        <div className="mb-4 flex items-center justify-between">
-          <label
-            htmlFor="course-select"
-            className="block text-sm font-medium text-slate-700"
-          >
-            Select Course:
-          </label>
-          {selectedCourseId && (
-            <Link
-              href={`/teacher/courses/${selectedCourseId}/assignments?create=true`}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
-            >
-              <FileText className="h-4 w-4" />
-              Create Assignment
-            </Link>
-          )}
-        </div>
+        <label
+          htmlFor="course-select"
+          className="block text-sm font-medium text-slate-700 mb-2"
+        >
+          Select Course:
+        </label>
         <select
           id="course-select"
           value={selectedCourseId || ""}
@@ -73,19 +62,29 @@ export function AssignmentsDashboardClient({
       {/* Assignments List */}
       {selectedCourseId ? (
         assignmentsWithSubmissions.length === 0 ? (
-          <EmptyState
-            title="No assignments yet"
-            description="Create assignments for this course to get started."
-            action={
+          <div className="space-y-4">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {selectedCourse?.course_name} Assignments
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  No assignments yet
+                </p>
+              </div>
               <Link
                 href={`/teacher/courses/${selectedCourseId}/assignments?create=true`}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
               >
                 <FileText className="h-4 w-4" />
-                Create First Assignment
+                Create Assignment
               </Link>
-            }
-          />
+            </div>
+            <EmptyState
+              title="No assignments yet"
+              description="Create assignments for this course to get started."
+            />
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="mb-4 flex items-center justify-between">

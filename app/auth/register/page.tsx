@@ -1,7 +1,7 @@
 import RegisterForm from "@/app/auth/register/register-form";
 
 export const metadata = {
-  title: "Register | AI LMS",
+  title: "Register | ILMS",
   description: "Create a new account to get started",
 };
 

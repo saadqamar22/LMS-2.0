@@ -1,7 +1,7 @@
 import LoginForm from "@/app/auth/login/login-form";
 
 export const metadata = {
-  title: "Login | AI LMS",
+  title: "Login | ILMS",
   description: "Sign in to your account",
 };
 

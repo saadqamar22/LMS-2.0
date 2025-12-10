@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Admin Dashboard | AI LMS",
-  description: "Admin dashboard for AI LMS",
+  title: "Admin Dashboard | ILMS",
+  description: "Admin dashboard for ILMS",
 };
 
 export default function LegacyAdminDashboard() {

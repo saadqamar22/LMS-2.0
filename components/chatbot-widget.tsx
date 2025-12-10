@@ -26,7 +26,7 @@ export function ChatbotWidget() {
         </div>
         <div>
           <p className="text-sm font-semibold text-slate-900">
-            AI Mentor Beta
+            AI Assistant
           </p>
           <p className="text-xs text-slate-500">Always-on learning assistant</p>
         </div>

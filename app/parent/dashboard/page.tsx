@@ -82,7 +82,15 @@ export default async function ParentDashboardPage() {
         <Link href="/parent/children">
           <DashboardCard
             title="Attendance"
-            value={totalAttendanceRecords > 0 ? `${attendanceRate}%` : "N/A"}
+            value={
+              totalAttendanceRecords > 0 ? (
+                <span className={attendanceRate < 80 ? "text-red-600" : ""}>
+                  {attendanceRate}%
+                </span>
+              ) : (
+                "N/A"
+              )
+            }
             subtitle={
               totalAttendanceRecords > 0
                 ? `${totalPresentCount + totalLateCount} / ${totalAttendanceRecords} present`

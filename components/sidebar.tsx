@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Home,
   LayoutDashboard,
+  Megaphone,
   Settings,
   Users,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const ROLE_NAV: Record<
     { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
     { label: "Courses", href: "/student/courses", icon: BookOpen },
     { label: "Assignments", href: "/student/assignments", icon: ClipboardList },
+    { label: "Announcements", href: "/student/announcements", icon: Megaphone },
     { label: "Attendance", href: "/student/attendance", icon: ChartLine },
     { label: "Marks", href: "/student/marks", icon: BarChart3 },
   ],
@@ -34,6 +36,7 @@ const ROLE_NAV: Record<
     { label: "Dashboard", href: "/teacher/dashboard", icon: LayoutDashboard },
     { label: "Courses", href: "/teacher/courses", icon: BookOpen },
     { label: "Assignments", href: "/teacher/assignments", icon: ClipboardList },
+    { label: "Announcements", href: "/teacher/announcements", icon: Megaphone },
     { label: "Students", href: "/teacher/students", icon: Users },
     { label: "Attendance", href: "/teacher/attendance", icon: ChartLine },
     { label: "Marks", href: "/teacher/marks", icon: FileText },
@@ -42,6 +45,7 @@ const ROLE_NAV: Record<
   parent: [
     { label: "Dashboard", href: "/parent/dashboard", icon: LayoutDashboard },
     { label: "Children", href: "/parent/children", icon: Users },
+    { label: "Announcements", href: "/parent/announcements", icon: Megaphone },
     { label: "Reports", href: "/parent/reports", icon: FileText },
   ],
   admin: [
@@ -52,10 +56,10 @@ const ROLE_NAV: Record<
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ],
   ai: [
-    { label: "Chat Assistant", href: "/ai/chat-assistant", icon: Bot },
-    { label: "Quiz Generator", href: "/ai/quiz-generator", icon: ClipboardList },
-    { label: "Summarizer", href: "/ai/summarizer", icon: FileText },
-    { label: "Parent Reports", href: "/ai/parent-report", icon: GraduationCap },
+    { label: "Chat Assistant (Coming Soon)", href: "/ai/chat-assistant", icon: Bot },
+    { label: "Quiz Generator (Coming Soon)", href: "/ai/quiz-generator", icon: ClipboardList },
+    { label: "Summarizer (Coming Soon)", href: "/ai/summarizer", icon: FileText },
+    { label: "Parent Reports (Coming Soon)", href: "/ai/parent-report", icon: GraduationCap },
   ],
 };
 
@@ -79,11 +83,11 @@ export function Sidebar({ role }: SidebarProps) {
           <Home className="h-6 w-6" />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-            AI LMS
-          </p>
           <p className="text-lg font-semibold text-slate-900">
-            Future Learning
+            ILMS
+          </p>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+            Smart Learning
           </p>
         </div>
       </Link>
