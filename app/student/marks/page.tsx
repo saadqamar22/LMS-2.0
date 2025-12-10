@@ -209,13 +209,13 @@ export default async function StudentMarksPage({
 
                   <div className="space-y-3">
                     {courseData.marks.map((mark) => {
+                      const obtainedMarks = mark.obtained_marks;
+                      const totalMarks = mark.module_total_marks;
                       const percentage =
-                        mark.obtained_marks !== null &&
-                        mark.module_total_marks !== null &&
-                        mark.module_total_marks > 0
-                          ? Math.round(
-                              ((mark.obtained_marks || 0) / mark.module_total_marks) * 100,
-                            )
+                        typeof obtainedMarks === "number" &&
+                        typeof totalMarks === "number" &&
+                        totalMarks > 0
+                          ? Math.round((obtainedMarks / totalMarks) * 100)
                           : null;
                       const diffFromAverage =
                         mark.moduleStatistics && mark.moduleStatistics.average > 0
