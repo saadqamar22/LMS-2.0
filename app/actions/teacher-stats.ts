@@ -51,7 +51,7 @@ export async function getTeacherStats(): Promise<
       };
     }
 
-    const courseIds = (courses || []).map((c) => c.course_id);
+    const courseIds = ((courses || []) as Array<{ course_id: string }>).map((c) => c.course_id);
     const totalCourses = courseIds.length;
 
     // Get total unique students across all courses
@@ -87,8 +87,12 @@ export async function getTeacherStats(): Promise<
       console.error("Error fetching recent courses:", recentCoursesError);
     }
 
-    const recentCourseIds =
-      (recentCoursesData || []).map((c) => c.course_id) || [];
+    const recentCoursesList = ((recentCoursesData || []) as Array<{
+      course_id: string;
+      course_name: string;
+      course_code: string;
+    }>);
+    const recentCourseIds = recentCoursesList.map((c) => c.course_id);
 
     // Get student counts for each course
     let enrollmentCounts: any[] = [];
@@ -98,7 +102,7 @@ export async function getTeacherStats(): Promise<
         .select("course_id")
         .in("course_id", recentCourseIds);
       
-      enrollmentCounts = enrollmentCountsData || [];
+      enrollmentCounts = ((enrollmentCountsData || []) as Array<{ course_id: string }>);
     }
 
     const countsByCourse = new Map<string, number>();
@@ -107,13 +111,12 @@ export async function getTeacherStats(): Promise<
       countsByCourse.set(e.course_id, count + 1);
     });
 
-    const recentCourses =
-      (recentCoursesData || []).map((course) => ({
-        course_id: course.course_id,
-        course_name: course.course_name,
-        course_code: course.course_code,
-        student_count: countsByCourse.get(course.course_id) || 0,
-      })) || [];
+    const recentCourses = recentCoursesList.map((course) => ({
+      course_id: course.course_id,
+      course_name: course.course_name,
+      course_code: course.course_code,
+      student_count: countsByCourse.get(course.course_id) || 0,
+    }));
 
     return {
       success: true,
