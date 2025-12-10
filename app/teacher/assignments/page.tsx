@@ -1,6 +1,6 @@
 import { DashboardShell } from "@/components/dashboard-shell";
 import { getTeacherCourses } from "@/app/actions/courses";
-import { getCourseAssignments } from "@/app/actions/assignments";
+import { getCourseAssignments, type Assignment } from "@/app/actions/assignments";
 import { getAssignmentSubmissions } from "@/app/actions/submissions";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
@@ -35,9 +35,7 @@ export default async function TeacherAssignmentsDashboardPage({
   const courses = coursesResult.courses;
 
   // If a course is selected, fetch assignments and submissions
-  let assignments: Awaited<ReturnType<typeof getCourseAssignments>>["success"] extends true
-    ? Awaited<ReturnType<typeof getCourseAssignments>>["assignments"]
-    : [] = [];
+  let assignments: Assignment[] = [];
   let assignmentsWithSubmissions: Array<{
     assignment: typeof assignments[0];
     submissionCount: number;
