@@ -288,7 +288,7 @@ export function MarksEntryForm({
         const marks = typeof data?.obtainedMarks === "number" ? data.obtainedMarks : null;
         return marks;
       })
-      .filter((m): m is number => m !== null && m !== undefined && m !== "");
+      .filter((m): m is number => m !== null && m !== undefined);
 
     if (allMarks.length === 0) return null;
 
