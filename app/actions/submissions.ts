@@ -383,17 +383,30 @@ export async function getStudentSubmission(
     return {
       success: true,
       submission: submission
-        ? {
-            submission_id: submission.submission_id,
-            assignment_id: submission.assignment_id,
-            student_id: submission.student_id,
-            file_url: submission.file_url,
-            text_answer: submission.text_answer,
-            marks: submission.marks,
-            feedback: submission.feedback,
-            submitted_at: submission.submitted_at,
-            graded_at: submission.graded_at,
-          }
+        ? (() => {
+            const submissionData = submission as {
+              submission_id: string;
+              assignment_id: string;
+              student_id: string;
+              file_url: string | null;
+              text_answer: string | null;
+              marks: number | null;
+              feedback: string | null;
+              submitted_at: string | null;
+              graded_at: string | null;
+            };
+            return {
+              submission_id: submissionData.submission_id,
+              assignment_id: submissionData.assignment_id,
+              student_id: submissionData.student_id,
+              file_url: submissionData.file_url,
+              text_answer: submissionData.text_answer,
+              marks: submissionData.marks,
+              feedback: submissionData.feedback,
+              submitted_at: submissionData.submitted_at,
+              graded_at: submissionData.graded_at,
+            };
+          })()
         : null,
     };
   } catch (error) {
