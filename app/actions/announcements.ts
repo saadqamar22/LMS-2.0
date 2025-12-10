@@ -89,15 +89,17 @@ export async function createAnnouncement(
   try {
     const supabase = createAdminClient();
 
+    const insertData = {
+      teacher_id: session.userId,
+      course_id: input.is_all_students ? null : input.course_id || null,
+      title: input.title.trim(),
+      content: input.content.trim(),
+      audience: input.audience,
+    };
+
     const { error: insertError } = await supabase
       .from("announcements")
-      .insert({
-        teacher_id: session.userId,
-        course_id: input.is_all_students ? null : input.course_id || null,
-        title: input.title.trim(),
-        content: input.content.trim(),
-        audience: input.audience,
-      });
+      .insert(insertData as any);
 
     if (insertError) {
       console.error("Error creating announcement:", JSON.stringify(insertError, null, 2));
