@@ -159,7 +159,7 @@ export async function getStudentAnnouncements(): Promise<
       };
     }
 
-    const enrolledCourseIds = (enrollments || []).map(e => e.course_id);
+    const enrolledCourseIds = ((enrollments || []) as Array<{ course_id: string }>).map(e => e.course_id);
 
     // Get announcements: either course_id is null (all students) or matches enrolled courses
     // We need to get all announcements first, then filter in JavaScript
@@ -329,7 +329,7 @@ export async function getParentAnnouncements(): Promise<
       };
     }
 
-    const enrolledCourseIds = [...new Set((enrollments || []).map(e => e.course_id))];
+    const enrolledCourseIds = [...new Set(((enrollments || []) as Array<{ course_id: string }>).map(e => e.course_id))];
 
     // Get announcements: either course_id is null (all students) or matches children's enrolled courses
     // We need to get all announcements first, then filter in JavaScript
