@@ -130,17 +130,6 @@ export default async function TeacherCourseDetailPage({
           />
         )}
       </section>
-
-      <section className="mt-8 grid gap-6 lg:grid-cols-2">
-        <EmptyState
-          title="Modules"
-          description="Add modules to organize course content. This feature will be available soon."
-        />
-        <EmptyState
-          title="Announcements"
-          description="Post announcements for your students. This feature will be available soon."
-        />
-      </section>
     </DashboardShell>
   );
 }
