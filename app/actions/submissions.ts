@@ -226,7 +226,8 @@ export async function getAssignmentSubmissions(
       };
     }
 
-    // Fetch submissions with student info
+    // Submissions reference users.id (student_id). PostgREST cannot embed
+    // students!submissions_student_id_fkey unless that FK exists; fetch students separately.
     const { data: submissions, error: submissionsError } = await supabase
       .from("submissions")
       .select(
@@ -239,14 +240,7 @@ export async function getAssignmentSubmissions(
         marks,
         feedback,
         submitted_at,
-        graded_at,
-        students!submissions_student_id_fkey (
-          id,
-          registration_number,
-          users!students_id_fkey (
-            full_name
-          )
-        )
+        graded_at
       `,
       )
       .eq("assignment_id", assignmentId)
@@ -263,7 +257,7 @@ export async function getAssignmentSubmissions(
       };
     }
 
-    const submissionsList = ((submissions || []) as Array<{
+    const submissionRows = (submissions || []) as Array<{
       submission_id: string;
       assignment_id: string;
       student_id: string;
@@ -273,24 +267,64 @@ export async function getAssignmentSubmissions(
       feedback: string | null;
       submitted_at: string | null;
       graded_at: string | null;
-      students?: {
-        id: string;
-        registration_number: string | null;
-        users?: { full_name: string | null } | null;
-      } | null;
-    }>).map((submission) => ({
-      submission_id: submission.submission_id,
-      assignment_id: submission.assignment_id,
-      student_id: submission.student_id,
-      file_url: submission.file_url,
-      text_answer: submission.text_answer,
-      marks: submission.marks,
-      feedback: submission.feedback,
-      submitted_at: submission.submitted_at,
-      graded_at: submission.graded_at,
-      student_name: submission.students?.users?.full_name || "Unknown",
-      registration_number: submission.students?.registration_number || null,
-    }));
+    }>;
+
+    const studentIds = [
+      ...new Set(submissionRows.map((s) => s.student_id)),
+    ];
+
+    type StudentRow = {
+      id: string;
+      registration_number: string | null;
+      users?: { full_name: string | null } | null;
+    };
+
+    const studentMap = new Map<
+      string,
+      { full_name: string | null; registration_number: string | null }
+    >();
+
+    if (studentIds.length > 0) {
+      const { data: studentRows, error: studentsError } = await supabase
+        .from("students")
+        .select("id, registration_number, users!students_id_fkey (full_name)")
+        .in("id", studentIds);
+
+      if (studentsError) {
+        console.error(
+          "Error fetching students for submissions:",
+          JSON.stringify(studentsError, null, 2),
+        );
+        return {
+          success: false,
+          error: studentsError.message || "Failed to load student details.",
+        };
+      }
+
+      for (const row of (studentRows || []) as StudentRow[]) {
+        studentMap.set(row.id, {
+          full_name: row.users?.full_name ?? null,
+          registration_number: row.registration_number,
+        });
+      }
+    }
+
+    const submissionsList = submissionRows.map((submission) => {
+      const info = studentMap.get(submission.student_id);
+      return {
+        submission_id: submission.submission_id,
+        assignment_id: submission.assignment_id,
+        student_id: submission.student_id,
+        file_url: submission.file_url,
+        text_answer: submission.text_answer,
+        marks: submission.marks,
+        feedback: submission.feedback,
+        submitted_at: submission.submitted_at,
+        graded_at: submission.graded_at,
+        student_name: info?.full_name || "Unknown",
+        registration_number: info?.registration_number ?? null,
+      };
+    });
 
     return {
       success: true,
