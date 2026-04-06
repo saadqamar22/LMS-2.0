@@ -1,0 +1,548 @@
+"use server";
+
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentSession } from "@/lib/auth/get-session";
+import { revalidatePath } from "next/cache";
+
+export interface Submission {
+  submission_id: string;
+  assignment_id: string;
+  student_id: string;
+  file_url: string | null;
+  text_answer: string | null;
+  marks: number | null;
+  feedback: string | null;
+  submitted_at: string | null;
+  graded_at: string | null;
+  student_name?: string;
+  registration_number?: string | null;
+}
+
+export interface CreateSubmissionInput {
+  assignmentId: string;
+  textAnswer?: string;
+  fileUrl?: string;
+}
+
+export interface GradeSubmissionInput {
+  submissionId: string;
+  marks: number;
+  feedback?: string;
+}
+
+/**
+ * Submit an assignment (student only)
+ */
+export async function submitAssignment(
+  input: CreateSubmissionInput,
+): Promise<
+  | { success: true; submission: Submission }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "student") {
+    return {
+      success: false,
+      error: "Only students can submit assignments.",
+    };
+  }
+
+  if (!input.textAnswer?.trim() && !input.fileUrl?.trim()) {
+    return {
+      success: false,
+      error: "Please provide either a text answer or upload a file.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify assignment exists and student is enrolled
+    const { data: assignment, error: assignmentError } = await supabase
+      .from("assignments")
+      .select("assignment_id, course_id")
+      .eq("assignment_id", input.assignmentId)
+      .single();
+
+    if (assignmentError || !assignment) {
+      return {
+        success: false,
+        error: "Assignment not found.",
+      };
+    }
+
+    const assignmentData = assignment as { assignment_id: string; course_id: string };
+
+    // Verify student is enrolled
+    const { data: enrollment, error: enrollmentError } = await supabase
+      .from("enrollments")
+      .select("enrollment_id")
+      .eq("course_id", assignmentData.course_id)
+      .eq("student_id", session.userId)
+      .maybeSingle();
+
+    if (enrollmentError || !enrollment) {
+      return {
+        success: false,
+        error: "You are not enrolled in this course.",
+      };
+    }
+
+    // Check if submission already exists
+    const { data: existingSubmission } = await supabase
+      .from("submissions")
+      .select("submission_id")
+      .eq("assignment_id", input.assignmentId)
+      .eq("student_id", session.userId)
+      .maybeSingle();
+
+    let submission;
+    if (existingSubmission) {
+      const existingSubmissionData = existingSubmission as { submission_id: string };
+      // Update existing submission
+      const updateQuery = supabase.from("submissions") as any;
+      const { data: updated, error: updateError } = await updateQuery
+        .update({
+          text_answer: input.textAnswer?.trim() || null,
+          file_url: input.fileUrl?.trim() || null,
+          submitted_at: new Date().toISOString(),
+        })
+        .eq("submission_id", existingSubmissionData.submission_id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error(
+          "Error updating submission:",
+          JSON.stringify(updateError, null, 2),
+        );
+        return {
+          success: false,
+          error: updateError.message || "Failed to update submission.",
+        };
+      }
+      submission = updated;
+    } else {
+      // Create new submission
+      const insertQuery = supabase.from("submissions") as any;
+      const { data: created, error: createError } = await insertQuery
+        .insert({
+          assignment_id: input.assignmentId,
+          student_id: session.userId,
+          text_answer: input.textAnswer?.trim() || null,
+          file_url: input.fileUrl?.trim() || null,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error(
+          "Error creating submission:",
+          JSON.stringify(createError, null, 2),
+        );
+        return {
+          success: false,
+          error: createError.message || "Failed to submit assignment.",
+        };
+      }
+      submission = created;
+    }
+
+    revalidatePath(`/student/courses/${assignmentData.course_id}/assignments/${input.assignmentId}`);
+    revalidatePath(`/teacher/courses/${assignmentData.course_id}/assignments/${input.assignmentId}`);
+
+    return {
+      success: true,
+      submission: {
+        submission_id: submission.submission_id,
+        assignment_id: submission.assignment_id,
+        student_id: submission.student_id,
+        file_url: submission.file_url,
+        text_answer: submission.text_answer,
+        marks: submission.marks,
+        feedback: submission.feedback,
+        submitted_at: submission.submitted_at,
+        graded_at: submission.graded_at,
+      },
+    };
+  } catch (error) {
+    console.error("Unexpected error submitting assignment:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+/**
+ * Get submissions for an assignment (teacher only)
+ */
+export async function getAssignmentSubmissions(
+  assignmentId: string,
+): Promise<
+  | { success: true; submissions: Submission[] }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "teacher") {
+    return {
+      success: false,
+      error: "Only teachers can view submissions.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify assignment exists and teacher owns the course
+    const { data: assignment, error: assignmentError } = await supabase
+      .from("assignments")
+      .select("assignment_id, course_id, teacher_id")
+      .eq("assignment_id", assignmentId)
+      .single();
+
+    if (assignmentError || !assignment) {
+      return {
+        success: false,
+        error: "Assignment not found.",
+      };
+    }
+
+    const assignmentData = assignment as { assignment_id: string; course_id: string; teacher_id: string };
+    if (assignmentData.teacher_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to view submissions for this assignment.",
+      };
+    }
+
+    // Fetch submissions with student info
+    const { data: submissions, error: submissionsError } = await supabase
+      .from("submissions")
+      .select(
+        `
+        submission_id,
+        assignment_id,
+        student_id,
+        file_url,
+        text_answer,
+        marks,
+        feedback,
+        submitted_at,
+        graded_at,
+        students!submissions_student_id_fkey (
+          id,
+          registration_number,
+          users!students_id_fkey (
+            full_name
+          )
+        )
+      `,
+      )
+      .eq("assignment_id", assignmentId)
+      .order("submitted_at", { ascending: false });
+
+    if (submissionsError) {
+      console.error(
+        "Error fetching submissions:",
+        JSON.stringify(submissionsError, null, 2),
+      );
+      return {
+        success: false,
+        error: submissionsError.message || "Failed to fetch submissions.",
+      };
+    }
+
+    const submissionsList = ((submissions || []) as Array<{
+      submission_id: string;
+      assignment_id: string;
+      student_id: string;
+      file_url: string | null;
+      text_answer: string | null;
+      marks: number | null;
+      feedback: string | null;
+      submitted_at: string | null;
+      graded_at: string | null;
+      students?: {
+        id: string;
+        registration_number: string | null;
+        users?: { full_name: string | null } | null;
+      } | null;
+    }>).map((submission) => ({
+      submission_id: submission.submission_id,
+      assignment_id: submission.assignment_id,
+      student_id: submission.student_id,
+      file_url: submission.file_url,
+      text_answer: submission.text_answer,
+      marks: submission.marks,
+      feedback: submission.feedback,
+      submitted_at: submission.submitted_at,
+      graded_at: submission.graded_at,
+      student_name: submission.students?.users?.full_name || "Unknown",
+      registration_number: submission.students?.registration_number || null,
+    }));
+
+    return {
+      success: true,
+      submissions: submissionsList,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching submissions:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+/**
+ * Get student's submission for an assignment
+ */
+export async function getStudentSubmission(
+  assignmentId: string,
+): Promise<
+  | { success: true; submission: Submission | null }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "student") {
+    return {
+      success: false,
+      error: "Only students can view their submissions.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify assignment exists and student is enrolled
+    const { data: assignment, error: assignmentError } = await supabase
+      .from("assignments")
+      .select("assignment_id, course_id")
+      .eq("assignment_id", assignmentId)
+      .single();
+
+    if (assignmentError || !assignment) {
+      return {
+        success: false,
+        error: "Assignment not found.",
+      };
+    }
+
+    const assignmentData = assignment as { assignment_id: string; course_id: string };
+
+    // Verify student is enrolled
+    const { data: enrollment, error: enrollmentError } = await supabase
+      .from("enrollments")
+      .select("enrollment_id")
+      .eq("course_id", assignmentData.course_id)
+      .eq("student_id", session.userId)
+      .maybeSingle();
+
+    if (enrollmentError || !enrollment) {
+      return {
+        success: false,
+        error: "You are not enrolled in this course.",
+      };
+    }
+
+    // Fetch submission
+    const { data: submission, error: submissionError } = await supabase
+      .from("submissions")
+      .select("*")
+      .eq("assignment_id", assignmentId)
+      .eq("student_id", session.userId)
+      .maybeSingle();
+
+    if (submissionError) {
+      console.error(
+        "Error fetching submission:",
+        JSON.stringify(submissionError, null, 2),
+      );
+      return {
+        success: false,
+        error: submissionError.message || "Failed to fetch submission.",
+      };
+    }
+
+    return {
+      success: true,
+      submission: submission
+        ? (() => {
+            const submissionData = submission as {
+              submission_id: string;
+              assignment_id: string;
+              student_id: string;
+              file_url: string | null;
+              text_answer: string | null;
+              marks: number | null;
+              feedback: string | null;
+              submitted_at: string | null;
+              graded_at: string | null;
+            };
+            return {
+              submission_id: submissionData.submission_id,
+              assignment_id: submissionData.assignment_id,
+              student_id: submissionData.student_id,
+              file_url: submissionData.file_url,
+              text_answer: submissionData.text_answer,
+              marks: submissionData.marks,
+              feedback: submissionData.feedback,
+              submitted_at: submissionData.submitted_at,
+              graded_at: submissionData.graded_at,
+            };
+          })()
+        : null,
+    };
+  } catch (error) {
+    console.error("Unexpected error fetching submission:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+/**
+ * Grade a submission (teacher only)
+ */
+export async function gradeSubmission(
+  input: GradeSubmissionInput,
+): Promise<
+  | { success: true; submission: Submission }
+  | { success: false; error: string }
+> {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    return { success: false, error: "You must be logged in." };
+  }
+
+  if (session.role !== "teacher") {
+    return {
+      success: false,
+      error: "Only teachers can grade submissions.",
+    };
+  }
+
+  if (input.marks < 0) {
+    return {
+      success: false,
+      error: "Marks cannot be negative.",
+    };
+  }
+
+  try {
+    const supabase = createAdminClient();
+
+    // Verify submission exists and teacher owns the assignment
+    const { data: submission, error: submissionError } = await supabase
+      .from("submissions")
+      .select(
+        `
+        submission_id,
+        assignment_id,
+        assignments!submissions_assignment_id_fkey (
+          teacher_id
+        )
+      `,
+      )
+      .eq("submission_id", input.submissionId)
+      .single();
+
+    if (submissionError || !submission) {
+      return {
+        success: false,
+        error: "Submission not found.",
+      };
+    }
+
+    const submissionData = submission as {
+      submission_id: string;
+      assignment_id: string;
+      assignments?: { teacher_id: string } | null;
+    };
+    const assignment = submissionData.assignments as { teacher_id: string } | null;
+    if (assignment?.teacher_id !== session.userId) {
+      return {
+        success: false,
+        error: "You do not have permission to grade this submission.",
+      };
+    }
+
+    // Update submission with grade
+    const updateQuery = supabase.from("submissions") as any;
+    const { data: updated, error: updateError } = await updateQuery
+      .update({
+        marks: input.marks,
+        feedback: input.feedback?.trim() || null,
+        graded_at: new Date().toISOString(),
+      })
+      .eq("submission_id", input.submissionId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error(
+        "Error grading submission:",
+        JSON.stringify(updateError, null, 2),
+      );
+      return {
+        success: false,
+        error: updateError.message || "Failed to grade submission.",
+      };
+    }
+
+    const updatedData = updated as {
+      submission_id: string;
+      assignment_id: string;
+      student_id: string;
+      file_url: string | null;
+      text_answer: string | null;
+      marks: number | null;
+      feedback: string | null;
+      submitted_at: string | null;
+      graded_at: string | null;
+    };
+
+    revalidatePath(`/teacher/courses/${submissionData.assignment_id}/assignments/${submissionData.assignment_id}`);
+    revalidatePath(`/student/courses/*/assignments/${submissionData.assignment_id}`);
+
+    return {
+      success: true,
+      submission: {
+        submission_id: updatedData.submission_id,
+        assignment_id: updatedData.assignment_id,
+        student_id: updatedData.student_id,
+        file_url: updatedData.file_url,
+        text_answer: updatedData.text_answer,
+        marks: updatedData.marks,
+        feedback: updatedData.feedback,
+        submitted_at: updatedData.submitted_at,
+        graded_at: updatedData.graded_at,
+      },
+    };
+  } catch (error) {
+    console.error("Unexpected error grading submission:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
