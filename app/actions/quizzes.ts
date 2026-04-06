@@ -669,19 +669,21 @@ export async function getStudentQuizResult(quizId: string): Promise<
   try {
     const supabase = createAdminClient();
 
-    const [quizRes, attemptRes] = await Promise.all([
-      supabase.from("quizzes").select("*").eq("quiz_id", quizId).single(),
-      supabase
-        .from("quiz_attempts")
-        .select("*")
-        .eq("quiz_id", quizId)
-        .eq("student_id", session.userId)
-        .not("submitted_at", "is", null)
-        .single(),
-    ]);
+    const { data: quizData, error: quizError } = await (supabase.from("quizzes") as any)
+      .select("*")
+      .eq("quiz_id", quizId)
+      .single();
 
-    if (quizRes.error || !quizRes.data) return { success: false, error: "Quiz not found." };
-    if (attemptRes.error || !attemptRes.data)
+    if (quizError || !quizData) return { success: false, error: "Quiz not found." };
+
+    const { data: attemptData, error: attemptError } = await (supabase.from("quiz_attempts") as any)
+      .select("*")
+      .eq("quiz_id", quizId)
+      .eq("student_id", session.userId)
+      .not("submitted_at", "is", null)
+      .single();
+
+    if (attemptError || !attemptData)
       return { success: false, error: "No submitted attempt found." };
 
     const { data: questions, error: qErr } = await supabase
@@ -694,9 +696,9 @@ export async function getStudentQuizResult(quizId: string): Promise<
 
     return {
       success: true,
-      quiz: quizRes.data as any as Quiz,
+      quiz: quizData as Quiz,
       questions: (questions || []) as Question[],
-      attempt: attemptRes.data as QuizAttempt,
+      attempt: attemptData as QuizAttempt,
     };
   } catch {
     return { success: false, error: "An unexpected error occurred." };
