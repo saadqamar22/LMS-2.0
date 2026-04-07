@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/get-session";
-import { getGeminiModel } from "@/lib/gemini";
+import { generateText } from "@/lib/ai";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
@@ -15,7 +15,6 @@ export async function POST(request: Request) {
   try {
     const supabase = createAdminClient();
 
-    // Verify this student belongs to the parent
     const { data: student } = await supabase
       .from("students")
       .select("id, parent_id, class, section, users!students_id_fkey(full_name)")
@@ -28,16 +27,11 @@ export async function POST(request: Request) {
     const s = student as any;
     const studentName = s.users?.full_name || "Student";
 
-    // Fetch marks with module/course info
     const { data: marks } = await supabase
       .from("marks")
-      .select(`
-        obtained_marks,
-        modules!marks_module_id_fkey(module_name, total_marks, courses!modules_course_id_fkey(course_name, course_code))
-      `)
+      .select(`obtained_marks, modules!marks_module_id_fkey(module_name, total_marks, courses!modules_course_id_fkey(course_name, course_code))`)
       .eq("student_id", studentId);
 
-    // Fetch attendance
     const { data: attendance } = await supabase
       .from("attendance")
       .select("status, date")
@@ -54,7 +48,6 @@ export async function POST(request: Request) {
       ? Math.round(((presentCount + lateCount) / totalRecords) * 100)
       : null;
 
-    // Organize marks by course
     const courseMap: Record<string, { courseName: string; courseCode: string; modules: { name: string; obtained: number; total: number; pct: number }[] }> = {};
     for (const mark of (marks || []) as any[]) {
       const mod = mark.modules;
@@ -74,8 +67,6 @@ export async function POST(request: Request) {
         : null;
       return `${c.courseCode} - ${c.courseName}: ${c.modules.map(m => `${m.name} ${m.obtained}/${m.total} (${m.pct}%)`).join(", ")}${avgPct !== null ? ` | Course avg: ${avgPct}%` : ""}`;
     }).join("\n");
-
-    const model = getGeminiModel();
 
     const prompt = `You are an academic advisor generating a parent-friendly progress report for a student.
 
@@ -99,12 +90,10 @@ Write a comprehensive, warm, and constructive parent report in markdown format. 
 
 Keep the tone encouraging and professional. Write as if addressed directly to the parent.`;
 
-    const result = await model.generateContent(prompt);
-    const report = result.response.text();
-
+    const report = await generateText(prompt);
     return NextResponse.json({ report, studentName });
   } catch (err) {
-    console.error("Gemini parent report error:", err);
+    console.error("AI parent report error:", err);
     return NextResponse.json({ error: "Failed to generate report. Please try again." }, { status: 500 });
   }
 }

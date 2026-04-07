@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/get-session";
-import { getGeminiModel } from "@/lib/gemini";
+import { generateText } from "@/lib/ai";
 
 export async function POST(request: Request) {
   const session = await getCurrentSession();
@@ -21,10 +21,7 @@ export async function POST(request: Request) {
 
   const instruction = modeInstructions[summaryMode] || modeInstructions.concise;
 
-  try {
-    const model = getGeminiModel();
-
-    const prompt = `You are an academic content summarizer for an LMS.
+  const prompt = `You are an academic content summarizer for an LMS.
 
 ${instruction}
 
@@ -35,12 +32,11 @@ Content to summarize:
 ${text}
 ---`;
 
-    const result = await model.generateContent(prompt);
-    const summary = result.response.text();
-
+  try {
+    const summary = await generateText(prompt);
     return NextResponse.json({ summary });
   } catch (err) {
-    console.error("Gemini summarizer error:", err);
+    console.error("AI summarizer error:", err);
     return NextResponse.json({ error: "AI request failed. Please try again." }, { status: 500 });
   }
 }
