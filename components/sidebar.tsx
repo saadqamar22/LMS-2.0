@@ -27,7 +27,8 @@ const ROLE_NAV: Record<
   student: [
     { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
     { label: "Courses", href: "/student/courses", icon: BookOpen },
-    { label: "Assignments", href: "/student/assignments", icon: ClipboardList },
+    { label: "Quizzes", href: "/student/quizzes", icon: ClipboardList },
+    { label: "Assignments", href: "/student/assignments", icon: PenTool },
     { label: "Announcements", href: "/student/announcements", icon: Megaphone },
     { label: "Attendance", href: "/student/attendance", icon: ChartLine },
     { label: "Marks", href: "/student/marks", icon: BarChart3 },

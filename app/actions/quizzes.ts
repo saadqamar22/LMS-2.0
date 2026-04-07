@@ -407,22 +407,31 @@ export async function getQuizAttempts(
   try {
     const supabase = createAdminClient();
 
-    const { data, error } = await supabase
-      .from("quiz_attempts")
-      .select(`
-        attempt_id, quiz_id, student_id, answers, score, started_at, submitted_at,
-        students!quiz_attempts_student_id_fkey (
-          registration_number,
-          users!students_id_fkey ( full_name )
-        )
-      `)
+    const { data, error } = await (supabase.from("quiz_attempts") as any)
+      .select("attempt_id, quiz_id, student_id, answers, score, started_at, submitted_at")
       .eq("quiz_id", quizId)
       .not("submitted_at", "is", null)
       .order("submitted_at", { ascending: false });
 
     if (error) return { success: false, error: error.message };
+    if (!data || data.length === 0) return { success: true, attempts: [] };
 
-    const attempts: QuizAttempt[] = ((data || []) as any[]).map((a) => ({
+    // Fetch student info separately to avoid FK name issues
+    const studentIds = [...new Set((data as any[]).map((a) => a.student_id))];
+    const { data: students } = await supabase
+      .from("students")
+      .select("id, registration_number")
+      .in("id", studentIds);
+
+    const { data: users } = await supabase
+      .from("users")
+      .select("id, full_name")
+      .in("id", studentIds);
+
+    const studentMap = new Map((students || []).map((s: any) => [s.id, s]));
+    const userMap = new Map((users || []).map((u: any) => [u.id, u]));
+
+    const attempts: QuizAttempt[] = (data as any[]).map((a) => ({
       attempt_id: a.attempt_id,
       quiz_id: a.quiz_id,
       student_id: a.student_id,
@@ -430,8 +439,8 @@ export async function getQuizAttempts(
       score: a.score,
       started_at: a.started_at,
       submitted_at: a.submitted_at,
-      student_name: a.students?.users?.full_name || "Unknown",
-      registration_number: a.students?.registration_number || null,
+      student_name: userMap.get(a.student_id)?.full_name || "Unknown",
+      registration_number: studentMap.get(a.student_id)?.registration_number || null,
     }));
 
     return { success: true, attempts };
