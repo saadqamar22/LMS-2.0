@@ -1,11 +1,30 @@
 /**
- * Server-side PDF text extraction using pdfjs-dist legacy (Node.js compatible).
- * Must only be called from server components / API routes.
+ * Server-side document text extraction.
+ * Supports PDF (via pdfjs-dist) and DOCX (via mammoth).
+ * Detects actual file type from magic bytes, not from the stored DB type.
  */
-export async function extractPdfText(buffer: Buffer): Promise<string> {
+
+export async function extractDocumentText(buffer: Buffer, contentType?: string): Promise<string> {
+  // Detect by magic bytes (more reliable than DB type or content-type header)
+  const magic4 = buffer.slice(0, 4).toString("hex");
+
+  // PDF: starts with %PDF (25 50 44 46)
+  if (magic4 === "25504446") {
+    return extractPdfText(buffer);
+  }
+
+  // DOCX / XLSX / ZIP: starts with PK (50 4b 03 04)
+  if (magic4 === "504b0304") {
+    return extractDocxText(buffer);
+  }
+
+  // Plain text fallback
+  return buffer.toString("utf-8").trim();
+}
+
+async function extractPdfText(buffer: Buffer): Promise<string> {
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  // Point to the worker file so pdfjs can set up its fake worker in Node.js
   if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
     const path = await import("path");
     const { pathToFileURL } = await import("url");
@@ -16,9 +35,8 @@ export async function extractPdfText(buffer: Buffer): Promise<string> {
     pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
   }
 
-  const uint8 = new Uint8Array(buffer);
   const loadingTask = pdfjsLib.getDocument({
-    data: uint8,
+    data: new Uint8Array(buffer),
     useWorkerFetch: false,
     isEvalSupported: false,
     useSystemFonts: true,
@@ -37,4 +55,11 @@ export async function extractPdfText(buffer: Buffer): Promise<string> {
   }
 
   return pages.join("\n").trim();
+}
+
+async function extractDocxText(buffer: Buffer): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mammoth = require("mammoth");
+  const result = await mammoth.extractRawText({ buffer });
+  return (result.value || "").trim();
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/get-session";
 import { generateText } from "@/lib/ai";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractPdfText } from "@/lib/pdf-extract";
+import { extractDocumentText } from "@/lib/pdf-extract";
 
 /**
  * POST /api/ai/material-tools
@@ -61,21 +61,20 @@ async function extractTextFromMaterial(
     }
   }
 
-  // Links and types without extractable text
+  // Links have no extractable file
   if (m.type === "link") {
     return { text: `Material title: ${m.title}` };
   }
 
   if (m.type === "video" || m.type === "image") {
-    return { error: `Cannot extract text from ${m.type} files. Use a PDF or text file instead.` };
+    return { error: `Cannot extract text from ${m.type} files. Upload a PDF or Word document instead.` };
   }
 
   if (!m.file_url) {
     return { error: "Material has no file attached." };
   }
 
-  // Extract the Supabase storage path from the file_url
-  // file_url looks like /api/files?bucket=materials&path=...
+  // Extract storage path from /api/files?bucket=materials&path=...
   let storagePath: string | null = null;
   try {
     const url = new URL(m.file_url, "http://localhost");
@@ -88,56 +87,30 @@ async function extractTextFromMaterial(
     return { error: "Could not determine storage path from file URL." };
   }
 
-  // Get a signed URL and fetch the file via HTTPS (more reliable than .download())
-  console.log("[material-tools] storagePath:", storagePath);
-  console.log("[material-tools] file_url:", m.file_url);
-
+  // Fetch via signed URL (most reliable way to get raw bytes from Supabase storage)
   const { data: signedData, error: signedErr } = await supabase.storage
     .from("materials")
     .createSignedUrl(storagePath, 60);
 
   if (signedErr || !signedData?.signedUrl) {
-    console.error("[material-tools] signed URL error:", signedErr, "path:", storagePath);
     return { error: `Could not generate file URL: ${signedErr?.message || "unknown error"}` };
   }
 
-  console.log("[material-tools] signedUrl:", signedData.signedUrl.slice(0, 120));
-
   const fetchRes = await fetch(signedData.signedUrl);
-  const contentType = fetchRes.headers.get("content-type") || "";
-  console.log("[material-tools] fetch status:", fetchRes.status, "content-type:", contentType);
-
   if (!fetchRes.ok) {
     return { error: `File fetch failed: ${fetchRes.status} ${fetchRes.statusText}` };
   }
 
   const buffer = Buffer.from(await fetchRes.arrayBuffer());
-  console.log("[material-tools] buffer size:", buffer.length, "first bytes:", buffer.slice(0, 8).toString("hex"));
 
-  // Verify we actually got a PDF (first 4 bytes must be %PDF)
-  if (m.type === "pdf") {
-    const magic = buffer.slice(0, 4).toString("ascii");
-    if (magic !== "%PDF") {
-      console.error("[material-tools] bad PDF magic bytes:", JSON.stringify(magic));
-      return { error: `Downloaded file is not a valid PDF (got: ${JSON.stringify(magic)}, size: ${buffer.length} bytes). Content-type: ${contentType}` };
-    }
+  try {
+    const text = await extractDocumentText(buffer);
+    if (!text) return { error: "File appears to be empty or contains no extractable text." };
+    return { text: text.slice(0, 40000) };
+  } catch (e) {
+    console.error("[material-tools] extract error:", e);
+    return { error: `Could not extract text: ${e instanceof Error ? e.message : String(e)}` };
   }
-
-  if (m.type === "pdf") {
-    try {
-      const text = await extractPdfText(buffer);
-      if (!text) return { error: "PDF appears to be empty or could not be read (possibly scanned/image-based)." };
-      return { text: text.slice(0, 40000) };
-    } catch (e) {
-      console.error("[material-tools] pdf extract error:", e);
-      return { error: `PDF parse failed: ${e instanceof Error ? e.message : String(e)}` };
-    }
-  }
-
-  // For text-based files (txt, md, etc.)
-  const text = buffer.toString("utf-8").trim();
-  if (!text) return { error: "File appears to be empty." };
-  return { text: text.slice(0, 40000) };
 }
 
 export async function POST(request: Request) {
