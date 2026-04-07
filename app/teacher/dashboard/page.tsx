@@ -19,65 +19,38 @@ export default async function TeacherDashboardPage() {
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Teaching center
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Welcome back
-          </h1>
-          <p className="text-sm text-slate-500">
-            Manage your courses, students, and track their progress.
-          </p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Overview</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
         </div>
         <Link
           href="/teacher/create-course"
-          className="rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
+          className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
         >
-          Create course
+          + Create Course
         </Link>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-6 md:grid-cols-2">
         <DashboardCard
-          title="Total students"
+          title="Total Students"
           value={stats.totalStudents.toString()}
           subtitle="Across all courses"
           icon={<Users className="h-5 w-5" />}
         />
         <DashboardCard
-          title="Total courses"
+          title="Total Courses"
           value={stats.totalCourses.toString()}
           subtitle="Active courses"
           icon={<GraduationCap className="h-5 w-5" />}
         />
-        <Link href="/teacher/courses">
-          <DashboardCard
-            title="View all courses"
-            value="→"
-            subtitle="Manage your courses"
-            icon={<GraduationCap className="h-5 w-5" />}
-          />
-        </Link>
-        <Link href="/teacher/courses">
-          <DashboardCard
-            title="Quick actions"
-            value="→"
-            subtitle="Mark attendance, grades"
-            icon={<Users className="h-5 w-5" />}
-          />
-        </Link>
       </section>
 
       {stats.recentCourses.length > 0 ? (
-        <section className="mt-8">
+        <section>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Recent courses
-              </p>
-              <h2 className="text-xl font-semibold text-slate-900">
-                Your courses ({stats.recentCourses.length})
-              </h2>
+              <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+              <h2 className="text-xl font-semibold text-slate-900">Your Courses</h2>
             </div>
             <Link
               href="/teacher/courses"
@@ -102,10 +75,12 @@ export default async function TeacherDashboardPage() {
           </div>
         </section>
       ) : (
-        <section className="mt-8">
+        <section>
           <EmptyState
             title="No courses yet"
-            description="Create your first course to get started teaching. Click the button above to create a course."
+            description="Create your first course to start teaching."
+            actionLabel="Create Course"
+            actionHref="/teacher/create-course"
           />
         </section>
       )}

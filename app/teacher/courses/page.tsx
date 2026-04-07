@@ -13,21 +13,17 @@ export default async function TeacherCoursesPage() {
       <DashboardShell role="teacher">
         <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
-              Courses
-            </p>
-            <h1 className="text-2xl font-semibold text-slate-900">
-              Manage your classes
-            </h1>
+            <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+            <h1 className="text-2xl font-semibold text-slate-900">My Courses</h1>
           </div>
           <Link
             href="/teacher/create-course"
-            className="rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200"
+            className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
           >
-            Create course
+            + Create Course
           </Link>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
           {result.error}
         </div>
       </DashboardShell>
@@ -54,33 +50,26 @@ export default async function TeacherCoursesPage() {
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Courses
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Manage your classes
-          </h1>
-          <p className="text-sm text-slate-500">
-            {courses.length === 0
-              ? "Create your first course to get started."
-              : `You have ${courses.length} course${courses.length === 1 ? "" : "s"}.`}
-          </p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+          <h1 className="text-2xl font-semibold text-slate-900">My Courses</h1>
         </div>
         <Link
           href="/teacher/create-course"
-          className="rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200"
+          className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
         >
-          Create course
+          + Create Course
         </Link>
       </section>
 
       {courses.length === 0 ? (
         <EmptyState
           title="No courses yet"
-          description="Create your first course to start teaching. Click the button above to get started."
+          description="Create your first course to start teaching."
+          actionLabel="Create Course"
+          actionHref="/teacher/create-course"
         />
       ) : (
-        <section className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {coursesWithStudentCount.map((course) => (
             <CourseCard
               key={course.course_id}

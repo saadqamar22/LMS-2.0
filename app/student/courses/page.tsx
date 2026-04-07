@@ -24,17 +24,11 @@ export default async function StudentCoursesPage() {
   if (!availableCoursesResult.success) {
     return (
       <DashboardShell role="student">
-        <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
-              Learning journey
-            </p>
-            <h1 className="text-2xl font-semibold text-slate-900">
-              Browse courses
-            </h1>
-          </div>
+        <section>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Browse Courses</h1>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
           {availableCoursesResult.error}
         </div>
       </DashboardShell>
@@ -68,20 +62,9 @@ export default async function StudentCoursesPage() {
 
   return (
     <DashboardShell role="student">
-      <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Learning journey
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Browse courses
-          </h1>
-          <p className="text-sm text-slate-500">
-            {courses.length === 0
-              ? "No courses available yet."
-              : `Browse ${courses.length} available course${courses.length === 1 ? "" : "s"}.`}
-          </p>
-        </div>
+      <section>
+        <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+        <h1 className="text-2xl font-semibold text-slate-900">Browse Courses</h1>
       </section>
 
       {enrolledCourses.length > 0 && (
@@ -130,22 +113,32 @@ export default async function StudentCoursesPage() {
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {courses.map((course) => {
               const isEnrolled = enrolledCourseIds.has(course.course_id);
-              return (
-                <div key={course.course_id} className="relative">
-                  <CourseCard
-                    courseId={course.course_id}
-                    title={course.course_name}
-                    code={course.course_code}
-                    teacher={course.teacher_name || "TBA"}
-                    students={enrollmentCountMap.get(course.course_id) || 0}
-                    tags={[]}
-                    href={`/student/courses/${course.course_id}`}
-                  />
-                  {!isEnrolled && (
-                    <div className="absolute bottom-4 right-4">
-                      <EnrollButton courseId={course.course_id} />
-                    </div>
-                  )}
+              return isEnrolled ? (
+                <CourseCard
+                  key={course.course_id}
+                  courseId={course.course_id}
+                  title={course.course_name}
+                  code={course.course_code}
+                  teacher={course.teacher_name || "TBA"}
+                  students={enrollmentCountMap.get(course.course_id) || 0}
+                  tags={[]}
+                  href={`/student/courses/${course.course_id}`}
+                />
+              ) : (
+                <div key={course.course_id} className="flex flex-col rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)]">
+                  <div className="flex-1">
+                    <CourseCard
+                      courseId={course.course_id}
+                      title={course.course_name}
+                      code={course.course_code}
+                      teacher={course.teacher_name || "TBA"}
+                      students={enrollmentCountMap.get(course.course_id) || 0}
+                      tags={[]}
+                    />
+                  </div>
+                  <div className="border-t border-slate-100 px-6 py-3">
+                    <EnrollButton courseId={course.course_id} />
+                  </div>
                 </div>
               );
             })}

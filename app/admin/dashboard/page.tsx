@@ -148,15 +148,9 @@ export default async function AdminDashboardPage() {
       <section className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Latest registrations</p>
-            <h2 className="text-xl font-semibold text-slate-900">Recently Added Users</h2>
+            <p className="text-xs uppercase tracking-wide text-slate-400">Users</p>
+            <h2 className="text-xl font-semibold text-slate-900">Recent Registrations</h2>
           </div>
-          <a
-            href="/admin/users"
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
-          >
-            Manage users
-          </a>
         </div>
 
         {stats.recentUsers.length === 0 ? (

@@ -123,9 +123,9 @@ export default async function ParentDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Family</p>
+            <p className="text-xs uppercase tracking-wide text-slate-400">Children</p>
             <h2 className="text-xl font-semibold text-slate-900">
-              Your {children.length === 1 ? "Child" : "Children"}
+              {children.length === 1 ? "Your Child" : "Your Children"}
             </h2>
           </div>
           {children.length > 3 && (
@@ -165,7 +165,7 @@ export default async function ParentDashboardPage() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-2.5 text-center">
-                  <p className="text-xs text-slate-400">Attend.</p>
+                  <p className="text-xs text-slate-400">Attend</p>
                   <p className={`mt-0.5 text-base font-bold ${attendanceRate !== null && attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
                     {attendanceRate !== null ? `${attendanceRate}%` : "—"}
                   </p>

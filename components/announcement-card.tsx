@@ -7,9 +7,9 @@ interface AnnouncementCardProps {
 
 export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
   const audienceLabels = {
-    students: "For Students",
-    parents: "For Parents",
-    both: "For Students & Parents",
+    students: "Students",
+    parents: "Parents",
+    both: "All",
   };
 
   const audienceColors = {
@@ -45,25 +45,16 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
                 })}
               </span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${audienceColors[announcement.audience]}`}
-          >
-            {audienceLabels[announcement.audience]}
-          </span>
-          {!announcement.course_id && (
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-              All Students
-            </span>
-          )}
-        </div>
+        <span
+          className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${audienceColors[announcement.audience]}`}
+        >
+          {audienceLabels[announcement.audience]}
+        </span>
       </div>
       <div className="rounded-xl bg-slate-50 p-4">
         <p className="whitespace-pre-wrap text-sm text-slate-700">

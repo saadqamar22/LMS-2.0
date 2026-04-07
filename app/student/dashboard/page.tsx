@@ -113,7 +113,7 @@ export default async function StudentDashboardPage() {
           value={
             <GPADisplay gpa={gpa} percentage={percentage} size="lg" showToggle={true} />
           }
-          subtitle="Click to switch between GPA and percentage"
+          subtitle="Click to toggle percentage"
           icon={<GraduationCap className="h-5 w-5" />}
         />
         <Link href="/student/attendance">
@@ -131,7 +131,7 @@ export default async function StudentDashboardPage() {
         <DashboardCard
           title="Enrolled Courses"
           value={enrolledCourses.length.toString()}
-          subtitle="Total enrolled courses"
+          subtitle="Active enrollments"
           icon={<BookOpenCheck className="h-5 w-5" />}
         />
       </section>
