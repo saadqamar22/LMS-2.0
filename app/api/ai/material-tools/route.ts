@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth/get-session";
 import { generateText } from "@/lib/ai";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { extractPdfText } from "@/lib/pdf-extract";
 
 /**
  * POST /api/ai/material-tools
@@ -87,29 +88,49 @@ async function extractTextFromMaterial(
     return { error: "Could not determine storage path from file URL." };
   }
 
-  // Download the file from Supabase storage
-  const { data: fileData, error: dlError } = await supabase.storage
-    .from("materials")
-    .download(storagePath);
+  // Get a signed URL and fetch the file via HTTPS (more reliable than .download())
+  console.log("[material-tools] storagePath:", storagePath);
+  console.log("[material-tools] file_url:", m.file_url);
 
-  if (dlError || !fileData) {
-    console.error("[material-tools] storage download error:", dlError, "path:", storagePath);
-    return { error: `File download failed: ${dlError?.message || "unknown error"}` };
+  const { data: signedData, error: signedErr } = await supabase.storage
+    .from("materials")
+    .createSignedUrl(storagePath, 60);
+
+  if (signedErr || !signedData?.signedUrl) {
+    console.error("[material-tools] signed URL error:", signedErr, "path:", storagePath);
+    return { error: `Could not generate file URL: ${signedErr?.message || "unknown error"}` };
   }
 
-  const buffer = Buffer.from(await fileData.arrayBuffer());
+  console.log("[material-tools] signedUrl:", signedData.signedUrl.slice(0, 120));
+
+  const fetchRes = await fetch(signedData.signedUrl);
+  const contentType = fetchRes.headers.get("content-type") || "";
+  console.log("[material-tools] fetch status:", fetchRes.status, "content-type:", contentType);
+
+  if (!fetchRes.ok) {
+    return { error: `File fetch failed: ${fetchRes.status} ${fetchRes.statusText}` };
+  }
+
+  const buffer = Buffer.from(await fetchRes.arrayBuffer());
+  console.log("[material-tools] buffer size:", buffer.length, "first bytes:", buffer.slice(0, 8).toString("hex"));
+
+  // Verify we actually got a PDF (first 4 bytes must be %PDF)
+  if (m.type === "pdf") {
+    const magic = buffer.slice(0, 4).toString("ascii");
+    if (magic !== "%PDF") {
+      console.error("[material-tools] bad PDF magic bytes:", JSON.stringify(magic));
+      return { error: `Downloaded file is not a valid PDF (got: ${JSON.stringify(magic)}, size: ${buffer.length} bytes). Content-type: ${contentType}` };
+    }
+  }
 
   if (m.type === "pdf") {
     try {
-      const pdfModule = await import("pdf-parse");
-      const pdfParse = (pdfModule as any).default ?? pdfModule;
-      const parsed = await pdfParse(buffer);
-      const text = parsed.text?.trim();
+      const text = await extractPdfText(buffer);
       if (!text) return { error: "PDF appears to be empty or could not be read (possibly scanned/image-based)." };
       return { text: text.slice(0, 40000) };
     } catch (e) {
-      console.error("[material-tools] pdf-parse error:", e);
-      return { error: "Failed to extract text from PDF. The file may be corrupted or image-based." };
+      console.error("[material-tools] pdf extract error:", e);
+      return { error: `PDF parse failed: ${e instanceof Error ? e.message : String(e)}` };
     }
   }
 
