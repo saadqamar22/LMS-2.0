@@ -55,10 +55,10 @@ const ROLE_NAV: Record<
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ],
   ai: [
-    { label: "Chat Assistant (Coming Soon)", href: "/ai/chat-assistant", icon: Bot },
-    { label: "Quiz Generator (Coming Soon)", href: "/ai/quiz-generator", icon: ClipboardList },
-    { label: "Summarizer (Coming Soon)", href: "/ai/summarizer", icon: FileText },
-    { label: "Parent Reports (Coming Soon)", href: "/ai/parent-report", icon: GraduationCap },
+    { label: "Chat Assistant", href: "/ai/chat-assistant", icon: Bot },
+    { label: "Quiz Generator", href: "/ai/quiz-generator", icon: ClipboardList },
+    { label: "Summarizer", href: "/ai/summarizer", icon: FileText },
+    { label: "AI Progress Report", href: "/ai/parent-report", icon: GraduationCap },
     { label: "Reports", href: "/parent/reports", icon: FileText },
   ],
 };
