@@ -60,7 +60,6 @@ const ROLE_NAV: Record<
     { label: "Quiz Generator", href: "/ai/quiz-generator", icon: ClipboardList },
     { label: "Summarizer", href: "/ai/summarizer", icon: FileText },
     { label: "AI Progress Report", href: "/ai/parent-report", icon: GraduationCap },
-    { label: "Reports", href: "/parent/reports", icon: FileText },
   ],
 };
 

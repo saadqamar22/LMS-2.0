@@ -15,19 +15,28 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *   - materialId: string            (fetch file from storage and extract text)
  */
 
-async function extractTextFromMaterial(materialId: string, session: { userId: string; role: string }): Promise<string | null> {
+type ExtractResult = { text: string } | { error: string };
+
+async function extractTextFromMaterial(
+  materialId: string,
+  session: { userId: string; role: string },
+): Promise<ExtractResult> {
   const supabase = createAdminClient();
 
-  const { data: material } = await supabase
+  const { data: material, error: matErr } = await supabase
     .from("materials")
     .select("material_id, title, type, file_url, external_url, course_id")
     .eq("material_id", materialId)
     .single();
 
-  if (!material) return null;
+  if (matErr || !material) {
+    console.error("[material-tools] material fetch error:", matErr);
+    return { error: "Material not found." };
+  }
+
   const m = material as any;
 
-  // Verify student is enrolled or teacher owns the course
+  // Verify access
   if (session.role === "student") {
     const { data: enrollment } = await supabase
       .from("enrollments")
@@ -35,50 +44,79 @@ async function extractTextFromMaterial(materialId: string, session: { userId: st
       .eq("student_id", session.userId)
       .eq("course_id", m.course_id)
       .maybeSingle();
-    if (!enrollment) return null;
+    if (!enrollment) return { error: "You are not enrolled in this course." };
   } else if (session.role === "teacher") {
-    const { data: course } = await supabase
+    const { data: course, error: courseErr } = await supabase
       .from("courses")
       .select("teacher_id")
       .eq("course_id", m.course_id)
       .single();
-    if (!course || (course as any).teacher_id !== session.userId) return null;
+    if (courseErr || !course) {
+      console.error("[material-tools] course fetch error:", courseErr);
+      return { error: "Course not found." };
+    }
+    if ((course as any).teacher_id !== session.userId) {
+      return { error: "You do not own this course." };
+    }
   }
 
-  if (m.type === "link" || !m.file_url) {
-    // For links, just return the title as context
-    return `Material title: ${m.title}`;
+  // Links and types without extractable text
+  if (m.type === "link") {
+    return { text: `Material title: ${m.title}` };
+  }
+
+  if (m.type === "video" || m.type === "image") {
+    return { error: `Cannot extract text from ${m.type} files. Use a PDF or text file instead.` };
+  }
+
+  if (!m.file_url) {
+    return { error: "Material has no file attached." };
   }
 
   // Extract the Supabase storage path from the file_url
   // file_url looks like /api/files?bucket=materials&path=...
-  const url = new URL(m.file_url, "http://localhost");
-  const storagePath = url.searchParams.get("path");
-  if (!storagePath) return null;
+  let storagePath: string | null = null;
+  try {
+    const url = new URL(m.file_url, "http://localhost");
+    storagePath = url.searchParams.get("path");
+  } catch {
+    return { error: "Invalid file URL format." };
+  }
+
+  if (!storagePath) {
+    return { error: "Could not determine storage path from file URL." };
+  }
 
   // Download the file from Supabase storage
-  const { data: fileData, error } = await supabase.storage
+  const { data: fileData, error: dlError } = await supabase.storage
     .from("materials")
     .download(storagePath);
 
-  if (error || !fileData) return null;
+  if (dlError || !fileData) {
+    console.error("[material-tools] storage download error:", dlError, "path:", storagePath);
+    return { error: `File download failed: ${dlError?.message || "unknown error"}` };
+  }
 
   const buffer = Buffer.from(await fileData.arrayBuffer());
 
   if (m.type === "pdf") {
     try {
-      // Dynamic import to avoid build-time issues
       const pdfModule = await import("pdf-parse");
       const pdfParse = (pdfModule as any).default ?? pdfModule;
       const parsed = await pdfParse(buffer);
-      return parsed.text?.slice(0, 40000) || null; // cap at 40k chars
-    } catch {
-      return null;
+      const text = parsed.text?.trim();
+      if (!text) return { error: "PDF appears to be empty or could not be read (possibly scanned/image-based)." };
+      return { text: text.slice(0, 40000) };
+    } catch (e) {
+      console.error("[material-tools] pdf-parse error:", e);
+      return { error: "Failed to extract text from PDF. The file may be corrupted or image-based." };
     }
   }
 
-  // For text-based files, decode as UTF-8
-  return buffer.toString("utf-8").slice(0, 40000);
+  // For text-based files (txt, md, etc.)
+  const text = buffer.toString("utf-8").trim();
+  if (!text) return { error: "File appears to be empty." };
+  return { text: text.slice(0, 40000) };
 }
 
 export async function POST(request: Request) {
@@ -93,11 +131,11 @@ export async function POST(request: Request) {
   let content: string = "";
 
   if (materialId) {
-    const extracted = await extractTextFromMaterial(materialId, session);
-    if (!extracted) {
-      return NextResponse.json({ error: "Could not read material content. Make sure you have access." }, { status: 400 });
+    const result = await extractTextFromMaterial(materialId, session);
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
-    content = extracted;
+    content = result.text;
   } else if (text?.trim()) {
     content = text.trim().slice(0, 40000);
   } else {
