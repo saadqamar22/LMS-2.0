@@ -13,9 +13,10 @@ interface Props {
   isPublished: boolean;
   mode: Mode;
   questionId?: string;
+  gradingMode?: "auto" | "manual";
 }
 
-export function QuizManageClient({ quizId, courseId, isPublished, mode, questionId }: Props) {
+export function QuizManageClient({ quizId, courseId, isPublished, mode, questionId, gradingMode }: Props) {
   const router = useRouter();
 
   if (mode === "delete-question") {
@@ -32,7 +33,7 @@ export function QuizManageClient({ quizId, courseId, isPublished, mode, question
     );
   }
 
-  return <AddQuestionForm quizId={quizId} courseId={courseId} onDone={() => router.refresh()} />;
+  return <AddQuestionForm quizId={quizId} courseId={courseId} gradingMode={gradingMode || "auto"} onDone={() => router.refresh()} />;
 }
 
 // ─── Delete button ──────────────────────────────────────────────────────────
@@ -98,12 +99,23 @@ function PublishToggle({ quizId, isPublished, onDone }: { quizId: string; isPubl
 
 type QuestionType = "mcq" | "true_false" | "short_answer";
 
-function AddQuestionForm({ quizId, courseId, onDone }: { quizId: string; courseId: string; onDone: () => void }) {
+function AddQuestionForm({
+  quizId,
+  courseId,
+  gradingMode,
+  onDone,
+}: {
+  quizId: string;
+  courseId: string;
+  gradingMode: "auto" | "manual";
+  onDone: () => void;
+}) {
   const [type, setType] = useState<QuestionType>("mcq");
   const [text, setText] = useState("");
   const [marks, setMarks] = useState(1);
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState("");
+  const [rubric, setRubric] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -131,6 +143,7 @@ function AddQuestionForm({ quizId, courseId, onDone }: { quizId: string; courseI
       options: type === "mcq" ? options.filter((o) => o.trim()) : undefined,
       correctAnswer,
       marks,
+      rubric: type === "short_answer" && gradingMode === "auto" ? rubric : undefined,
     });
     setLoading(false);
 
@@ -141,6 +154,7 @@ function AddQuestionForm({ quizId, courseId, onDone }: { quizId: string; courseI
       setMarks(1);
       setOptions(["", "", "", ""]);
       setCorrectAnswer("");
+      setRubric("");
       onDone();
     }
   }
@@ -153,7 +167,7 @@ function AddQuestionForm({ quizId, courseId, onDone }: { quizId: string; courseI
         <label className="mb-1 block text-xs font-medium text-slate-600">Type</label>
         <select
           value={type}
-          onChange={(e) => { setType(e.target.value as QuestionType); setCorrectAnswer(""); }}
+          onChange={(e) => { setType(e.target.value as QuestionType); setCorrectAnswer(""); setRubric(""); }}
           className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none"
         >
           <option value="mcq">Multiple Choice</option>
@@ -228,16 +242,38 @@ function AddQuestionForm({ quizId, courseId, onDone }: { quizId: string; courseI
       )}
 
       {type === "short_answer" && (
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">Expected Answer</label>
-          <input
-            type="text"
-            value={correctAnswer}
-            onChange={(e) => setCorrectAnswer(e.target.value)}
-            placeholder="The expected answer"
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none"
-          />
-          <p className="mt-1 text-xs text-slate-400">Short answers are not auto-graded. Students see their response after submission.</p>
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">Model Answer *</label>
+            <input
+              type="text"
+              value={correctAnswer}
+              onChange={(e) => setCorrectAnswer(e.target.value)}
+              placeholder="The expected/model answer"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none"
+            />
+          </div>
+          {gradingMode === "auto" ? (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                AI Grading Rubric <span className="text-slate-400">(optional)</span>
+              </label>
+              <textarea
+                rows={2}
+                value={rubric}
+                onChange={(e) => setRubric(e.target.value)}
+                placeholder="e.g. Award full marks if student mentions photosynthesis and sunlight. Partial marks for incomplete explanations."
+                className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none"
+              />
+              <p className="mt-1 text-xs text-slate-400">
+                Instructions for AI grader. If blank, AI grades based on the model answer.
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400">
+              Manual grading mode — you will review and award marks after submission.
+            </p>
+          )}
         </div>
       )}
 

@@ -148,16 +148,20 @@ export default async function QuizResultsPage({ params }: PageProps) {
             </table>
           </div>
 
-          {/* Manual grading panels — one per student, shown only if manual + short_answer questions exist */}
-          {isManual && shortAnswerQuestions.length > 0 && (
+          {/* Short answer grading — auto shows AI grades, manual shows teacher grading UI */}
+          {shortAnswerQuestions.length > 0 && (
             <section>
               <div className="mb-4">
-                <p className="text-xs uppercase tracking-wide text-slate-400">Manual Grading</p>
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  {isManual ? "Manual Grading" : "AI Grading"}
+                </p>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  Grade Short Answer Questions
+                  Short Answer Responses
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Review each student&apos;s short answer responses and award marks. Saving will update their total score.
+                  {isManual
+                    ? "Review each student's short answer responses and award marks. Saving will update their total score."
+                    : "Short answers were graded automatically by AI on submission."}
                 </p>
               </div>
               <div className="space-y-6">
@@ -171,7 +175,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
                         <p className="font-semibold text-slate-900">{attempt.student_name}</p>
                         <p className="text-xs text-slate-400">
                           {attempt.registration_number || "No reg. number"} ·{" "}
-                          Current score: {attempt.score ?? 0}/{quiz.total_marks}
+                          Score: {attempt.score ?? 0}/{quiz.total_marks}
                         </p>
                       </div>
                     </div>
@@ -179,6 +183,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
                       attempt={attempt}
                       shortAnswerQuestions={shortAnswerQuestions}
                       totalMarks={quiz.total_marks}
+                      gradingMode={quiz.grading_mode}
                     />
                   </div>
                 ))}

@@ -106,9 +106,9 @@ export function CreateQuizForm({ courseId }: { courseId: string }) {
                 : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }`}
           >
-            <p className="font-semibold">Auto Grade</p>
+            <p className="font-semibold">AI Grade</p>
             <p className="mt-0.5 text-xs opacity-75">
-              MCQ &amp; True/False graded instantly. Short answers via AI (coming soon).
+              MCQ &amp; True/False graded instantly. Short answers graded by AI on submission.
             </p>
           </button>
           <button
@@ -122,29 +122,30 @@ export function CreateQuizForm({ courseId }: { courseId: string }) {
           >
             <p className="font-semibold">Manual Grade</p>
             <p className="mt-0.5 text-xs opacity-75">
-              You review and score short answer questions manually after submission.
+              MCQ &amp; True/False graded instantly. You review short answers and award marks manually.
             </p>
           </button>
         </div>
       </div>
 
-      {/* Rubric — shown for both modes but labelled differently */}
-      <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">
-          {gradingMode === "manual" ? "Grading Rubric (optional)" : "Rubric for AI (optional, for future Gemini grading)"}
-        </label>
-        <textarea
-          value={rubric}
-          onChange={(e) => setRubric(e.target.value)}
-          rows={3}
-          placeholder={
-            gradingMode === "manual"
-              ? "e.g. Award 2 marks for mentioning X, 1 mark for Y…"
-              : "e.g. Full marks for complete explanation, partial for key terms only…"
-          }
-          className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
-        />
-      </div>
+      {/* Default AI rubric — only for auto mode as quiz-level fallback */}
+      {gradingMode === "auto" && (
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            Default AI Rubric <span className="text-slate-400 font-normal">(optional)</span>
+          </label>
+          <textarea
+            value={rubric}
+            onChange={(e) => setRubric(e.target.value)}
+            rows={2}
+            placeholder="e.g. Award full marks for complete explanation, partial marks if key concept is mentioned…"
+            className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            Used as fallback when a short answer question has no individual rubric.
+          </p>
+        </div>
+      )}
 
       <button
         type="submit"

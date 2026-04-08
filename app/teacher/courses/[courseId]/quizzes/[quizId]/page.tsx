@@ -58,7 +58,7 @@ export default async function TeacherQuizManagePage({ params }: PageProps) {
           <div className="lg:col-span-1">
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
               <h2 className="mb-4 text-base font-semibold text-slate-900">Add Question</h2>
-              <QuizManageClient quizId={quizId} courseId={courseId} isPublished={false} mode="add-question" />
+              <QuizManageClient quizId={quizId} courseId={courseId} isPublished={false} mode="add-question" gradingMode={quiz.grading_mode} />
             </div>
           </div>
         )}
@@ -110,9 +110,16 @@ export default async function TeacherQuizManagePage({ params }: PageProps) {
                         </p>
                       )}
                       {q.type === "short_answer" && (
-                        <p className="mt-2 text-sm text-slate-500">
-                          Expected: <span className="font-medium text-green-700">{q.correct_answer}</span>
-                        </p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm text-slate-500">
+                            Model answer: <span className="font-medium text-green-700">{q.correct_answer}</span>
+                          </p>
+                          {q.rubric && (
+                            <p className="text-xs text-slate-400">
+                              AI rubric: <span className="italic">{q.rubric}</span>
+                            </p>
+                          )}
+                        </div>
                       )}
                     </div>
                     {!quiz.is_published && (

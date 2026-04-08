@@ -18,7 +18,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
   const [current, setCurrent] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<{ score: number; total: number } | null>(null);
+  const [result, setResult] = useState<{ score: number; total: number; gradingMode: "auto" | "manual" } | null>(null);
   const [timeLeft, setTimeLeft] = useState(
     quiz.time_limit_mins ? quiz.time_limit_mins * 60 : null,
   );
@@ -31,7 +31,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
     if (!res.success) {
       setError(res.error);
     } else {
-      setResult({ score: res.score, total: res.total });
+      setResult({ score: res.score, total: res.total, gradingMode: res.gradingMode });
     }
   }, [answers, quiz.quiz_id]);
 
@@ -54,28 +54,55 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
 
   // ─── Result screen ──────────────────────────────────────────────────────────
   if (result) {
+    const isManual = result.gradingMode === "manual";
+    const hasShortAnswer = questions.some((q) => q.type === "short_answer");
+    const showUnderReview = isManual && hasShortAnswer;
+
     return (
       <div className="mx-auto max-w-lg text-center">
         <div className="rounded-3xl border border-slate-100 bg-white p-10 shadow-[var(--shadow-card)]">
-          <div
-            className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl font-bold text-white ${
-              pct >= 70 ? "bg-green-500" : pct >= 50 ? "bg-yellow-500" : "bg-red-500"
-            }`}
-          >
-            {pct}%
-          </div>
-          <h2 className="text-2xl font-semibold text-slate-900">Quiz Submitted!</h2>
-          <p className="mt-2 text-slate-500">
-            You scored <strong>{result.score}</strong> out of <strong>{result.total}</strong>
-          </p>
-          <p className={`mt-1 font-semibold ${pct >= 70 ? "text-green-600" : pct >= 50 ? "text-yellow-600" : "text-red-600"}`}>
-            {pct >= 70 ? "Great job!" : pct >= 50 ? "Good effort!" : "Keep practising!"}
-          </p>
+          {showUnderReview ? (
+            <>
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-4xl">
+                ⏳
+              </div>
+              <h2 className="text-2xl font-semibold text-slate-900">Quiz Submitted!</h2>
+              <p className="mt-2 text-slate-500">
+                MCQ & True/False questions have been graded automatically.
+              </p>
+              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
+                <p className="text-sm font-semibold text-amber-700">Short answers: Under Review</p>
+                <p className="mt-1 text-xs text-amber-600">
+                  Your teacher will review your short answer responses and update your score.
+                </p>
+              </div>
+              <p className="mt-4 text-sm text-slate-500">
+                Current score: <strong>{result.score}</strong> / {result.total} (short answers pending)
+              </p>
+            </>
+          ) : (
+            <>
+              <div
+                className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl font-bold text-white ${
+                  pct >= 70 ? "bg-green-500" : pct >= 50 ? "bg-yellow-500" : "bg-red-500"
+                }`}
+              >
+                {pct}%
+              </div>
+              <h2 className="text-2xl font-semibold text-slate-900">Quiz Submitted!</h2>
+              <p className="mt-2 text-slate-500">
+                You scored <strong>{result.score}</strong> out of <strong>{result.total}</strong>
+              </p>
+              <p className={`mt-1 font-semibold ${pct >= 70 ? "text-green-600" : pct >= 50 ? "text-yellow-600" : "text-red-600"}`}>
+                {pct >= 70 ? "Great job!" : pct >= 50 ? "Good effort!" : "Keep practising!"}
+              </p>
+            </>
+          )}
           <button
-            onClick={() => router.push(`/student/courses/${courseId}/quizzes`)}
+            onClick={() => router.push(`/student/courses/${courseId}/quizzes/${quiz.quiz_id}/result`)}
             className="mt-8 w-full rounded-xl bg-[#4F46E5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA]"
           >
-            Back to Quizzes
+            View Detailed Results
           </button>
         </div>
       </div>

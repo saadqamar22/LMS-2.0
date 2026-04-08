@@ -28,6 +28,7 @@ export interface Question {
   correct_answer: string;
   marks: number;
   order_index: number;
+  rubric: string | null;
 }
 
 export interface QuizAttempt {
@@ -40,6 +41,7 @@ export interface QuizAttempt {
   submitted_at: string | null;
   student_name?: string;
   registration_number?: string | null;
+  question_grades: Record<string, { marks: number; feedback: string }> | null;
 }
 
 // ─── Teacher: create quiz ───────────────────────────────────────────────────
@@ -104,6 +106,7 @@ export async function addQuestion(input: {
   correctAnswer: string;
   marks: number;
   orderIndex?: number;
+  rubric?: string;
 }): Promise<{ success: true; questionId: string } | { success: false; error: string }> {
   const session = await getCurrentSession();
   if (!session) return { success: false, error: "You must be logged in." };
@@ -143,6 +146,7 @@ export async function addQuestion(input: {
         correct_answer: input.correctAnswer,
         marks: input.marks,
         order_index: nextIndex,
+        rubric: input.type === "short_answer" ? (input.rubric?.trim() || null) : null,
       }])
       .select("question_id")
       .single();
@@ -408,7 +412,7 @@ export async function getQuizAttempts(
     const supabase = createAdminClient();
 
     const { data, error } = await (supabase.from("quiz_attempts") as any)
-      .select("attempt_id, quiz_id, student_id, answers, score, started_at, submitted_at")
+      .select("attempt_id, quiz_id, student_id, answers, score, started_at, submitted_at, question_grades")
       .eq("quiz_id", quizId)
       .not("submitted_at", "is", null)
       .order("submitted_at", { ascending: false });
@@ -441,6 +445,7 @@ export async function getQuizAttempts(
       submitted_at: a.submitted_at,
       student_name: userMap.get(a.student_id)?.full_name || "Unknown",
       registration_number: studentMap.get(a.student_id)?.registration_number || null,
+      question_grades: a.question_grades || null,
     }));
 
     return { success: true, attempts };
@@ -501,7 +506,10 @@ export async function getPublishedQuizzesByCourse(
 export async function submitQuizAttempt(
   quizId: string,
   answers: Record<string, string>,
-): Promise<{ success: true; score: number; total: number } | { success: false; error: string }> {
+): Promise<
+  | { success: true; score: number; total: number; gradingMode: "auto" | "manual" }
+  | { success: false; error: string }
+> {
   const session = await getCurrentSession();
   if (!session) return { success: false, error: "You must be logged in." };
   if (session.role !== "student") return { success: false, error: "Access denied." };
@@ -509,16 +517,17 @@ export async function submitQuizAttempt(
   try {
     const supabase = createAdminClient();
 
-    // Verify quiz is published
     const { data: quiz } = await supabase
       .from("quizzes")
-      .select("is_published, total_marks, course_id, grading_mode")
+      .select("is_published, total_marks, course_id, grading_mode, rubric")
       .eq("quiz_id", quizId)
       .single();
     if (!quiz || !(quiz as any).is_published)
       return { success: false, error: "Quiz not available." };
 
-    // Check no previous submission
+    const q = quiz as any;
+    const gradingMode: "auto" | "manual" = q.grading_mode || "auto";
+
     const { data: existing } = await supabase
       .from("quiz_attempts")
       .select("attempt_id, submitted_at")
@@ -528,30 +537,47 @@ export async function submitQuizAttempt(
     if (existing && (existing as any).submitted_at)
       return { success: false, error: "You have already submitted this quiz." };
 
-    // Fetch questions and auto-grade
     const { data: questions } = await supabase
       .from("questions")
-      .select("question_id, correct_answer, marks, type")
+      .select("question_id, correct_answer, marks, type, rubric")
       .eq("quiz_id", quizId);
 
-    // short_answer is never auto-graded:
-    //   manual mode → teacher grades via the results page
-    //   auto mode   → Gemini integration pending
+    // Grade MCQ and True/False automatically
     let score = 0;
-    for (const q of (questions || []) as any[]) {
-      const studentAnswer = answers[q.question_id]?.trim().toLowerCase();
-      const correct = q.correct_answer?.trim().toLowerCase();
-      if (q.type !== "short_answer" && studentAnswer === correct) {
-        score += q.marks;
+    for (const question of (questions || []) as any[]) {
+      if (question.type === "short_answer") continue;
+      const studentAnswer = answers[question.question_id]?.trim().toLowerCase();
+      const correct = question.correct_answer?.trim().toLowerCase();
+      if (studentAnswer === correct) score += question.marks;
+    }
+
+    // Grade short_answer with AI (auto mode only)
+    let questionGrades: Record<string, { marks: number; feedback: string }> | null = null;
+    if (gradingMode === "auto") {
+      const { gradeShortAnswer } = await import("@/lib/ai-grader");
+      questionGrades = {};
+      for (const question of (questions || []) as any[]) {
+        if (question.type !== "short_answer") continue;
+        const studentAnswer = answers[question.question_id] || "";
+        // Per-question rubric first, fall back to quiz-level rubric
+        const rubric = question.rubric || q.rubric || null;
+        const gradeResult = await gradeShortAnswer(
+          question.question_text ?? "",
+          studentAnswer,
+          question.correct_answer ?? "",
+          question.marks,
+          rubric,
+        );
+        questionGrades[question.question_id] = gradeResult;
+        score += gradeResult.marks;
       }
     }
 
     const now = new Date().toISOString();
 
     if (existing) {
-      // Update existing in-progress attempt
       await (supabase.from("quiz_attempts") as any)
-        .update({ answers, score, submitted_at: now })
+        .update({ answers, score, submitted_at: now, question_grades: questionGrades })
         .eq("attempt_id", (existing as any).attempt_id);
     } else {
       await (supabase.from("quiz_attempts") as any)
@@ -562,11 +588,12 @@ export async function submitQuizAttempt(
           score,
           started_at: now,
           submitted_at: now,
+          question_grades: questionGrades,
         }]);
     }
 
-    revalidatePath(`/student/courses/${(quiz as any).course_id}/quizzes`);
-    return { success: true, score, total: (quiz as any).total_marks };
+    revalidatePath(`/student/courses/${q.course_id}/quizzes`);
+    return { success: true, score, total: q.total_marks, gradingMode };
   } catch {
     return { success: false, error: "An unexpected error occurred." };
   }
@@ -686,7 +713,7 @@ export async function getStudentQuizResult(quizId: string): Promise<
     if (quizError || !quizData) return { success: false, error: "Quiz not found." };
 
     const { data: attemptData, error: attemptError } = await (supabase.from("quiz_attempts") as any)
-      .select("*")
+      .select("attempt_id, quiz_id, student_id, answers, score, started_at, submitted_at, question_grades")
       .eq("quiz_id", quizId)
       .eq("student_id", session.userId)
       .not("submitted_at", "is", null)
@@ -775,8 +802,22 @@ export async function gradeManualQuestions(
 
     const newScore = autoScore + manualScore;
 
+    // Build question_grades for manual grading
+    const questionGrades: Record<string, { marks: number; feedback: string }> = {};
+    for (const [questionId, marks] of Object.entries(questionMarks)) {
+      const question = ((questions || []) as any[]).find(
+        (q) => q.question_id === questionId && q.type === "short_answer",
+      );
+      if (question) {
+        questionGrades[questionId] = {
+          marks: Math.min(Math.max(0, marks), question.marks),
+          feedback: "Graded by teacher.",
+        };
+      }
+    }
+
     const { error } = await (supabase.from("quiz_attempts") as any)
-      .update({ score: newScore })
+      .update({ score: newScore, question_grades: questionGrades })
       .eq("attempt_id", attemptId);
 
     if (error) return { success: false, error: error.message };

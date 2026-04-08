@@ -25,6 +25,7 @@ interface GeneratedQuestion {
   options: string[] | null;
   correct_answer: string;
   marks: number;
+  rubric?: string;
 }
 
 interface Props {
@@ -58,6 +59,7 @@ export function QuizGeneratorClient({ courses }: Props) {
   const [types, setTypes] = useState<string[]>(["mcq"]);
   const [quizTitle, setQuizTitle] = useState("");
   const [timeLimit, setTimeLimit] = useState("");
+  const [gradingMode, setGradingMode] = useState<"auto" | "manual">("auto");
 
   // Generated
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
@@ -162,6 +164,7 @@ export function QuizGeneratorClient({ courses }: Props) {
       title: quizTitle,
       totalMarks,
       timeLimitMins: timeLimit ? parseInt(timeLimit) : undefined,
+      gradingMode,
     });
 
     if (!quizResult.success) {
@@ -182,6 +185,7 @@ export function QuizGeneratorClient({ courses }: Props) {
         correctAnswer: q.correct_answer,
         marks: q.marks,
         orderIndex: i,
+        rubric: q.type === "short_answer" && gradingMode === "auto" ? q.rubric : undefined,
       });
     }
 
@@ -500,6 +504,41 @@ export function QuizGeneratorClient({ courses }: Props) {
                 />
               </div>
             </div>
+
+            {/* Grading mode */}
+            <div className="mt-4">
+              <label className="mb-2 block text-sm font-medium text-slate-700">Grading Mode</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setGradingMode("auto")}
+                  className={`rounded-xl border p-3 text-left text-sm transition ${
+                    gradingMode === "auto"
+                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <p className="font-semibold">AI Grade</p>
+                  <p className="mt-0.5 text-xs opacity-75">
+                    MCQ/T-F instant. Short answers graded by AI. Add rubrics below.
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGradingMode("manual")}
+                  className={`rounded-xl border p-3 text-left text-sm transition ${
+                    gradingMode === "manual"
+                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <p className="font-semibold">Manual Grade</p>
+                  <p className="mt-0.5 text-xs opacity-75">
+                    MCQ/T-F instant. You review short answers and award marks.
+                  </p>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -512,9 +551,12 @@ export function QuizGeneratorClient({ courses }: Props) {
 
             {questions.map((q, i) => (
               <div key={i} className="rounded-2xl border border-slate-100 bg-white shadow-[var(--shadow-card)]">
-                <button
-                  className="flex w-full items-center justify-between px-5 py-4 text-left"
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="flex w-full cursor-pointer items-center justify-between px-5 py-4 text-left"
                   onClick={() => setExpanded(expanded === i ? null : i)}
+                  onKeyDown={(e) => e.key === "Enter" && setExpanded(expanded === i ? null : i)}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-xs font-bold text-[#4F46E5]">
@@ -536,6 +578,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   <div className="flex items-center gap-3 ml-4 shrink-0">
                     <span className="text-xs text-slate-400">{q.marks}m</span>
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         removeQuestion(i);
@@ -550,7 +593,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                       <ChevronDown className="h-4 w-4 text-slate-400" />
                     )}
                   </div>
-                </button>
+                </div>
 
                 {expanded === i && (
                   <div className="border-t border-slate-100 px-5 pb-4 space-y-3">
@@ -607,6 +650,23 @@ export function QuizGeneratorClient({ courses }: Props) {
                         />
                       </div>
                     </div>
+
+                    {/* Rubric for short_answer in auto grading mode */}
+                    {q.type === "short_answer" && gradingMode === "auto" && (
+                      <div>
+                        <label className="text-xs font-medium text-slate-500">
+                          AI Grading Rubric <span className="text-slate-400">(optional)</span>
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={q.rubric || ""}
+                          onChange={(e) => updateQuestion(i, "rubric", e.target.value)}
+                          placeholder="e.g. Award full marks if student mentions X and Y. Partial marks for incomplete answers."
+                          className="mt-1 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                        />
+                        <p className="mt-1 text-xs text-slate-400">Instructions for AI grader. Leave blank to grade based on model answer alone.</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
