@@ -32,12 +32,15 @@ export async function POST(request: Request) {
       .select(`obtained_marks, modules!marks_module_id_fkey(module_name, total_marks, courses!modules_course_id_fkey(course_name, course_code))`)
       .eq("student_id", studentId);
 
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
     const { data: attendance } = await supabase
       .from("attendance")
       .select("status, date")
       .eq("student_id", studentId)
-      .order("date", { ascending: false })
-      .limit(90);
+      .gte("date", sixMonthsAgo.toISOString().split("T")[0])
+      .order("date", { ascending: true });
 
     const attendanceList = (attendance || []) as any[];
     const totalRecords = attendanceList.length;
@@ -48,6 +51,21 @@ export async function POST(request: Request) {
       ? Math.round(((presentCount + lateCount) / totalRecords) * 100)
       : null;
 
+    // Group attendance by month (chronological order preserved)
+    const monthOrder: string[] = [];
+    const attendanceByMonth: Record<string, { present: number; absent: number; late: number }> = {};
+    for (const record of attendanceList) {
+      const monthKey = new Date(record.date).toLocaleString("default", { month: "short" });
+      if (!attendanceByMonth[monthKey]) {
+        attendanceByMonth[monthKey] = { present: 0, absent: 0, late: 0 };
+        monthOrder.push(monthKey);
+      }
+      const status = record.status as "present" | "absent" | "late";
+      if (status in attendanceByMonth[monthKey]) attendanceByMonth[monthKey][status]++;
+    }
+    const attendanceChartData = monthOrder.map(month => ({ month, ...attendanceByMonth[month] }));
+
+    // Build course map
     const courseMap: Record<string, { courseName: string; courseCode: string; modules: { name: string; obtained: number; total: number; pct: number }[] }> = {};
     for (const mark of (marks || []) as any[]) {
       const mod = mark.modules;
@@ -63,35 +81,89 @@ export async function POST(request: Request) {
 
     const coursesSummary = Object.values(courseMap).map(c => {
       const avgPct = c.modules.length > 0
-        ? Math.round(c.modules.reduce((s, m) => s + m.pct, 0) / c.modules.length)
+        ? Math.round(c.modules.reduce((sum, m) => sum + m.pct, 0) / c.modules.length)
         : null;
       return `${c.courseCode} - ${c.courseName}: ${c.modules.map(m => `${m.name} ${m.obtained}/${m.total} (${m.pct}%)`).join(", ")}${avgPct !== null ? ` | Course avg: ${avgPct}%` : ""}`;
     }).join("\n");
 
-    const prompt = `You are an academic advisor generating a parent-friendly progress report for a student.
+    const coursePerformanceData = Object.values(courseMap).map(c => ({
+      course: c.courseCode,
+      courseName: c.courseName,
+      pct: c.modules.length > 0 ? Math.round(c.modules.reduce((sum, m) => sum + m.pct, 0) / c.modules.length) : 0,
+    }));
+
+    const bestCourse = coursePerformanceData.length > 0
+      ? coursePerformanceData.reduce((best, c) => c.pct > best.pct ? c : best)
+      : null;
+
+    const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+    const prompt = `You are a professional academic advisor writing a formal progress report for a parent. Write a warm, thorough, and data-driven report.
 
 Student: ${studentName}
 Class: ${s.class || "N/A"} | Section: ${s.section || "N/A"}
+Report Date: ${reportDate}
 
 ACADEMIC PERFORMANCE:
 ${coursesSummary || "No marks recorded yet."}
 
-ATTENDANCE (last 90 days):
-Total: ${totalRecords} records | Present: ${presentCount} | Late: ${lateCount} | Absent: ${absentCount}
-Attendance rate: ${attendanceRate !== null ? `${attendanceRate}%` : "No data"}
+ATTENDANCE (last 6 months):
+Total Sessions: ${totalRecords} | Present: ${presentCount} | Late: ${lateCount} | Absent: ${absentCount}
+Overall Attendance Rate: ${attendanceRate !== null ? `${attendanceRate}%` : "No data"}
 
-Write a comprehensive, warm, and constructive parent report in markdown format. Include:
-1. **Overall Assessment** — brief overall summary (2-3 sentences)
-2. **Academic Performance** — subject-by-subject analysis with strengths and areas for improvement
-3. **Attendance** — comment on attendance pattern
-4. **Strengths** — what the student is doing well
-5. **Areas for Improvement** — specific actionable suggestions
-6. **Recommendations** — 3-4 practical tips for the parent to support their child
+Generate a professional progress report in markdown using EXACTLY this structure:
 
-Keep the tone encouraging and professional. Write as if addressed directly to the parent.`;
+## Executive Summary
+
+(2–3 sentences giving a balanced overall picture of ${studentName}'s current academic standing. Reference the attendance rate and general performance trend.)
+
+## Academic Performance
+
+(Write one focused paragraph per subject. For each subject: state the performance level, reference specific scores/percentages, highlight what the student is doing well in that subject, and note any area of concern. Be specific and data-driven.)
+
+## Attendance & Engagement
+
+(Analyse the attendance pattern. Reference the ${attendanceRate !== null ? `${attendanceRate}% attendance rate` : "attendance data"} explicitly. Note any impact on academic performance if relevant. Be encouraging if attendance is good; be constructive and solution-focused if it needs improvement.)
+
+## Strengths & Achievements
+
+(Bullet list of 3–5 specific, evidence-backed strengths. Each bullet should reference actual data or observable behaviours.)
+
+## Areas for Development
+
+(Bullet list of 2–4 specific, actionable areas needing improvement. Frame these constructively — focus on opportunity, not failure.)
+
+## Recommendations for Parents
+
+(Numbered list of 4–5 practical, specific actions the parent can take at home to support their child's progress.)
+
+---
+
+*This report was prepared based on available academic records. For a detailed discussion, please contact the class teacher.*
+
+Tone requirements: warm but professional, specific not generic, encouraging but honest. Address the parent directly using "your child" or "${studentName}".`;
 
     const report = await generateText(prompt);
-    return NextResponse.json({ report, studentName });
+
+    return NextResponse.json({
+      report,
+      studentName,
+      studentInfo: { class: s.class, section: s.section },
+      chartData: {
+        coursePerformance: coursePerformanceData,
+        attendance: attendanceChartData,
+        summary: {
+          attendanceRate,
+          totalRecords,
+          presentCount,
+          absentCount,
+          lateCount,
+          totalCourses: coursePerformanceData.length,
+          bestCourse: bestCourse?.courseName ?? null,
+          bestCoursePct: bestCourse?.pct ?? null,
+        },
+      },
+    });
   } catch (err) {
     console.error("AI parent report error:", err);
     return NextResponse.json({ error: "Failed to generate report. Please try again." }, { status: 500 });
