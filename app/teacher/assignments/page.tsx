@@ -25,7 +25,7 @@ export default async function TeacherAssignmentsDashboardPage({
   if (!coursesResult.success) {
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {coursesResult.error}
         </div>
       </DashboardShell>
@@ -73,10 +73,10 @@ export default async function TeacherAssignmentsDashboardPage({
   return (
     <DashboardShell role="teacher">
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-medium text-slate-500">
           Assignments Management
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           All Assignments
         </h1>
         <p className="mt-1 text-sm text-slate-500">

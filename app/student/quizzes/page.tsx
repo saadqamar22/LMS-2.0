@@ -35,7 +35,7 @@ export default async function StudentQuizzesPage() {
   return (
     <DashboardShell role="student">
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">Quizzes</p>
+        <p className="text-xs font-medium text-slate-500">Quizzes</p>
         <h1 className="text-2xl font-semibold text-slate-900">My Quizzes</h1>
       </section>
 
@@ -52,10 +52,10 @@ export default async function StudentQuizzesPage() {
             {pendingQuizzes.map((quiz) => (
               <div
                 key={quiz.quiz_id}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+                className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#4F46E5]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
                     <ClipboardList className="h-5 w-5" />
                   </div>
                   <div>
@@ -74,7 +74,7 @@ export default async function StudentQuizzesPage() {
                 </div>
                 <Link
                   href={`/student/courses/${quiz.course_id}/quizzes/${quiz.quiz_id}/take`}
-                  className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+                  className="flex shrink-0 items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                 >
                   Start <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
@@ -97,7 +97,7 @@ export default async function StudentQuizzesPage() {
               return (
                 <div
                   key={quiz.quiz_id}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+                  className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <div className="flex items-center gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">

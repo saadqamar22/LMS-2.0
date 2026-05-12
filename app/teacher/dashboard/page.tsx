@@ -18,13 +18,11 @@ export default async function TeacherDashboardPage() {
   return (
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Overview</p>
-          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
-        </div>
+        <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
         <Link
           href="/teacher/create-course"
-          className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+          className="self-start rounded-md px-4 py-2 text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "var(--role-primary)" }}
         >
           + Create Course
         </Link>
@@ -48,13 +46,10 @@ export default async function TeacherDashboardPage() {
       {stats.recentCourses.length > 0 ? (
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
-              <h2 className="text-xl font-semibold text-slate-900">Your Courses</h2>
-            </div>
+            <h2 className="text-base font-semibold text-slate-900">Your Courses</h2>
             <Link
               href="/teacher/courses"
-              className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+              className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
               View all →
             </Link>

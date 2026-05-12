@@ -14,16 +14,9 @@ interface GPATrendChartProps {
 
 export function GPATrendChart({ data }: GPATrendChartProps) {
   return (
-    <div className="h-64 rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="h-64 rounded-xl border border-slate-200 bg-white p-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Analytics
-          </p>
-          <h3 className="text-lg font-semibold text-slate-900">
-            GPA performance
-          </h3>
-        </div>
+        <h3 className="text-sm font-semibold text-slate-900">GPA Performance</h3>
       </div>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -35,16 +28,16 @@ export function GPATrendChart({ data }: GPATrendChartProps) {
           <YAxis domain={[0, 4]} stroke="#94A3B8" />
           <Tooltip
             contentStyle={{
-              borderRadius: "1rem",
+              borderRadius: "0.5rem",
               border: "1px solid #E2E8F0",
             }}
           />
           <Line
             type="monotone"
             dataKey="gpa"
-            stroke="#4F46E5"
+            stroke="#2563EB"
             strokeWidth={3}
-            dot={{ stroke: "#4F46E5", fill: "#FFFFFF", strokeWidth: 2 }}
+            dot={{ stroke: "#2563EB", fill: "#FFFFFF", strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>

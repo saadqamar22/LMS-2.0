@@ -50,7 +50,7 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
   if (studentError || !studentData) {
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           Student not found.
         </div>
       </DashboardShell>
@@ -79,7 +79,7 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
   if (!coursesResult.success) {
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {coursesResult.error}
         </div>
       </DashboardShell>
@@ -194,9 +194,9 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
     <DashboardShell role="teacher">
       <div className="space-y-6">
         {/* Student Info Header */}
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-[#EEF2FF] p-3 text-[#4F46E5]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
               <GraduationCap className="h-8 w-8" />
             </div>
             <div className="flex-1">
@@ -229,13 +229,13 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
             {courseData.map(({ course, marks, attendance, attendanceRate, assignments, gpa, percentage }) => (
               <div
                 key={course.course_id}
-                className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                className="rounded-xl border border-slate-200 bg-white p-5"
               >
                 {/* Course Header */}
                 <div className="mb-6 flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-[#4F46E5]" />
+                      <BookOpen className="h-5 w-5 text-slate-400" />
                       <h2 className="text-xl font-semibold text-slate-900">{course.course_name}</h2>
                     </div>
                     <p className="mt-1 text-sm text-slate-500">{course.course_code}</p>

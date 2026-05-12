@@ -54,14 +54,14 @@ export function SummarizerClient() {
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Input Panel */}
       <div className="space-y-4">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <h2 className="mb-3 font-semibold text-slate-900">Paste Content</h2>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={12}
             placeholder="Paste your lecture notes, article, textbook passage, or any content you want summarized…"
-            className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#4F46E5] placeholder:text-slate-400"
+            className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-slate-400 placeholder:text-slate-400"
           />
           <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
             <span>{wordCount} words · {charCount}/50,000 chars</span>
@@ -74,7 +74,7 @@ export function SummarizerClient() {
         </div>
 
         {/* Mode selector */}
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <h2 className="mb-3 font-semibold text-slate-900">Summary Style</h2>
           <div className="grid grid-cols-2 gap-2">
             {MODES.map((m) => (
@@ -83,7 +83,7 @@ export function SummarizerClient() {
                 onClick={() => setMode(m.value)}
                 className={`rounded-xl border p-3 text-left transition ${
                   mode === m.value
-                    ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                    ? "border-slate-400 bg-slate-200 text-slate-700"
                     : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                 }`}
               >
@@ -97,7 +97,7 @@ export function SummarizerClient() {
         <button
           onClick={handleSummarize}
           disabled={!text.trim() || loading || charCount > 50000}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4F46E5] px-4 py-3 font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-800 px-4 py-3 font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
           {loading ? "Summarizing…" : "Summarize"}
@@ -109,7 +109,7 @@ export function SummarizerClient() {
       </div>
 
       {/* Output Panel */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Summary</h2>
           {summary && (
@@ -131,7 +131,7 @@ export function SummarizerClient() {
         ) : loading ? (
           <div className="flex h-48 items-center justify-center">
             <div className="text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4F46E5]" />
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-slate-400" />
               <p className="mt-3 text-sm text-slate-400">Analyzing content…</p>
             </div>
           </div>

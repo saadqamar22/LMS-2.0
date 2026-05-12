@@ -10,7 +10,7 @@ export default async function AIChatAssistantPage() {
   return (
     <DashboardShell role={currentUser.role as "student" | "teacher" | "parent" | "admin"}>
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">AI Tools</p>
+        <p className="text-xs font-medium text-slate-500">AI Tools</p>
         <h1 className="text-2xl font-semibold text-slate-900">Chat Assistant</h1>
         <p className="mt-1 text-sm text-slate-500">Ask questions about courses, concepts, assignments, and more.</p>
       </section>

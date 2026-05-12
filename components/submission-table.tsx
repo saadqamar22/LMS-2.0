@@ -39,7 +39,7 @@ export function SubmissionTable({
 
   if (submissions.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-8 text-center">
+      <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
         <FileText className="mx-auto h-12 w-12 text-slate-300" />
         <p className="mt-4 text-sm font-medium text-slate-500">
           No submissions yet
@@ -53,27 +53,27 @@ export function SubmissionTable({
 
   return (
     <>
-      <div className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">
                   Student
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">
                   Submission
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">
                   Submitted At
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">
                   Marks
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <th className="px-6 py-3 text-right text-xs font-semibold text-slate-600">
                   Actions
                 </th>
               </tr>
@@ -89,7 +89,7 @@ export function SubmissionTable({
                   <tr key={submission.submission_id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-500">
                           <GraduationCap className="h-4 w-4" />
                         </div>
                         <div>
@@ -111,7 +111,7 @@ export function SubmissionTable({
                             href={normalizeFileUrl(submission.file_url, "submissions") || submission.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 text-sm text-[#4F46E5] hover:text-[#4338CA]"
+                            className="flex items-center gap-1.5 text-sm text-slate-600 underline hover:text-slate-900"
                           >
                             <FileText className="h-4 w-4" />
                             View File
@@ -170,7 +170,8 @@ export function SubmissionTable({
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => setGradingSubmissionId(submission.submission_id)}
-                        className="rounded-xl bg-[#4F46E5] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#4338CA]"
+                        className="rounded-md px-3 py-1.5 text-xs font-semibold text-white"
+                        style={{ backgroundColor: "var(--role-primary)" }}
                       >
                         {isGraded ? "Update Grade" : "Grade"}
                       </button>

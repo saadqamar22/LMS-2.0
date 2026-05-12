@@ -32,14 +32,14 @@ export function AssignmentCard({
 
   const status = deadlineStatus || getDeadlineStatus();
 
-  const statusColors = {
-    upcoming: "bg-blue-50 text-blue-700 border-blue-200",
-    due_soon: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    overdue: "bg-red-50 text-red-700 border-red-200",
+  const statusStyles = {
+    upcoming: "bg-blue-50 text-blue-700 border-blue-100",
+    due_soon: "bg-amber-50 text-amber-700 border-amber-100",
+    overdue: "bg-red-50 text-red-700 border-red-100",
   };
 
   const submissionColors = {
-    submitted: "text-green-600",
+    submitted: "text-emerald-600",
     graded: "text-blue-600",
     not_submitted: "text-slate-400",
   };
@@ -47,82 +47,66 @@ export function AssignmentCard({
   return (
     <Link
       href={`/student/courses/${assignment.course_id}/assignments/${assignment.assignment_id}`}
-      className="block rounded-2xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition-all hover:shadow-lg hover:border-[#4F46E5]"
+      className="block rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300 hover:bg-slate-50/50"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#4F46E5]" />
-            <h3 className="text-lg font-semibold text-slate-900">
-              {assignment.title}
-            </h3>
+            <FileText className="h-4 w-4 shrink-0 text-slate-400" />
+            <h3 className="font-semibold text-slate-900">{assignment.title}</h3>
           </div>
 
           {assignment.description && (
-            <p className="mb-4 line-clamp-2 text-sm text-slate-600">
+            <p className="mb-3 line-clamp-2 text-sm text-slate-500">
               {assignment.description}
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            <div className="flex items-center gap-1.5 text-slate-500">
-              <Calendar className="h-4 w-4" />
-              <span>
-                Due: {deadline.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 text-slate-500">
-              <Clock className="h-4 w-4" />
-              <span>
-                {isOverdue
-                  ? `${Math.abs(daysUntilDeadline)} days overdue`
-                  : `${daysUntilDeadline} days left`}
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="h-3.5 w-3.5" />
+              Due {deadline.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" />
+              {isOverdue
+                ? `${Math.abs(daysUntilDeadline)}d overdue`
+                : `${daysUntilDeadline}d left`}
+            </span>
             {assignment.file_url && (
-              <div className="flex items-center gap-1.5 text-[#4F46E5]">
-                <Download className="h-4 w-4" />
-                <span className="font-medium">File Available</span>
-              </div>
+              <span className="inline-flex items-center gap-1 text-slate-500">
+                <Download className="h-3.5 w-3.5" />
+                File attached
+              </span>
             )}
           </div>
         </div>
 
-        <div className="ml-4 flex flex-col items-end gap-2">
-          <span
-            className={`rounded-lg border px-3 py-1 text-xs font-semibold ${statusColors[status]}`}
-          >
-            {status === "overdue"
-              ? "Overdue"
-              : status === "due_soon"
-                ? "Due Soon"
-                : "Upcoming"}
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${statusStyles[status]}`}>
+            {status === "overdue" ? "Overdue" : status === "due_soon" ? "Due Soon" : "Upcoming"}
           </span>
 
           {submissionStatus && (
-            <div
-              className={`flex items-center gap-1.5 text-xs font-medium ${submissionColors[submissionStatus]}`}
-            >
+            <div className={`flex items-center gap-1 text-xs font-medium ${submissionColors[submissionStatus]}`}>
               {submissionStatus === "graded" ? (
                 <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>
-                    Graded {marks !== null && marks !== undefined && `(${marks}%)`}
-                  </span>
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Graded {marks != null && `(${marks}%)`}</span>
                 </>
               ) : submissionStatus === "submitted" ? (
                 <>
-                  <CheckCircle2 className="h-4 w-4" />
+                  <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>Submitted</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="h-4 w-4" />
-                  <span>Not Submitted</span>
+                  <XCircle className="h-3.5 w-3.5" />
+                  <span>Not submitted</span>
                 </>
               )}
             </div>

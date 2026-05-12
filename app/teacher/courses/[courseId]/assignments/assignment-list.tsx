@@ -24,12 +24,12 @@ export function AssignmentList({ assignments, courseId }: AssignmentListProps) {
           <Link
             key={assignment.assignment_id}
             href={`/teacher/courses/${courseId}/assignments/${assignment.assignment_id}`}
-            className="block rounded-2xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition-all hover:shadow-lg hover:border-[#4F46E5]"
+            className="block rounded-xl border border-slate-200 bg-white p-5 transition-all hover:border-slate-300"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#4F46E5]" />
+                  <FileText className="h-5 w-5 text-slate-400" />
                   <h3 className="text-lg font-semibold text-slate-900">
                     {assignment.title}
                   </h3>
@@ -55,7 +55,7 @@ export function AssignmentList({ assignments, courseId }: AssignmentListProps) {
                     </span>
                   </div>
                   {assignment.file_url && (
-                    <div className="flex items-center gap-1.5 text-[#4F46E5]">
+                    <div className="flex items-center gap-1.5 text-slate-500">
                       <Download className="h-4 w-4" />
                       <span className="font-medium">File Attached</span>
                     </div>

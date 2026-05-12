@@ -22,7 +22,7 @@ export function CourseFilter({ courses, selectedCourseId }: CourseFilterProps) {
   };
 
   return (
-    <div className="mb-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
       <label
         htmlFor="course-filter"
         className="mb-2 block text-sm font-medium text-slate-700"
@@ -33,7 +33,7 @@ export function CourseFilter({ courses, selectedCourseId }: CourseFilterProps) {
         id="course-filter"
         value={selectedCourseId || ""}
         onChange={(e) => handleCourseChange(e.target.value)}
-        className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+        className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
       >
         <option value="">All Courses</option>
         {courses.map((course) => (

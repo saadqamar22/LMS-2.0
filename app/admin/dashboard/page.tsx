@@ -96,8 +96,8 @@ export default async function AdminDashboardPage() {
 
       {/* Attendance overview + enrollment breakdown */}
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-          <p className="text-xs uppercase tracking-wide text-slate-400">Last 30 days</p>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <p className="text-xs font-medium text-slate-500">Last 30 days</p>
           <h2 className="mt-1 text-xl font-semibold text-slate-900">Attendance Overview</h2>
           {stats.attendancePct === null ? (
             <p className="mt-4 text-sm text-slate-400">No attendance records in the last 30 days.</p>
@@ -118,8 +118,8 @@ export default async function AdminDashboardPage() {
           )}
         </div>
 
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-          <p className="text-xs uppercase tracking-wide text-slate-400">Breakdown</p>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <p className="text-xs font-medium text-slate-500">Breakdown</p>
           <h2 className="mt-1 text-xl font-semibold text-slate-900">User Roles</h2>
           <div className="mt-6 space-y-4">
             {[
@@ -145,10 +145,10 @@ export default async function AdminDashboardPage() {
       </section>
 
       {/* Recent users */}
-      <section className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+      <section className="rounded-xl border border-slate-200 bg-white overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Users</p>
+            <p className="text-xs font-medium text-slate-500">Users</p>
             <h2 className="text-xl font-semibold text-slate-900">Recent Registrations</h2>
           </div>
         </div>

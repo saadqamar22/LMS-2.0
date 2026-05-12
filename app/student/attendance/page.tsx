@@ -56,7 +56,7 @@ export default async function StudentAttendancePage({
       <DashboardShell role="student">
         <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Attendance
             </p>
             <h1 className="text-2xl font-semibold text-slate-900">
@@ -64,7 +64,7 @@ export default async function StudentAttendancePage({
             </h1>
           </div>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {attendanceResult.error}
         </div>
       </DashboardShell>
@@ -111,12 +111,7 @@ export default async function StudentAttendancePage({
   return (
     <DashboardShell role="student">
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
-          Attendance
-        </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
-          My Attendance
-        </h1>
+        <h1 className="text-xl font-semibold text-slate-900">My Attendance</h1>
         <p className="mt-1 text-sm text-slate-500">
           View your attendance records for all enrolled courses
         </p>
@@ -135,37 +130,23 @@ export default async function StudentAttendancePage({
       ) : (
         <>
           <section className="mt-8 grid gap-6 md:grid-cols-4">
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Total Records
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
-                {totalRecords}
-              </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">Total Records</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{totalRecords}</p>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Attendance Rate
-              </p>
-              <p className={`mt-2 text-3xl font-semibold ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">Attendance Rate</p>
+              <p className={`mt-2 text-2xl font-bold tabular-nums ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
                 {attendanceRate}%
               </p>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Present
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-green-600">
-                {presentCount}
-              </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">Present</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-green-600">{presentCount}</p>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Absent
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-red-600">
-                {absentCount}
-              </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">Absent</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-red-600">{absentCount}</p>
             </div>
           </section>
 
@@ -173,13 +154,11 @@ export default async function StudentAttendancePage({
             {Object.entries(attendanceByCourse).map(([courseId, courseData]) => (
               <div
                 key={courseId}
-                className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                className="rounded-xl border border-slate-200 bg-white p-5"
               >
                 <div className="mb-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    {courseData.course_code}
-                  </p>
-                  <h3 className="text-lg font-semibold text-slate-900">
+                  <p className="font-mono text-xs text-slate-400">{courseData.course_code}</p>
+                  <h3 className="text-base font-semibold text-slate-900">
                     {courseData.course_name}
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -213,7 +192,7 @@ export default async function StudentAttendancePage({
                           </div>
                         </div>
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${config.bgColor} ${config.color}`}
+                          className={`rounded-md px-2 py-0.5 text-xs font-semibold ${config.bgColor} ${config.color}`}
                         >
                           {config.label}
                         </span>

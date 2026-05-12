@@ -13,17 +13,17 @@ export default async function TeacherCoursesPage() {
       <DashboardShell role="teacher">
         <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+            <p className="text-xs font-medium text-slate-500">Courses</p>
             <h1 className="text-2xl font-semibold text-slate-900">My Courses</h1>
           </div>
           <Link
             href="/teacher/create-course"
-            className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+            className="self-start rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
           >
             + Create Course
           </Link>
         </section>
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {result.error}
         </div>
       </DashboardShell>
@@ -50,12 +50,12 @@ export default async function TeacherCoursesPage() {
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+          <p className="text-xs font-medium text-slate-500">Courses</p>
           <h1 className="text-2xl font-semibold text-slate-900">My Courses</h1>
         </div>
         <Link
           href="/teacher/create-course"
-          className="self-start rounded-2xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+          className="self-start rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
         >
           + Create Course
         </Link>

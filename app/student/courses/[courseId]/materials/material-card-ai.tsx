@@ -124,7 +124,7 @@ export function MaterialCardWithAI({ material }: { material: Material }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]">
+    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5">
       {/* Material header */}
       <div className="flex items-start justify-between gap-2">
         <div className={`rounded-xl p-2.5 ${colorClass}`}>
@@ -155,7 +155,7 @@ export function MaterialCardWithAI({ material }: { material: Material }) {
           <button
             onClick={() => runTool("quiz")}
             disabled={!!loading}
-            className="flex items-center gap-1.5 rounded-lg bg-[#EEF2FF] px-3 py-1.5 text-xs font-medium text-[#4F46E5] hover:bg-indigo-100 disabled:opacity-50 transition"
+            className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50 transition"
           >
             {loading === "quiz" ? <Loader2 className="h-3 w-3 animate-spin" /> : <BookOpen className="h-3 w-3" />}
             Practice Quiz
@@ -182,8 +182,8 @@ export function MaterialCardWithAI({ material }: { material: Material }) {
       {/* Loading state */}
       {loading && (
         <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-          <Loader2 className="h-4 w-4 animate-spin text-[#4F46E5]" />
-          <Sparkles className="h-3.5 w-3.5 text-[#4F46E5]" />
+          <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+          <Sparkles className="h-3.5 w-3.5 text-slate-500" />
           Generating with AI…
         </div>
       )}
@@ -195,11 +195,11 @@ export function MaterialCardWithAI({ material }: { material: Material }) {
 
       {/* AI result panel */}
       {result && (
-        <div className="mt-1 rounded-2xl border border-slate-100 bg-slate-50">
+        <div className="mt-1 rounded-xl border border-slate-100 bg-slate-50">
           {/* Panel header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#4F46E5]" />
+              <Sparkles className="h-4 w-4 text-slate-500" />
               <span className="text-sm font-semibold text-slate-800">
                 {result.tool === "quiz"
                   ? "Practice Quiz"
@@ -322,7 +322,7 @@ function QuizPanel({
               onClick={() => setAnswers({ ...answers, [index]: opt })}
               className={`w-full rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                 answers[index] === opt
-                  ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                  ? "border-blue-500 bg-blue-50 text-blue-800"
                   : "border-slate-200 text-slate-700 hover:bg-slate-100"
               }`}
             >
@@ -339,7 +339,7 @@ function QuizPanel({
               onClick={() => setAnswers({ ...answers, [index]: opt })}
               className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition ${
                 answers[index] === opt
-                  ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                  ? "border-blue-500 bg-blue-50 text-blue-800"
                   : "border-slate-200 text-slate-700 hover:bg-slate-100"
               }`}
             >
@@ -353,7 +353,7 @@ function QuizPanel({
           value={answers[index] || ""}
           onChange={(e) => setAnswers({ ...answers, [index]: e.target.value })}
           placeholder="Type your answer…"
-          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
         />
       )}
 
@@ -370,7 +370,7 @@ function QuizPanel({
           <button
             onClick={() => setIndex(index + 1)}
             disabled={!answers[index]}
-            className="flex-1 rounded-xl bg-[#4F46E5] py-2 text-sm font-semibold text-white hover:bg-[#4338CA] disabled:opacity-40"
+            className="flex-1 rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-40"
           >
             Next
           </button>

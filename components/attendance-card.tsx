@@ -24,14 +24,14 @@ export function AttendanceCard({
   icon,
 }: AttendanceCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-3xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]">
+    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5">
       <div>
         <p className="text-sm font-medium text-slate-500">{label}</p>
-        <p className="mt-2 text-2xl font-semibold text-slate-900">{value}</p>
+        <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{value}</p>
       </div>
       <div
         className={clsx(
-          "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold capitalize",
+          "inline-flex items-center gap-2 rounded-md px-3 py-1 text-xs font-semibold capitalize",
           STATUS_COLOR[status],
         )}
       >

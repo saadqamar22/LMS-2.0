@@ -60,7 +60,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
 
     return (
       <div className="mx-auto max-w-lg text-center">
-        <div className="rounded-3xl border border-slate-100 bg-white p-10 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-8">
           {showUnderReview ? (
             <>
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-4xl">
@@ -100,7 +100,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
           )}
           <button
             onClick={() => router.push(`/student/courses/${courseId}/quizzes/${quiz.quiz_id}/result`)}
-            className="mt-8 w-full rounded-xl bg-[#4F46E5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA]"
+            className="mt-8 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
             View Detailed Results
           </button>
@@ -139,13 +139,13 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
       {/* Progress bar */}
       <div className="h-1.5 w-full rounded-full bg-slate-100">
         <div
-          className="h-1.5 rounded-full bg-[#4F46E5] transition-all"
+          className="h-1.5 rounded-full bg-blue-600 transition-all"
           style={{ width: `${((current + 1) / questions.length) * 100}%` }}
         />
       </div>
 
       {/* Question card */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
           {q.marks} mark{q.marks !== 1 ? "s" : ""} · {q.type.replace("_", " ")}
         </p>
@@ -159,7 +159,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
               onClick={() => setAnswer(q.question_id, opt)}
               className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
                 answers[q.question_id] === opt
-                  ? "border-[#4F46E5] bg-[#EEF2FF] font-medium text-[#4F46E5]"
+                  ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
                   : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
@@ -175,7 +175,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
               onClick={() => setAnswer(q.question_id, opt.toLowerCase())}
               className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
                 answers[q.question_id] === opt.toLowerCase()
-                  ? "border-[#4F46E5] bg-[#EEF2FF] font-medium text-[#4F46E5]"
+                  ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
                   : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
@@ -189,7 +189,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
               value={answers[q.question_id] || ""}
               onChange={(e) => setAnswer(q.question_id, e.target.value)}
               placeholder="Type your answer here…"
-              className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#4F46E5]"
+              className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
             />
           )}
         </div>
@@ -218,7 +218,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
               onClick={() => setCurrent(i)}
               className={`h-7 w-7 rounded-lg text-xs font-semibold transition ${
                 i === current
-                  ? "bg-[#4F46E5] text-white"
+                  ? "bg-blue-600 text-white"
                   : answers[questions[i].question_id]
                   ? "bg-green-100 text-green-700"
                   : "bg-slate-100 text-slate-500"
@@ -233,7 +233,7 @@ export function TakeQuizClient({ quiz, questions, courseId }: Props) {
           <button
             type="button"
             onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
-            className="rounded-xl bg-[#4F46E5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA]"
+            className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
             Next
           </button>

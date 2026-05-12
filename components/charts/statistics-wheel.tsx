@@ -20,7 +20,7 @@ export function StatisticsWheel({
 
   // Create data for the pie chart showing average vs remaining
   const averageData = [
-    { name: "Average Marks", value: average, color: "#4F46E5" },
+    { name: "Average Marks", value: average, color: "#2563EB" },
     { name: "Remaining", value: Math.max(0, totalMarks - average), color: "#E5E7EB" },
   ];
 
@@ -79,7 +79,7 @@ export function StatisticsWheel({
   };
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="rounded-xl border border-slate-200 bg-white p-6">
       <h3 className="mb-4 text-lg font-semibold text-slate-900">
         Statistics: {moduleName}
       </h3>
@@ -107,7 +107,7 @@ export function StatisticsWheel({
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-2 text-center">
-            <p className="text-2xl font-semibold text-[#4F46E5]">
+            <p className="text-2xl font-semibold tabular-nums text-slate-900">
               {average.toFixed(2)} / {totalMarks}
             </p>
             <p className="text-xs text-slate-500">{percentage.toFixed(1)}%</p>
@@ -139,7 +139,7 @@ export function StatisticsWheel({
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-2 text-center">
-            <p className="text-2xl font-semibold text-[#F59E0B]">
+            <p className="text-2xl font-semibold tabular-nums text-amber-600">
               {stdDeviation.toFixed(2)}
             </p>
             <p className="text-xs text-slate-500">

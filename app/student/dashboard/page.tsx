@@ -138,19 +138,12 @@ export default async function StudentDashboardPage() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
-              Announcements
-            </p>
-            <h2 className="text-xl font-semibold text-slate-900">
-              Recent Announcements
-            </h2>
-          </div>
+          <h2 className="text-base font-semibold text-slate-900">Recent Announcements</h2>
           <Link
             href="/student/announcements"
-            className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+            className="text-sm font-medium text-slate-500 hover:text-slate-700"
           >
-            View All →
+            View all →
           </Link>
         </div>
         {announcements.length === 0 ? (
@@ -170,7 +163,7 @@ export default async function StudentDashboardPage() {
               <div className="text-center">
                 <Link
                   href="/student/announcements"
-                  className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+                  className="text-sm font-medium text-slate-500 hover:text-slate-700"
                 >
                   View all {announcementsResult.announcements.length} announcements →
                 </Link>
@@ -182,11 +175,8 @@ export default async function StudentDashboardPage() {
 
       {/* Due Quizzes */}
       <section>
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Quizzes</p>
-            <h2 className="text-xl font-semibold text-slate-900">Due Quizzes</h2>
-          </div>
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-slate-900">Due Quizzes</h2>
         </div>
         {pendingQuizzes.length === 0 ? (
           <EmptyState
@@ -198,14 +188,14 @@ export default async function StudentDashboardPage() {
             {pendingQuizzes.map((quiz) => (
               <div
                 key={quiz.quiz_id}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-[var(--shadow-card)]"
+                className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#4F46E5]">
-                    <ClipboardList className="h-5 w-5" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100" style={{ color: "var(--role-primary)" }}>
+                    <ClipboardList className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900">{quiz.title}</p>
+                    <p className="font-medium text-slate-900">{quiz.title}</p>
                     <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-400">
                       <span>{quiz.course_code} — {quiz.course_name}</span>
                       {quiz.time_limit_mins && (
@@ -220,7 +210,8 @@ export default async function StudentDashboardPage() {
                 </div>
                 <Link
                   href={`/student/courses/${quiz.course_id}/quizzes/${quiz.quiz_id}/take`}
-                  className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+                  className="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors"
+                  style={{ backgroundColor: "var(--role-primary)" }}
                 >
                   Start <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
@@ -230,13 +221,10 @@ export default async function StudentDashboardPage() {
         )}
       </section>
 
-      <section className="mt-8">
+      <section>
         <div className="mb-4">
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Assignments
-          </p>
-          <h2 className="text-xl font-semibold text-slate-900">
-            Upcoming assignments
+          <h2 className="text-base font-semibold text-slate-900">
+            Upcoming Assignments
           </h2>
         </div>
         {assignmentsWithStatus.length === 0 ? (

@@ -30,13 +30,13 @@ export default async function StudentAssignmentsPage({
         <div className="mb-4">
           <Link
             href={`/student/courses/${courseId}`}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Course
           </Link>
         </div>
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {assignmentsResult.error}
         </div>
       </DashboardShell>
@@ -88,7 +88,7 @@ export default async function StudentAssignmentsPage({
       <div className="mb-4">
         <Link
           href={`/student/courses/${courseId}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Course
@@ -96,10 +96,10 @@ export default async function StudentAssignmentsPage({
       </div>
 
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-medium text-slate-500">
           Assignments
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           Course Assignments
         </h1>
         <p className="mt-1 text-sm text-slate-500">

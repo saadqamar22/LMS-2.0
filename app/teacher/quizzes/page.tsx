@@ -11,7 +11,7 @@ export default async function TeacherQuizzesPage() {
   return (
     <DashboardShell role="teacher">
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">Quizzes</p>
+        <p className="text-xs font-medium text-slate-500">Quizzes</p>
         <h1 className="text-2xl font-semibold text-slate-900">Manage Quizzes</h1>
         <p className="mt-1 text-sm text-slate-500">
           Select a course below to create and manage its quizzes.
@@ -31,19 +31,19 @@ export default async function TeacherQuizzesPage() {
             <Link
               key={course.course_id}
               href={`/teacher/courses/${course.course_id}/quizzes`}
-              className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:shadow-md"
+              className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 transition hover:shadow-md"
             >
-              <div className="rounded-xl bg-[#EEF2FF] p-2.5 text-[#4F46E5]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                 <ClipboardList className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+                <p className="text-xs font-medium text-slate-500">
                   {course.course_code}
                 </p>
                 <h3 className="mt-0.5 font-semibold text-slate-900 truncate">
                   {course.course_name}
                 </h3>
-                <p className="mt-1 text-xs text-[#4F46E5] font-medium">
+                <p className="mt-1 text-xs font-medium text-violet-600">
                   Manage quizzes →
                 </p>
               </div>

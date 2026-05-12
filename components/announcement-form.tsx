@@ -67,13 +67,13 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
   };
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="rounded-xl border border-slate-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Create Announcement</h3>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -92,7 +92,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200"
             placeholder="Enter announcement title"
             onFocus={(e) => {
               e.currentTarget.style.borderColor = colors.primary;
@@ -115,7 +115,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
             rows={6}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200"
             placeholder="Enter announcement content"
             onFocus={(e) => {
               e.currentTarget.style.borderColor = colors.primary;
@@ -143,7 +143,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
                     setCourseId("");
                   }
                 }}
-                className="rounded border-slate-300 text-[#4F46E5] focus:ring-[#4F46E5]"
+                className="rounded border-slate-300 text-slate-600 focus:ring-slate-400"
               />
               <span className="text-sm text-slate-700">
                 All Students (regardless of course enrollment)
@@ -155,7 +155,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
                 required={!isAllStudents}
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200"
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = colors.primary;
                   e.currentTarget.style.boxShadow = `0 0 0 2px ${colors.primaryLight}`;
@@ -190,7 +190,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
             required
             value={audience}
             onChange={(e) => setAudience(e.target.value as AnnouncementAudience)}
-            className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200"
             onFocus={(e) => {
               e.currentTarget.style.borderColor = colors.primary;
               e.currentTarget.style.boxShadow = `0 0 0 2px ${colors.primaryLight}`;
@@ -220,7 +220,7 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
               Cancel
             </button>
@@ -228,21 +228,8 @@ export function AnnouncementForm({ courses = [], onSuccess, onCancel, role = "te
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              backgroundColor: colors.primary,
-              boxShadow: `0 4px 14px 0 ${colors.primary}40`,
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = colors.primaryHover;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = colors.primary;
-              }
-            }}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: colors.primary }}
           >
             {loading ? "Creating..." : "Create Announcement"}
           </button>

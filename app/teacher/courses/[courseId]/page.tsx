@@ -31,7 +31,7 @@ export default async function TeacherCourseDetailPage({
     }
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {courseResult.error}
         </div>
       </DashboardShell>
@@ -55,10 +55,10 @@ export default async function TeacherCourseDetailPage({
     <DashboardShell role="teacher">
       <section>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             {course.course_code}
           </p>
-          <h1 className="text-3xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-bold tabular-nums text-slate-900">
             {course.course_name}
           </h1>
           <p className="mt-1 text-xs text-slate-400">
@@ -70,7 +70,7 @@ export default async function TeacherCourseDetailPage({
       <section className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <Link
           href={`/teacher/courses/${courseId}/assignments`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Assignments</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -79,7 +79,7 @@ export default async function TeacherCourseDetailPage({
         </Link>
         <Link
           href={`/teacher/courses/${courseId}/attendance`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Attendance</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -88,7 +88,7 @@ export default async function TeacherCourseDetailPage({
         </Link>
         <Link
           href={`/teacher/courses/${courseId}/marks`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Marks</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -97,7 +97,7 @@ export default async function TeacherCourseDetailPage({
         </Link>
         <Link
           href={`/teacher/courses/${courseId}#students`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Students</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -106,7 +106,7 @@ export default async function TeacherCourseDetailPage({
         </Link>
         <Link
           href={`/teacher/courses/${courseId}/materials`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Materials</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -115,7 +115,7 @@ export default async function TeacherCourseDetailPage({
         </Link>
         <Link
           href={`/teacher/courses/${courseId}/quizzes`}
-          className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+          className="rounded-xl border border-slate-200 bg-white p-5 transition"
         >
           <h3 className="text-lg font-semibold text-slate-900">Quizzes</h3>
           <p className="mt-2 text-sm text-slate-500">
@@ -127,7 +127,7 @@ export default async function TeacherCourseDetailPage({
       <section id="students" className="mt-8">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Enrollment
             </p>
             <h2 className="text-xl font-semibold text-slate-900">

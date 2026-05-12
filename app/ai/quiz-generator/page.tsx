@@ -23,7 +23,7 @@ export default async function AIQuizGeneratorPage() {
   return (
     <DashboardShell role="teacher">
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">AI Tools</p>
+        <p className="text-xs font-medium text-slate-500">AI Tools</p>
         <h1 className="text-2xl font-semibold text-slate-900">AI Quiz Generator</h1>
         <p className="mt-1 text-sm text-slate-500">
           Enter a topic and let AI generate quiz questions. Review, edit, then save directly to a course.

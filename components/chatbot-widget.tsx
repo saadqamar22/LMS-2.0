@@ -19,9 +19,9 @@ export function ChatbotWidget() {
   };
 
   return (
-    <div className="flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]">
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5">
       <div className="flex items-center gap-3">
-        <div className="rounded-2xl bg-[#EEF2FF] p-3 text-[#4F46E5]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100" style={{ color: "var(--role-primary)" }}>
           <Bot className="h-5 w-5" />
         </div>
         <div>
@@ -33,12 +33,12 @@ export function ChatbotWidget() {
       </div>
       <div className="mt-4 flex-1 space-y-3 overflow-y-auto">
         {messages.length === 0 ? (
-          <p className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-500">
+          <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">
             Conversations you start in the full AI assistant will appear here.
           </p>
         ) : (
           messages.map((message) => (
-            <div key={message.id} className="rounded-2xl bg-slate-50 p-3">
+            <div key={message.id} className="rounded-lg bg-slate-50 p-3">
               <p className="text-xs font-semibold text-slate-500">
                 {message.author}
               </p>
@@ -47,7 +47,7 @@ export function ChatbotWidget() {
           ))
         )}
       </div>
-      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3">
+      <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -56,7 +56,8 @@ export function ChatbotWidget() {
         />
         <button
           onClick={handleSend}
-          className="rounded-2xl bg-[#4F46E5] p-2 text-white"
+          className="rounded-md p-2 text-white"
+          style={{ backgroundColor: "var(--role-primary)" }}
         >
           <Send className="h-4 w-4" />
           <span className="sr-only">Send</span>

@@ -97,7 +97,7 @@ export function NotificationBell({ primaryColor }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-80 rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-slate-200 bg-white shadow-xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h3 className="text-sm font-semibold text-slate-900">

@@ -49,7 +49,7 @@ export default async function TeacherMaterialsPage({ params }: PageProps) {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">{course.course_code}</p>
+          <p className="text-xs font-medium text-slate-500">{course.course_code}</p>
           <h1 className="text-2xl font-semibold text-slate-900">Course Materials</h1>
         </div>
       </section>
@@ -57,7 +57,7 @@ export default async function TeacherMaterialsPage({ params }: PageProps) {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Upload Form */}
         <div className="lg:col-span-1">
-          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="mb-4 text-base font-semibold text-slate-900">Add New Material</h2>
             <TeacherMaterialsClient courseId={courseId} />
           </div>
@@ -78,7 +78,7 @@ export default async function TeacherMaterialsPage({ params }: PageProps) {
                 return (
                   <div
                     key={material.material_id}
-                    className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+                    className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5"
                   >
                     <div className={`rounded-xl p-2.5 ${colorClass}`}>
                       <Icon className="h-5 w-5" />
@@ -88,7 +88,7 @@ export default async function TeacherMaterialsPage({ params }: PageProps) {
                       {material.description && (
                         <p className="mt-0.5 text-sm text-slate-500 truncate">{material.description}</p>
                       )}
-                      <p className="mt-1 text-xs uppercase tracking-wide text-slate-400">{material.type}</p>
+                      <p className="mt-1 text-xs font-medium text-slate-500">{material.type}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {material.type === "link" && material.external_url ? (

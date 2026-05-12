@@ -21,7 +21,7 @@ export default async function StudentAssignmentsPage() {
   if (!enrollmentsResult.success) {
     return (
       <DashboardShell role="student">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {enrollmentsResult.error}
         </div>
       </DashboardShell>
@@ -106,14 +106,14 @@ export default async function StudentAssignmentsPage() {
     <DashboardShell role="student">
       <section className="mb-6">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
             <FileText className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               All Assignments
             </p>
-            <h1 className="text-3xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-bold tabular-nums text-slate-900">
               My Assignments
             </h1>
             <p className="mt-1 text-sm text-slate-500">

@@ -44,7 +44,7 @@ export default async function StudentQuizResultPage({ params }: PageProps) {
       </section>
 
       {/* Score card */}
-      <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <section className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="flex flex-col items-center gap-2 text-center">
           {hasPendingManual ? (
             <>
@@ -89,7 +89,7 @@ export default async function StudentQuizResultPage({ params }: PageProps) {
       {/* Question breakdown */}
       <section>
         <div className="mb-4">
-          <p className="text-xs uppercase tracking-wide text-slate-400">Review</p>
+          <p className="text-xs font-medium text-slate-500">Review</p>
           <h2 className="text-xl font-semibold text-slate-900">Answer Breakdown</h2>
         </div>
 
@@ -110,7 +110,7 @@ export default async function StudentQuizResultPage({ params }: PageProps) {
             return (
               <div
                 key={question.question_id}
-                className={`rounded-2xl border p-5 ${
+                className={`rounded-xl border p-5 ${
                   isShortAnswer
                     ? isUnderReview
                       ? "border-amber-100 bg-amber-50"

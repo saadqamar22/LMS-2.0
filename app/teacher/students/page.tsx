@@ -28,7 +28,7 @@ export default async function TeacherStudentsPage() {
   if (!coursesResult.success) {
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {coursesResult.error}
         </div>
       </DashboardShell>
@@ -77,10 +77,10 @@ export default async function TeacherStudentsPage() {
   return (
     <DashboardShell role="teacher">
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-medium text-slate-500">
           Students
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           All Students ({allStudents.length})
         </h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -99,11 +99,11 @@ export default async function TeacherStudentsPage() {
             <Link
               key={student.student_id}
               href={`/teacher/students/${student.student_id}`}
-              className="block rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:shadow-lg hover:border-[#4F46E5]"
+              className="block rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="rounded-xl bg-[#EEF2FF] p-3 text-[#4F46E5]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                     <GraduationCap className="h-6 w-6" />
                   </div>
                   <div className="flex-1">

@@ -19,9 +19,9 @@ export function FileUploadCard({
   };
 
   return (
-    <label className="flex cursor-pointer flex-col items-center gap-4 rounded-3xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500 transition hover:border-[#4F46E5] hover:bg-[#EEF2FF]/40">
+    <label className="flex cursor-pointer flex-col items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500 transition hover:border-slate-400 hover:bg-slate-50">
       <input type="file" className="hidden" multiple onChange={handleChange} />
-      <div className="rounded-2xl bg-[#EEF2FF] p-4 text-[#4F46E5]">
+      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100" style={{ color: "var(--role-primary)" }}>
         <CloudUpload className="h-6 w-6" />
       </div>
       <div>

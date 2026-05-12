@@ -37,7 +37,7 @@ export function AssignmentsDashboardClient({
   return (
     <div className="space-y-6">
       {/* Course Selection */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
         <label
           htmlFor="course-select"
           className="block text-sm font-medium text-slate-700 mb-2"
@@ -48,7 +48,7 @@ export function AssignmentsDashboardClient({
           id="course-select"
           value={selectedCourseId || ""}
           onChange={(e) => handleCourseChange(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+          className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
         >
           <option value="">-- Select a Course --</option>
           {courses.map((course) => (
@@ -74,7 +74,7 @@ export function AssignmentsDashboardClient({
               </div>
               <Link
                 href={`/teacher/courses/${selectedCourseId}/assignments?create=true`}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
               >
                 <FileText className="h-4 w-4" />
                 Create Assignment
@@ -99,7 +99,7 @@ export function AssignmentsDashboardClient({
               </div>
               <Link
                 href={`/teacher/courses/${selectedCourseId}/assignments?create=true`}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
               >
                 <FileText className="h-4 w-4" />
                 Create Assignment
@@ -117,12 +117,12 @@ export function AssignmentsDashboardClient({
               return (
                 <div
                   key={assignment.assignment_id}
-                  className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                  className="rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="mb-3 flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-[#4F46E5]" />
+                        <FileText className="h-5 w-5 text-slate-400" />
                         <h3 className="text-lg font-semibold text-slate-900">
                           {assignment.title}
                         </h3>
@@ -174,7 +174,7 @@ export function AssignmentsDashboardClient({
 
                       {assignment.file_url && (
                         <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
-                          <Download className="h-4 w-4 text-[#4F46E5]" />
+                          <Download className="h-4 w-4 text-slate-500" />
                           <span className="text-xs font-medium text-slate-600">
                             Assignment file attached
                           </span>
@@ -191,7 +191,7 @@ export function AssignmentsDashboardClient({
                     <div className="ml-4 flex flex-col items-end gap-2">
                       <Link
                         href={`/teacher/courses/${selectedCourseId}/assignments/${assignment.assignment_id}`}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+                        className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
                       >
                         View Submissions
                         <ArrowRight className="h-4 w-4" />

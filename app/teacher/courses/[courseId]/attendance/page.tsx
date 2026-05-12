@@ -41,7 +41,7 @@ export default async function TeacherAttendancePage({
     }
     return (
       <DashboardShell role="teacher">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {courseResult.error}
         </div>
       </DashboardShell>
@@ -60,21 +60,21 @@ export default async function TeacherAttendancePage({
         <div>
           <Link
             href={`/teacher/courses/${courseId}`}
-            className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+            className="text-sm font-semibold text-slate-600 hover:text-slate-900"
           >
             ← Back to course
           </Link>
-          <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">
+          <p className="mt-2 text-xs font-medium text-slate-500">
             {course.course_code}
           </p>
-          <h1 className="text-3xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-bold tabular-nums text-slate-900">
             Mark Attendance
           </h1>
         </div>
       </section>
 
       {students.length === 0 ? (
-        <div className="mt-8 rounded-2xl bg-yellow-50 p-4 text-sm text-yellow-800">
+        <div className="mt-8 rounded-xl bg-yellow-50 p-4 text-sm text-yellow-800">
           No students enrolled in this course yet. Students must enroll before
           you can mark attendance.
         </div>

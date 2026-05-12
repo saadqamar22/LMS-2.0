@@ -12,11 +12,11 @@ export default async function StudentAssignmentDetailPage({
 
   return (
     <DashboardShell role="student">
-      <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+      <section className="rounded-xl border border-slate-200 bg-white p-5">
+        <p className="text-xs font-medium text-slate-500">
           Assignment ID: {assignmentId}
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           Assignment details pending integration
         </h1>
         <p className="mt-2 text-sm text-slate-600">

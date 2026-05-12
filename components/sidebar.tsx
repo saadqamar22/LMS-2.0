@@ -72,96 +72,90 @@ export function Sidebar({ role }: SidebarProps) {
   const colors = getRoleColorScheme(role);
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-72 flex-col border-r border-slate-200 bg-white/90 px-6 py-8 shadow-sm lg:flex">
-      <Link href="/" className="mb-10 flex items-center gap-3">
-        <div 
-          className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md"
-          style={{
-            background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.primaryHover})`,
-          }}
+    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 lg:flex">
+      {/* Logo */}
+      <Link href="/" className="mb-8 flex items-center gap-2.5 px-2">
+        <div
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white"
+          style={{ backgroundColor: colors.primary }}
         >
-          <PenTool className="h-6 w-6" />
+          IL
         </div>
-        <div>
-          <p className="text-lg font-semibold text-slate-900">
-            ILMS
-          </p>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-            Smart Learning
-          </p>
-        </div>
+        <span className="text-base font-bold tracking-tight text-slate-900">ILMS</span>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-8 overflow-y-auto pb-10">
-        <nav className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            {role} space
+      <div className="flex flex-1 flex-col gap-6 overflow-y-auto pb-6">
+        {/* Role nav */}
+        <nav>
+          <p className="mb-1.5 px-2 text-[11px] font-medium text-slate-400">
+            {role.charAt(0).toUpperCase() + role.slice(1)}
           </p>
-          {ROLE_NAV[role].map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
-                  isActive
-                    ? `text-[${colors.primary}]`
-                    : "text-slate-500 hover:bg-slate-50",
-                )}
-                style={isActive ? {
-                  backgroundColor: colors.primaryLight,
-                  color: colors.primary,
-                } : {}}
-              >
-                <Icon
+          <div className="space-y-0.5">
+            {ROLE_NAV[role].map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
                   className={clsx(
-                    "h-4 w-4",
-                    isActive ? "" : "text-slate-400",
+                    "flex items-center gap-2.5 rounded-md px-2 py-2 text-sm transition-colors",
+                    isActive
+                      ? "font-medium"
+                      : "font-normal text-slate-500 hover:bg-slate-50 hover:text-slate-800",
                   )}
-                  style={isActive ? { color: colors.primary } : {}}
-                />
-                {item.label}
-              </Link>
-            );
-          })}
+                  style={isActive ? {
+                    backgroundColor: colors.primaryLight,
+                    color: colors.primary,
+                  } : {}}
+                >
+                  <Icon
+                    className="h-4 w-4 shrink-0"
+                    style={isActive ? { color: colors.primary } : { color: "#94A3B8" }}
+                  />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
-        <nav className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-slate-400">AI</p>
-          {ROLE_NAV.ai.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition",
-                  isActive
-                    ? `text-[${colors.primary}]`
-                    : "text-slate-500 hover:bg-slate-50",
-                )}
-                style={isActive ? {
-                  backgroundColor: colors.primaryLight,
-                  color: colors.primary,
-                } : {}}
-              >
-                <Icon
+        {/* Divider */}
+        <div className="h-px bg-slate-100" />
+
+        {/* AI nav */}
+        <nav>
+          <p className="mb-1.5 px-2 text-[11px] font-medium text-slate-400">AI Tools</p>
+          <div className="space-y-0.5">
+            {ROLE_NAV.ai.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
                   className={clsx(
-                    "h-4 w-4",
-                    isActive ? "" : "text-slate-400",
+                    "flex items-center gap-2.5 rounded-md px-2 py-2 text-sm transition-colors",
+                    isActive
+                      ? "font-medium"
+                      : "font-normal text-slate-500 hover:bg-slate-50 hover:text-slate-800",
                   )}
-                  style={isActive ? { color: colors.primary } : {}}
-                />
-                {item.label}
-              </Link>
-            );
-          })}
+                  style={isActive ? {
+                    backgroundColor: colors.primaryLight,
+                    color: colors.primary,
+                  } : {}}
+                >
+                  <Icon
+                    className="h-4 w-4 shrink-0"
+                    style={isActive ? { color: colors.primary } : { color: "#94A3B8" }}
+                  />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
       </div>
     </aside>
   );
 }
-

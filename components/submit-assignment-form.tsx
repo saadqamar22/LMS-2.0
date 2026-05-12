@@ -119,9 +119,9 @@ export function SubmitAssignmentForm({
   };
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="rounded-xl border border-slate-200 bg-white p-6">
       <div className="mb-4 flex items-center gap-2">
-        <Upload className="h-5 w-5 text-[#4F46E5]" />
+        <Upload className="h-5 w-5 text-slate-400" />
         <h3 className="text-lg font-semibold text-slate-900">
           {existingSubmission ? "Update Submission" : "Submit Assignment"}
         </h3>
@@ -143,7 +143,7 @@ export function SubmitAssignmentForm({
               setError(null);
             }}
             rows={6}
-            className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
             placeholder="Type your answer here..."
           />
         </div>
@@ -179,7 +179,7 @@ export function SubmitAssignmentForm({
                   href={normalizeFileUrl(existingSubmission.file_url, "submissions") || existingSubmission.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-block text-sm text-[#4F46E5] hover:text-[#4338CA]"
+                  className="mt-2 inline-block text-sm text-slate-600 hover:text-slate-900 underline"
                 >
                   View current file →
                 </a>
@@ -197,7 +197,7 @@ export function SubmitAssignmentForm({
               />
               <label
                 htmlFor="file"
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm font-medium text-slate-600 transition hover:border-[#4F46E5] hover:bg-[#EEF2FF] hover:text-[#4F46E5]"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:bg-slate-100"
               >
                 <Upload className="h-5 w-5" />
                 <span>Click to upload submission file</span>
@@ -225,7 +225,8 @@ export function SubmitAssignmentForm({
           <button
             type="submit"
             disabled={loading || uploadingFile}
-            className="flex-1 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: "var(--role-primary)" }}
           >
             {uploadingFile
               ? "Uploading file..."

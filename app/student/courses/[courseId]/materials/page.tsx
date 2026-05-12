@@ -33,7 +33,7 @@ export default async function StudentMaterialsPage({ params }: PageProps) {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">{course.course_code}</p>
+          <p className="text-xs font-medium text-slate-500">{course.course_code}</p>
           <h1 className="text-2xl font-semibold text-slate-900">Course Materials</h1>
         </div>
       </section>

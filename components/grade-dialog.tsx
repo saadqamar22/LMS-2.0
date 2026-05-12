@@ -45,7 +45,7 @@ export function GradeDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl rounded-3xl border border-slate-100 bg-white shadow-xl">
+      <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white shadow-lg">
         <div className="flex items-center justify-between border-b border-slate-100 p-6">
           <h3 className="text-lg font-semibold text-slate-900">
             Grade Submission
@@ -92,7 +92,7 @@ export function GradeDialog({
                 href={normalizeFileUrl(submission.file_url, "submissions") || submission.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-[#4F46E5] hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
                 View Submitted File
               </a>
@@ -120,7 +120,7 @@ export function GradeDialog({
                     setMarks(value);
                     setError(null);
                   }}
-                  className="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                  className="w-full rounded-lg border border-slate-200 pl-10 pr-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                   placeholder="Enter marks (0-100)"
                   required
                 />
@@ -142,7 +142,7 @@ export function GradeDialog({
                   setError(null);
                 }}
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                 placeholder="Provide feedback to the student..."
               />
             </div>
@@ -157,14 +157,15 @@ export function GradeDialog({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                style={{ backgroundColor: "var(--role-primary)" }}
               >
                 {loading ? "Grading..." : "Submit Grade"}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>

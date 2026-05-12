@@ -244,7 +244,7 @@ export function MarksForm({
   return (
     <div className="mt-8 space-y-6">
       {/* Module Selection and Creation */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <label
             htmlFor="module"
@@ -255,7 +255,7 @@ export function MarksForm({
           <button
             type="button"
             onClick={() => setShowCreateModule(!showCreateModule)}
-            className="flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+            className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
           >
             <Plus className="h-4 w-4" />
             Create Module
@@ -276,7 +276,7 @@ export function MarksForm({
                     setNewModuleName(e.target.value);
                     setModuleError(null);
                   }}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                   placeholder="e.g., Midterm Exam"
                 />
               </div>
@@ -294,7 +294,7 @@ export function MarksForm({
                     );
                     setModuleError(null);
                   }}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                   placeholder="100"
                 />
               </div>
@@ -309,7 +309,7 @@ export function MarksForm({
                 type="button"
                 onClick={handleCreateModule}
                 disabled={creatingModule}
-                className="rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50"
+                className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
               >
                 {creatingModule ? "Creating..." : "Create"}
               </button>
@@ -333,7 +333,7 @@ export function MarksForm({
           id="module"
           value={selectedModuleId}
           onChange={(e) => handleModuleChange(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+          className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
         >
           {modules.map((module) => (
             <option key={module.module_id} value={module.module_id}>
@@ -360,7 +360,7 @@ export function MarksForm({
 
       {/* Marks Entry Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <h3 className="mb-4 text-lg font-semibold text-slate-900">
             Enter Marks for Students
           </h3>
@@ -371,7 +371,7 @@ export function MarksForm({
               <div className="grid grid-cols-5 gap-4 text-center text-xs font-medium text-slate-600">
                 <div>
                   <p>Average</p>
-                  <p className="text-sm font-semibold text-[#4F46E5]">
+                  <p className="text-sm font-semibold text-slate-600">
                     {statistics.average.toFixed(2)}
                   </p>
                 </div>
@@ -423,11 +423,11 @@ export function MarksForm({
               return (
                 <div
                   key={student.student_id}
-                  className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                  className="rounded-xl border border-slate-100 bg-slate-50 p-4"
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="rounded-lg bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                      <div className="rounded-lg flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                         <GraduationCap className="h-4 w-4" />
                       </div>
                       <div>
@@ -477,7 +477,7 @@ export function MarksForm({
                               : parseFloat(e.target.value) || 0,
                           )
                         }
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
                         placeholder="0"
                       />
                     </div>
@@ -500,13 +500,13 @@ export function MarksForm({
         </div>
 
         {error && (
-          <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+          <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="rounded-2xl bg-green-50 p-4 text-sm text-green-800">
+          <div className="rounded-xl bg-green-50 p-4 text-sm text-green-800">
             Marks saved successfully!
           </div>
         )}
@@ -522,7 +522,7 @@ export function MarksForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-[#4F46E5] px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-violet-600 px-6 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Saving..." : "Save Marks"}
           </button>

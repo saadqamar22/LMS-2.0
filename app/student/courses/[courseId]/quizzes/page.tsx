@@ -32,7 +32,7 @@ export default async function StudentQuizzesPage({ params }: PageProps) {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">{course.course_code}</p>
+          <p className="text-xs font-medium text-slate-500">{course.course_code}</p>
           <h1 className="text-2xl font-semibold text-slate-900">Quizzes</h1>
         </div>
       </section>
@@ -44,10 +44,10 @@ export default async function StudentQuizzesPage({ params }: PageProps) {
           {quizzes.map((quiz) => (
             <div
               key={quiz.quiz_id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+              className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5"
             >
               <div className="flex items-start gap-4">
-                <div className={`rounded-xl p-2.5 ${quiz.attempted ? "bg-green-50 text-green-600" : "bg-[#EEF2FF] text-[#4F46E5]"}`}>
+                <div className={`rounded-xl p-2.5 ${quiz.attempted ? "bg-green-50 text-green-600" : "bg-slate-100 text-slate-500"}`}>
                   <ClipboardCheck className="h-5 w-5" />
                 </div>
                 <div>
@@ -85,7 +85,7 @@ export default async function StudentQuizzesPage({ params }: PageProps) {
               ) : (
                 <Link
                   href={`/student/courses/${courseId}/quizzes/${quiz.quiz_id}/take`}
-                  className="shrink-0 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+                  className="shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                 >
                   Start Quiz
                 </Link>

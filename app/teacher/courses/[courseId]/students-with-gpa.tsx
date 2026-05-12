@@ -17,7 +17,7 @@ export function StudentsWithGPA({
   studentMarks,
 }: StudentsWithGPAProps) {
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50">
@@ -48,7 +48,7 @@ export function StudentsWithGPA({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4F46E5]">
+                      <div className="flex flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                         <Users className="h-5 w-5" />
                       </div>
                       <span className="text-sm font-medium text-slate-900">
@@ -76,7 +76,7 @@ export function StudentsWithGPA({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/teacher/students/${student.student_id}`}
-                      className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+                      className="text-sm font-semibold text-slate-600 hover:text-slate-900"
                     >
                       View Details →
                     </Link>

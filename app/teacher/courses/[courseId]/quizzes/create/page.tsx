@@ -24,7 +24,7 @@ export default async function CreateQuizPage({ params }: PageProps) {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             {courseResult.course.course_code}
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">Create Quiz</h1>
@@ -32,7 +32,7 @@ export default async function CreateQuizPage({ params }: PageProps) {
       </section>
 
       <div className="mx-auto max-w-xl">
-        <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-[var(--shadow-card)]">
+        <div className="PLACEHOLDER">
           <CreateQuizForm courseId={courseId} />
         </div>
       </div>

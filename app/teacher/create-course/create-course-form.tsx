@@ -25,11 +25,11 @@ export function CreateCourseForm({
   return (
     <form
       action={formAction}
-      className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+      className="rounded-xl border border-slate-200 bg-white p-5"
     >
       <div className="space-y-6">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Instructor
           </p>
           <p className="text-lg font-semibold text-slate-900">{teacherName}</p>
@@ -40,7 +40,7 @@ export function CreateCourseForm({
             name="course_name"
             required
             placeholder="e.g., Advanced AI Systems"
-            className="w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+            className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
           />
         </Field>
 
@@ -49,7 +49,7 @@ export function CreateCourseForm({
             name="course_code"
             required
             placeholder="e.g., CS401"
-            className="w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+            className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
           />
           <p className="mt-1 text-xs text-slate-500">
             Unique course code (e.g., CS401, MATH202)
@@ -94,7 +94,7 @@ function SubmitButton() {
       type="submit"
       disabled={pending}
       className={clsx(
-        "rounded-2xl bg-[#4F46E5] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#4338CA]",
+        "rounded-xl bg-violet-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-violet-700",
         pending && "cursor-not-allowed opacity-70",
       )}
     >

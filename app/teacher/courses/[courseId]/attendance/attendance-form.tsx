@@ -108,7 +108,7 @@ export function AttendanceForm({
   return (
     <div className="mt-8 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <Calendar className="h-5 w-5 text-slate-400" />
@@ -120,7 +120,7 @@ export function AttendanceForm({
                 type="date"
                 value={selectedDate}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#C7D2FE]"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
               />
             </div>
             <div className="text-sm text-slate-600">
@@ -134,7 +134,7 @@ export function AttendanceForm({
               return (
                 <div
                   key={student.student_id}
-                  className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                  className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50 p-4"
                 >
                   <div className="flex-1">
                     <p className="font-medium text-slate-900">
@@ -154,7 +154,7 @@ export function AttendanceForm({
                         onClick={() => handleStatusChange(student.student_id, option.value)}
                         className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                           currentStatus === option.value
-                            ? `border-[#4F46E5] bg-[#EEF2FF] ${option.color}`
+                            ? `border-slate-400 bg-slate-100 ${option.color}`
                             : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                         }`}
                       >
@@ -170,13 +170,13 @@ export function AttendanceForm({
         </div>
 
         {error && (
-          <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+          <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="rounded-2xl bg-green-50 p-4 text-sm text-green-800">
+          <div className="rounded-xl bg-green-50 p-4 text-sm text-green-800">
             Attendance saved successfully!
           </div>
         )}
@@ -192,7 +192,7 @@ export function AttendanceForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-[#4F46E5] px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-violet-600 px-6 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Saving..." : "Save Attendance"}
           </button>
@@ -200,7 +200,7 @@ export function AttendanceForm({
       </form>
 
       {history.length > 0 && (
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
           <h3 className="mb-4 text-lg font-semibold text-slate-900">
             Attendance History
           </h3>

@@ -18,7 +18,7 @@ export default async function TeacherMarksPage({
       <DashboardShell role="teacher">
         <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Gradebook
             </p>
             <h1 className="text-2xl font-semibold text-slate-900">
@@ -26,7 +26,7 @@ export default async function TeacherMarksPage({
             </h1>
           </div>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {coursesResult.error}
         </div>
       </DashboardShell>
@@ -39,7 +39,7 @@ export default async function TeacherMarksPage({
     <DashboardShell role="teacher">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Gradebook
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">

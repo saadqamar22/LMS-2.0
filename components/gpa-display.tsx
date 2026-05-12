@@ -37,22 +37,22 @@ export function GPADisplay({
         <button
           type="button"
           onClick={() => setShowGPA(!showGPA)}
-          className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] px-3 py-2 transition hover:bg-[#E0E7FF]"
+          className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 transition hover:bg-slate-200"
           title={`Click to switch to ${showGPA ? "percentage" : "GPA"}`}
         >
           {showGPA ? (
-            <GraduationCap className={`${iconSizes[size]} text-[#4F46E5]`} />
+            <GraduationCap className={`${iconSizes[size]}`} style={{ color: "var(--role-primary)" }} />
           ) : (
-            <Percent className={`${iconSizes[size]} text-[#4F46E5]`} />
+            <Percent className={`${iconSizes[size]}`} style={{ color: "var(--role-primary)" }} />
           )}
-          <span className={`font-semibold text-[#4F46E5] ${sizeClasses[size]}`}>
+          <span className={`font-semibold tabular-nums ${sizeClasses[size]}`} style={{ color: "var(--role-primary)" }}>
             {showGPA ? formatGPA(gpa) : formatPercentage(percentage)}
           </span>
         </button>
       ) : (
-        <div className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] px-3 py-2">
-          <GraduationCap className={`${iconSizes[size]} text-[#4F46E5]`} />
-          <span className={`font-semibold text-[#4F46E5] ${sizeClasses[size]}`}>
+        <div className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
+          <GraduationCap className={iconSizes[size]} style={{ color: "var(--role-primary)" }} />
+          <span className={`font-semibold tabular-nums ${sizeClasses[size]}`} style={{ color: "var(--role-primary)" }}>
             {formatGPA(gpa)}
           </span>
           <span className="text-sm text-slate-500">({formatPercentage(percentage)})</span>

@@ -35,7 +35,7 @@ export function EnrollButton({ courseId }: EnrollButtonProps) {
       <button
         onClick={handleEnroll}
         disabled={loading}
-        className="w-full rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#4338CA] disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Enrolling…" : "Enroll in Course"}
       </button>

@@ -24,10 +24,10 @@ export default async function CreateCoursePage() {
     <DashboardShell role="teacher">
       <section className="space-y-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Course builder
           </p>
-          <h1 className="text-3xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-bold tabular-nums text-slate-900">
             Create a new course
           </h1>
           <p className="text-sm text-slate-500">

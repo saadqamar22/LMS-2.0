@@ -85,7 +85,7 @@ export function UserInfoDropdown({ profile, role = "student" }: UserInfoDropdown
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl">
           <div className="p-4">
             <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-semibold text-slate-900">

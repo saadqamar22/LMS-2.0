@@ -14,15 +14,16 @@ export function EmptyState({
   actionHref,
 }: EmptyStateProps) {
   return (
-    <div className="rounded-3xl border border-dashed border-slate-200 bg-white/60 p-8 text-center shadow-[var(--shadow-card)]">
-      <p className="text-base font-semibold text-slate-900">{title}</p>
+    <div className="rounded-xl border border-dashed border-slate-200 bg-white p-10 text-center">
+      <p className="text-sm font-semibold text-slate-700">{title}</p>
       {description && (
-        <p className="mt-2 text-sm text-slate-500">{description}</p>
+        <p className="mt-1.5 text-sm text-slate-400">{description}</p>
       )}
       {actionLabel && actionHref && (
         <Link
           href={actionHref}
-          className="mt-4 inline-flex rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4338CA]"
+          className="mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "var(--role-primary)" }}
         >
           {actionLabel}
         </Link>
@@ -30,4 +31,3 @@ export function EmptyState({
     </div>
   );
 }
-

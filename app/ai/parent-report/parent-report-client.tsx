@@ -181,22 +181,23 @@ export function ParentReportClient({ children }: Props) {
   return (
     <div className="space-y-6">
       {/* Child Selector */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="mb-4 font-semibold text-slate-900">Select Child</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {children.map((child) => (
             <button
               key={child.student_id}
               onClick={() => { setSelectedChild(child.student_id); setReport(""); setChartData(null); }}
-              className={`flex items-center gap-3 rounded-2xl border p-4 text-left transition ${
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
                 selectedChild === child.student_id
-                  ? "border-[#4F46E5] bg-[#EEF2FF]"
+                  ? "border-slate-400 bg-slate-100"
                   : "border-slate-200 bg-slate-50 hover:bg-slate-100"
               }`}
             >
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                selectedChild === child.student_id ? "bg-[#4F46E5] text-white" : "bg-slate-200 text-slate-600"
-              }`}>
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                style={{ backgroundColor: selectedChild === child.student_id ? "var(--role-primary)" : "#94A3B8" }}
+              >
                 {child.full_name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -212,7 +213,8 @@ export function ParentReportClient({ children }: Props) {
         <button
           onClick={generateReport}
           disabled={!selectedChild || loading}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4F46E5] py-3 font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-semibold text-white disabled:opacity-50"
+          style={{ backgroundColor: "var(--role-primary)" }}
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GraduationCap className="h-4 w-4" />}
           {loading
@@ -227,9 +229,9 @@ export function ParentReportClient({ children }: Props) {
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-3xl border border-slate-100 bg-white p-12 shadow-[var(--shadow-card)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-[#4F46E5]" />
+            <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--role-primary)" }} />
             <p className="text-sm font-medium text-slate-500">Analysing academic data…</p>
             <p className="text-xs text-slate-400">This may take a few seconds</p>
           </div>
@@ -240,10 +242,10 @@ export function ParentReportClient({ children }: Props) {
       {report && chartData && !loading && (
         <>
           {/* Report Header */}
-          <div className="rounded-3xl border border-[#4F46E5]/20 bg-gradient-to-br from-[#EEF2FF] to-[#F8F9FF] p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#4F46E5]">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                   Academic Progress Report
                 </p>
                 <h2 className="mt-1 text-2xl font-bold text-slate-900">{studentName}</h2>
@@ -278,26 +280,26 @@ export function ParentReportClient({ children }: Props) {
 
             {/* Summary Stats */}
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
                 <p className="text-xs text-slate-400">Attendance Rate</p>
                 <p className={`mt-0.5 text-xl font-bold ${attendanceColor(chartData.summary.attendanceRate)}`}>
                   {chartData.summary.attendanceRate !== null ? `${chartData.summary.attendanceRate}%` : "N/A"}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
                 <p className="text-xs text-slate-400">Courses Enrolled</p>
                 <p className="mt-0.5 text-xl font-bold text-slate-900">{chartData.summary.totalCourses}</p>
               </div>
-              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
                 <p className="text-xs text-slate-400">Top Subject</p>
-                <p className="mt-0.5 truncate text-sm font-bold text-[#4F46E5]">
+                <p className="mt-0.5 truncate text-sm font-bold text-slate-800">
                   {chartData.summary.bestCourse || "N/A"}
                 </p>
                 {chartData.summary.bestCoursePct !== null && (
                   <p className="text-xs text-slate-400">{chartData.summary.bestCoursePct}%</p>
                 )}
               </div>
-              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
                 <p className="text-xs text-slate-400">Sessions Tracked</p>
                 <p className="mt-0.5 text-xl font-bold text-slate-900">{chartData.summary.totalRecords}</p>
               </div>
@@ -307,7 +309,7 @@ export function ParentReportClient({ children }: Props) {
           {/* Charts */}
           <div className="grid gap-6 lg:grid-cols-2">
             {chartData.coursePerformance.length > 0 && (
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Academics</p>
                 <h3 className="mt-0.5 text-lg font-semibold text-slate-900">Course Performance</h3>
                 <div className="mt-4 h-56">
@@ -341,7 +343,7 @@ export function ParentReportClient({ children }: Props) {
             )}
 
             {chartData.attendance.length > 0 && (
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Attendance</p>
                 <h3 className="mt-0.5 text-lg font-semibold text-slate-900">Monthly Breakdown</h3>
                 <div className="mt-4 h-56">
@@ -374,7 +376,7 @@ export function ParentReportClient({ children }: Props) {
           </div>
 
           {/* Written Report */}
-          <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)]">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="border-b border-slate-100 bg-slate-50/60 px-8 py-4">
               <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                 Detailed Assessment

@@ -25,10 +25,10 @@ export default async function StudentCoursesPage() {
     return (
       <DashboardShell role="student">
         <section>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+          <p className="text-xs font-medium text-slate-500">Courses</p>
           <h1 className="text-2xl font-semibold text-slate-900">Browse Courses</h1>
         </section>
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {availableCoursesResult.error}
         </div>
       </DashboardShell>
@@ -63,14 +63,14 @@ export default async function StudentCoursesPage() {
   return (
     <DashboardShell role="student">
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">Courses</p>
+        <p className="text-xs font-medium text-slate-500">Courses</p>
         <h1 className="text-2xl font-semibold text-slate-900">Browse Courses</h1>
       </section>
 
       {enrolledCourses.length > 0 && (
         <section className="mt-8">
           <div className="mb-4">
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Your enrollments
             </p>
             <h2 className="text-xl font-semibold text-slate-900">
@@ -96,7 +96,7 @@ export default async function StudentCoursesPage() {
 
       <section className={enrolledCourses.length > 0 ? "mt-12" : "mt-8"}>
         <div className="mb-4">
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Available courses
           </p>
           <h2 className="text-xl font-semibold text-slate-900">
@@ -125,7 +125,7 @@ export default async function StudentCoursesPage() {
                   href={`/student/courses/${course.course_id}`}
                 />
               ) : (
-                <div key={course.course_id} className="flex flex-col rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)]">
+                <div key={course.course_id} className="flex flex-col rounded-xl border border-slate-200 bg-white">
                   <div className="flex-1">
                     <CourseCard
                       courseId={course.course_id}

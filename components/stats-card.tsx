@@ -9,16 +9,6 @@ interface StatsCardProps {
   variant?: "primary" | "secondary" | "neutral";
 }
 
-const VARIANT_STYLES: Record<
-  NonNullable<StatsCardProps["variant"]>,
-  string
-> = {
-  primary:
-    "bg-gradient-to-br from-[#4F46E5] to-[#6366F1] text-white shadow-indigo-200",
-  secondary: "bg-[#EEF2FF] text-[#312E81]",
-  neutral: "bg-white text-slate-900",
-};
-
 export function StatsCard({
   label,
   value,
@@ -26,24 +16,43 @@ export function StatsCard({
   icon,
   variant = "neutral",
 }: StatsCardProps) {
+  const isPrimary = variant === "primary";
+  const isSecondary = variant === "secondary";
+
   return (
     <div
       className={clsx(
-        "rounded-3xl border border-white/60 p-6 shadow-[var(--shadow-card)]",
-        VARIANT_STYLES[variant],
+        "rounded-xl border p-5",
+        isPrimary && "border-transparent text-white",
+        isSecondary && "border-slate-200 bg-slate-50 text-slate-900",
+        !isPrimary && !isSecondary && "border-slate-200 bg-white text-slate-900",
       )}
+      style={isPrimary ? { backgroundColor: "var(--role-primary)", borderColor: "var(--role-primary)" } : {}}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium opacity-80">{label}</p>
-          <p className="mt-2 text-3xl font-semibold">{value}</p>
-          {helper && <p className="mt-1 text-xs opacity-70">{helper}</p>}
+          <p className={clsx("text-xs font-medium", isPrimary ? "text-white/70" : "text-slate-500")}>
+            {label}
+          </p>
+          <p className="mt-1.5 text-2xl font-bold tabular-nums">{value}</p>
+          {helper && (
+            <p className={clsx("mt-0.5 text-xs", isPrimary ? "text-white/60" : "text-slate-400")}>
+              {helper}
+            </p>
+          )}
         </div>
         {icon && (
-          <div className="rounded-2xl bg-white/20 p-3 text-white">{icon}</div>
+          <div
+            className={clsx(
+              "flex h-9 w-9 items-center justify-center rounded-lg",
+              isPrimary ? "bg-white/15" : "bg-slate-100",
+            )}
+            style={!isPrimary ? { color: "var(--role-primary)" } : { color: "white" }}
+          >
+            {icon}
+          </div>
         )}
       </div>
     </div>
   );
 }
-

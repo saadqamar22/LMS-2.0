@@ -59,17 +59,17 @@ export default async function ChildAttendancePage({
           <div>
             <Link
               href="/parent/children"
-              className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+              className="text-sm font-semibold text-slate-600 hover:text-slate-900"
             >
               ← Back to children
             </Link>
-            <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">
+            <p className="mt-2 text-xs font-medium text-slate-500">
               {accessResult.childName}
             </p>
             <h1 className="text-2xl font-semibold text-slate-900">Attendance</h1>
           </div>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {attendanceResult.error}
         </div>
       </DashboardShell>
@@ -118,11 +118,11 @@ export default async function ChildAttendancePage({
         <div>
           <Link
             href="/parent/children"
-            className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+            className="text-sm font-semibold text-slate-600 hover:text-slate-900"
           >
             ← Back to children
           </Link>
-          <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">
+          <p className="mt-2 text-xs font-medium text-slate-500">
             {accessResult.childName}
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">Attendance</h1>
@@ -141,7 +141,7 @@ export default async function ChildAttendancePage({
         <>
           <section className="mt-8">
             <div className="mb-4">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
+              <p className="text-xs font-medium text-slate-500">
                 Combined Statistics
               </p>
               <h2 className="text-xl font-semibold text-slate-900">
@@ -149,35 +149,35 @@ export default async function ChildAttendancePage({
               </h2>
             </div>
             <div className="grid gap-6 md:grid-cols-4">
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <p className="text-xs font-medium text-slate-500">
                   Total Records
                 </p>
-                <p className="mt-2 text-3xl font-semibold text-slate-900">
+                <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">
                   {totalRecords}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <p className="text-xs font-medium text-slate-500">
                   Attendance Rate
                 </p>
-                <p className={`mt-2 text-3xl font-semibold ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
+                <p className={`mt-2 text-2xl font-bold tabular-nums ${attendanceRate < 80 ? "text-red-600" : "text-slate-900"}`}>
                   {attendanceRate}%
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <p className="text-xs font-medium text-slate-500">
                   Present
                 </p>
-                <p className="mt-2 text-3xl font-semibold text-green-600">
+                <p className="mt-2 text-2xl font-bold tabular-nums text-green-600">
                   {presentCount}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <p className="text-xs font-medium text-slate-500">
                   Absent
                 </p>
-                <p className="mt-2 text-3xl font-semibold text-red-600">
+                <p className="mt-2 text-2xl font-bold tabular-nums text-red-600">
                   {absentCount}
                 </p>
               </div>
@@ -199,11 +199,11 @@ export default async function ChildAttendancePage({
               return (
                 <div
                   key={courseId}
-                  className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                  className="rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-400">
+                      <p className="text-xs font-medium text-slate-500">
                         {courseData.course_code}
                       </p>
                       <h3 className="text-lg font-semibold text-slate-900">

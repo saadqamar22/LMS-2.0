@@ -196,7 +196,7 @@ export function QuizGeneratorClient({ courses }: Props) {
 
   if (step === "done") {
     return (
-      <div className="rounded-3xl border border-slate-100 bg-white p-12 shadow-[var(--shadow-card)] text-center">
+      <div className="PLACEHOLDER text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="h-8 w-8 text-green-600" />
         </div>
@@ -207,7 +207,7 @@ export function QuizGeneratorClient({ courses }: Props) {
         <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={() => router.push(`/teacher/courses/${courseId}/quizzes/${savedQuizId}`)}
-            className="rounded-xl bg-[#4F46E5] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA]"
+            className="rounded-xl bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
           >
             Manage Quiz
           </button>
@@ -232,9 +232,9 @@ export function QuizGeneratorClient({ courses }: Props) {
   return (
     <div className="space-y-6">
       {/* Step 1: Generation Form */}
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="mb-5 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-[#4F46E5]" />
+          <Sparkles className="h-5 w-5 text-slate-500" />
           <h2 className="font-semibold text-slate-900">Generate Questions with AI</h2>
         </div>
 
@@ -245,7 +245,7 @@ export function QuizGeneratorClient({ courses }: Props) {
             onClick={() => { setInputMode("topic"); setStep("generate"); setQuestions([]); }}
             className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition ${
               inputMode === "topic"
-                ? "bg-[#4F46E5] text-white"
+                ? "bg-slate-800 text-white"
                 : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -257,7 +257,7 @@ export function QuizGeneratorClient({ courses }: Props) {
             onClick={() => { setInputMode("content"); setStep("generate"); setQuestions([]); }}
             className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition ${
               inputMode === "content"
-                ? "bg-[#4F46E5] text-white"
+                ? "bg-slate-800 text-white"
                 : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -275,7 +275,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. Photosynthesis, World War II, Quadratic Equations"
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
               />
             </div>
           ) : (
@@ -287,7 +287,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onClick={() => setContentSource("text")}
                   className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     contentSource === "text"
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -314,7 +314,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   }}
                   className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     contentSource === "material"
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -332,7 +332,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                     value={pastedText}
                     onChange={(e) => setPastedText(e.target.value)}
                     placeholder="Paste lecture notes, textbook content, or any educational text here…"
-                    className="w-full resize-y rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                    className="w-full resize-y rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                   />
                   <p className="mt-1 text-xs text-slate-400">
                     {pastedText.length.toLocaleString()} / 40,000 characters
@@ -346,7 +346,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   <select
                     value={courseId}
                     onChange={(e) => setCourseId(e.target.value)}
-                    className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                    className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                   >
                     {courses.map((c) => (
                       <option key={c.course_id} value={c.course_id}>
@@ -372,7 +372,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                       <select
                         value={selectedMaterialId}
                         onChange={(e) => setSelectedMaterialId(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                       >
                         <option value="">— Select a material —</option>
                         {courseMaterials.map((m) => (
@@ -398,7 +398,7 @@ export function QuizGeneratorClient({ courses }: Props) {
               onChange={(e) =>
                 setNumQuestions(Math.min(20, Math.max(1, parseInt(e.target.value) || 5)))
               }
-              className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+              className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
             />
           </div>
 
@@ -412,7 +412,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onClick={() => setDifficulty(d)}
                   className={`flex-1 rounded-xl border py-2 text-sm font-medium capitalize transition ${
                     difficulty === d
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -436,7 +436,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onClick={() => toggleType(t.value)}
                   className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     types.includes(t.value)
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -454,7 +454,7 @@ export function QuizGeneratorClient({ courses }: Props) {
         <button
           onClick={handleGenerate}
           disabled={!canGenerate() || generating}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4F46E5] py-3 font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-800 py-3 font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
         >
           {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
           {generating ? "Generating…" : "Generate Questions"}
@@ -464,7 +464,7 @@ export function QuizGeneratorClient({ courses }: Props) {
       {/* Step 2: Review & Save */}
       {step === "review" && questions.length > 0 && (
         <>
-          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="mb-4 font-semibold text-slate-900">Quiz Details</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
@@ -472,7 +472,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                 <select
                   value={courseId}
                   onChange={(e) => setCourseId(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                 >
                   {courses.map((c) => (
                     <option key={c.course_id} value={c.course_id}>
@@ -487,7 +487,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   type="text"
                   value={quizTitle}
                   onChange={(e) => setQuizTitle(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                 />
               </div>
               <div>
@@ -500,7 +500,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   value={timeLimit}
                   onChange={(e) => setTimeLimit(e.target.value)}
                   placeholder="No limit"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#4F46E5]"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-400"
                 />
               </div>
             </div>
@@ -514,7 +514,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onClick={() => setGradingMode("auto")}
                   className={`rounded-xl border p-3 text-left text-sm transition ${
                     gradingMode === "auto"
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -528,7 +528,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onClick={() => setGradingMode("manual")}
                   className={`rounded-xl border p-3 text-left text-sm transition ${
                     gradingMode === "manual"
-                      ? "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
+                      ? "border-slate-400 bg-slate-200 text-slate-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -550,7 +550,7 @@ export function QuizGeneratorClient({ courses }: Props) {
             </div>
 
             {questions.map((q, i) => (
-              <div key={i} className="rounded-2xl border border-slate-100 bg-white shadow-[var(--shadow-card)]">
+              <div key={i} className="rounded-xl border border-slate-200 bg-white">
                 <div
                   role="button"
                   tabIndex={0}
@@ -559,7 +559,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                   onKeyDown={(e) => e.key === "Enter" && setExpanded(expanded === i ? null : i)}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-xs font-bold text-[#4F46E5]">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
                       {i + 1}
                     </span>
                     <span className="truncate text-sm font-medium text-slate-900">{q.question_text}</span>
@@ -603,7 +603,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                         rows={2}
                         value={q.question_text}
                         onChange={(e) => updateQuestion(i, "question_text", e.target.value)}
-                        className="mt-1 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                        className="mt-1 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                       />
                     </div>
 
@@ -620,7 +620,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                               newOpts[oi] = e.target.value;
                               updateQuestion(i, "options", newOpts);
                             }}
-                            className="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                            className="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                           />
                         ))}
                       </div>
@@ -633,7 +633,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                           type="text"
                           value={q.correct_answer}
                           onChange={(e) => updateQuestion(i, "correct_answer", e.target.value)}
-                          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                         />
                       </div>
                       <div>
@@ -646,7 +646,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                           onChange={(e) =>
                             updateQuestion(i, "marks", parseInt(e.target.value) || 1)
                           }
-                          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                         />
                       </div>
                     </div>
@@ -662,7 +662,7 @@ export function QuizGeneratorClient({ courses }: Props) {
                           value={q.rubric || ""}
                           onChange={(e) => updateQuestion(i, "rubric", e.target.value)}
                           placeholder="e.g. Award full marks if student mentions X and Y. Partial marks for incomplete answers."
-                          className="mt-1 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#4F46E5]"
+                          className="mt-1 w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
                         />
                         <p className="mt-1 text-xs text-slate-400">Instructions for AI grader. Leave blank to grade based on model answer alone.</p>
                       </div>
@@ -680,7 +680,7 @@ export function QuizGeneratorClient({ courses }: Props) {
           <button
             onClick={handleSave}
             disabled={saving || questions.length === 0 || !courseId || !quizTitle.trim()}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardList className="h-4 w-4" />}
             {saving ? "Saving quiz…" : `Save Quiz (${questions.length} questions)`}

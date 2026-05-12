@@ -47,7 +47,7 @@ export default async function StudentAssignmentDetailPage({
       <div className="mb-4">
         <Link
           href={`/student/courses/${courseId}/assignments`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Assignments
@@ -55,10 +55,10 @@ export default async function StudentAssignmentDetailPage({
       </div>
 
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-medium text-slate-500">
           Assignment
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           {assignment.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -67,7 +67,7 @@ export default async function StudentAssignmentDetailPage({
       </section>
 
       {/* Assignment Info */}
-      <div className="mb-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-4">
           {assignment.description && (
             <div>
@@ -108,7 +108,7 @@ export default async function StudentAssignmentDetailPage({
                     href={assignment.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA] hover:underline"
+                    className="text-sm font-semibold text-slate-600 hover:text-slate-900 hover:underline"
                   >
                     Download Assignment File →
                   </a>

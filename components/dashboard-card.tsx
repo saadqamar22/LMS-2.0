@@ -25,22 +25,25 @@ export function DashboardCard({
   return (
     <div
       className={clsx(
-        "rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]",
+        "rounded-xl border border-slate-200 bg-white p-5",
         className,
       )}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <div className="mt-2 text-3xl font-semibold text-slate-900">
-            {typeof value === "string" || typeof value === "number" ? value : value}
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className="text-xs font-medium text-slate-500">{title}</p>
+          <div className="mt-1.5 text-2xl font-bold tabular-nums text-slate-900">
+            {value}
           </div>
           {subtitle && (
-            <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+            <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
           )}
         </div>
         {icon && (
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F46E5]">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50"
+            style={{ color: "var(--role-primary)" }}
+          >
             {icon}
           </div>
         )}
@@ -48,17 +51,16 @@ export function DashboardCard({
       {trend && (
         <p
           className={clsx(
-            "mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold",
+            "mt-4 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium",
             trend.positive
-              ? "bg-green-50 text-green-600"
+              ? "bg-green-50 text-green-700"
               : "bg-red-50 text-red-600",
           )}
         >
           {trend.value}
-          <span className="text-slate-500">{trend.label}</span>
+          <span className="font-normal text-slate-500">{trend.label}</span>
         </p>
       )}
     </div>
   );
 }
-

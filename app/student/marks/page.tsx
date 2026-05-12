@@ -21,13 +21,13 @@ export default async function StudentMarksPage({
       <DashboardShell role="student">
         <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Grades
             </p>
             <h1 className="text-2xl font-semibold text-slate-900">My Marks</h1>
           </div>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {result.error}
         </div>
       </DashboardShell>
@@ -87,7 +87,7 @@ export default async function StudentMarksPage({
     <DashboardShell role="student">
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Grades
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">My Marks</h1>
@@ -107,27 +107,27 @@ export default async function StudentMarksPage({
       ) : (
         <>
           <section className="mt-8 grid gap-6 md:grid-cols-3">
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">
                 Total Modules
               </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">
                 {marks.length}
               </p>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">
                 Overall GPA / Percentage
               </p>
               <div className="mt-2">
                 <GPADisplay gpa={gpa} percentage={percentage} size="lg" showToggle={true} />
               </div>
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-medium text-slate-500">
                 Courses
               </p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">
                 {Object.keys(marksByCourse).length}
               </p>
             </div>
@@ -141,11 +141,11 @@ export default async function StudentMarksPage({
               return (
                 <div
                   key={courseId}
-                  className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                  className="rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-slate-400">
+                      <p className="text-xs font-medium text-slate-500">
                         {courseData.course_code}
                       </p>
                       <h3 className="text-lg font-semibold text-slate-900">
@@ -175,7 +175,7 @@ export default async function StudentMarksPage({
                         <div className="grid grid-cols-5 gap-4 text-center text-xs font-medium text-slate-600">
                           <div>
                             <p>Average</p>
-                            <p className="text-sm font-semibold text-[#4F46E5]">
+                            <p className="text-sm font-semibold text-slate-600">
                               {courseData.marks[0].moduleStatistics.average.toFixed(2)}
                             </p>
                           </div>

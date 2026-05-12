@@ -33,7 +33,7 @@ export default async function TeacherQuizzesPage({ params }: PageProps) {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">{course.course_code}</p>
+            <p className="text-xs font-medium text-slate-500">{course.course_code}</p>
             <h1 className="text-2xl font-semibold text-slate-900">Quizzes</h1>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default async function TeacherQuizzesPage({ params }: PageProps) {
           {quizzes.map((quiz) => (
             <div
               key={quiz.quiz_id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+              className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">

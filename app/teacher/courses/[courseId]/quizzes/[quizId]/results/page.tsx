@@ -70,7 +70,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
 
       {/* Rubric (if set) */}
       {quiz.rubric && (
-        <section className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+        <section className="rounded-xl border border-amber-100 bg-amber-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">Rubric</p>
           <p className="mt-1 text-sm text-amber-900 whitespace-pre-wrap">{quiz.rubric}</p>
         </section>
@@ -84,7 +84,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
       ) : (
         <>
           {/* Scores table */}
-          <div className="rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
             <table className="w-full text-sm">
               <thead className="border-b border-slate-100 bg-slate-50">
                 <tr>
@@ -152,7 +152,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
           {shortAnswerQuestions.length > 0 && (
             <section>
               <div className="mb-4">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
+                <p className="text-xs font-medium text-slate-500">
                   {isManual ? "Manual Grading" : "AI Grading"}
                 </p>
                 <h2 className="text-xl font-semibold text-slate-900">
@@ -168,7 +168,7 @@ export default async function QuizResultsPage({ params }: PageProps) {
                 {attempts.map((attempt) => (
                   <div
                     key={attempt.attempt_id}
-                    className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]"
+                    className="rounded-xl border border-slate-200 bg-white p-5"
                   >
                     <div className="mb-4 flex items-center justify-between">
                       <div>

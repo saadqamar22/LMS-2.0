@@ -12,23 +12,18 @@ interface AnnouncementsCardProps {
 
 export function AnnouncementsCard({ announcements }: AnnouncementsCardProps) {
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="rounded-xl border border-slate-200 bg-white p-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
-            Updates
-          </p>
-          <h3 className="text-lg font-semibold text-slate-900">Announcements</h3>
-        </div>
-        <button className="text-sm font-semibold text-[#4F46E5]">
+        <h3 className="text-base font-semibold text-slate-900">Announcements</h3>
+        <button className="text-sm font-medium text-slate-500 hover:text-slate-700">
           View all
         </button>
       </div>
-      <div className="mt-6 space-y-4">
+      <div className="mt-4 space-y-3">
         {announcements.map((announcement) => (
           <div
             key={announcement.id}
-            className="rounded-2xl border border-slate-100 p-4 transition hover:bg-slate-50"
+            className="rounded-lg border border-slate-100 p-4 transition hover:bg-slate-50"
           >
             <div className="flex items-center justify-between text-xs text-slate-400">
               <span>{announcement.author}</span>
@@ -38,7 +33,7 @@ export function AnnouncementsCard({ announcements }: AnnouncementsCardProps) {
               {announcement.title}
             </p>
             {announcement.tag && (
-              <span className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+              <span className="mt-3 inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
                 {announcement.tag}
               </span>
             )}

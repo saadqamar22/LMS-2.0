@@ -23,7 +23,7 @@ export default async function AIParentReportPage() {
   return (
     <DashboardShell role="parent">
       <section>
-        <p className="text-xs uppercase tracking-wide text-slate-400">AI Tools</p>
+        <p className="text-xs font-medium text-slate-500">AI Tools</p>
         <h1 className="text-2xl font-semibold text-slate-900">AI Progress Report</h1>
         <p className="mt-1 text-sm text-slate-500">
           Generate a detailed, AI-written progress report for your child based on their marks and attendance.

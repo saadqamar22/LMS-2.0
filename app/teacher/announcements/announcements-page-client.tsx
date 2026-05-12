@@ -50,7 +50,7 @@ export function AnnouncementsPageClient({
 
   if (error) {
     return (
-      <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+      <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
         {error}
       </div>
     );
@@ -87,7 +87,7 @@ export function AnnouncementsPageClient({
       )}
 
       {loading ? (
-        <div className="rounded-2xl bg-slate-50 p-8 text-center text-sm text-slate-500">
+        <div className="rounded-xl bg-slate-50 p-8 text-center text-sm text-slate-500">
           Refreshing announcements...
         </div>
       ) : announcements.length === 0 ? (

@@ -50,7 +50,7 @@ export function AssignmentsPageClient({
             setShowCreateForm(true);
             router.push(`/teacher/courses/${courseId}/assignments?create=true`);
           }}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#4F46E5] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-[#4338CA]"
+          className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700"
         >
           <Plus className="h-4 w-4" />
           Create Assignment

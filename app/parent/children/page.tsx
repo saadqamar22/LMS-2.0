@@ -12,7 +12,7 @@ export default async function ParentChildrenPage() {
       <DashboardShell role="parent">
         <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Family view
             </p>
             <h1 className="text-2xl font-semibold text-slate-900">
@@ -20,7 +20,7 @@ export default async function ParentChildrenPage() {
             </h1>
           </div>
         </section>
-        <div className="mt-8 rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {result.error}
         </div>
       </DashboardShell>
@@ -33,7 +33,7 @@ export default async function ParentChildrenPage() {
     <DashboardShell role="parent">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Family view
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">
@@ -57,10 +57,10 @@ export default async function ParentChildrenPage() {
           {children.map((child) => (
             <div
               key={child.student_id}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4F46E5]">
+                <div className="flex flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                   <Users className="h-6 w-6" />
                 </div>
                 <div className="flex-1">

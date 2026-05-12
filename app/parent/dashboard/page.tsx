@@ -76,44 +76,44 @@ export default async function ParentDashboardPage() {
   return (
     <DashboardShell role="parent">
       {/* Top stats */}
-      <section className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-          <div className="flex items-center justify-between">
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Children</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">{children.length}</p>
-              <p className="mt-1 text-xs text-slate-400">Linked accounts</p>
+              <p className="text-xs font-medium text-slate-500">Children</p>
+              <p className="mt-1.5 text-2xl font-bold tabular-nums text-slate-900">{children.length}</p>
+              <p className="mt-0.5 text-xs text-slate-400">Linked accounts</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F46E5]">
-              <Users className="h-6 w-6" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50" style={{ color: "var(--role-primary)" }}>
+              <Users className="h-4 w-4" />
             </div>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Total Courses</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">{totalCourses}</p>
-              <p className="mt-1 text-xs text-slate-400">Across all children</p>
+              <p className="text-xs font-medium text-slate-500">Total Courses</p>
+              <p className="mt-1.5 text-2xl font-bold tabular-nums text-slate-900">{totalCourses}</p>
+              <p className="mt-0.5 text-xs text-slate-400">Across all children</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F46E5]">
-              <BookOpen className="h-6 w-6" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50" style={{ color: "var(--role-primary)" }}>
+              <BookOpen className="h-4 w-4" />
             </div>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Avg Attendance</p>
-              <p className={`mt-2 text-3xl font-semibold ${avgAttendance !== null && avgAttendance < 80 ? "text-red-600" : "text-slate-900"}`}>
+              <p className="text-xs font-medium text-slate-500">Avg Attendance</p>
+              <p className={`mt-1.5 text-2xl font-bold tabular-nums ${avgAttendance !== null && avgAttendance < 80 ? "text-red-600" : "text-slate-900"}`}>
                 {avgAttendance !== null ? `${avgAttendance}%` : "—"}
               </p>
-              <p className="mt-1 text-xs text-slate-400">Combined average</p>
+              <p className="mt-0.5 text-xs text-slate-400">Combined average</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF2FF] text-[#4F46E5]">
-              <Calendar className="h-6 w-6" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50" style={{ color: "var(--role-primary)" }}>
+              <Calendar className="h-4 w-4" />
             </div>
           </div>
         </div>
@@ -122,28 +122,28 @@ export default async function ParentDashboardPage() {
       {/* Per-child cards */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Children</p>
-            <h2 className="text-xl font-semibold text-slate-900">
-              {children.length === 1 ? "Your Child" : "Your Children"}
-            </h2>
-          </div>
+          <h2 className="text-base font-semibold text-slate-900">
+            {children.length === 1 ? "Your Child" : "Your Children"}
+          </h2>
           {children.length > 3 && (
-            <Link href="/parent/children" className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]">
+            <Link href="/parent/children" className="text-sm font-medium text-slate-500 hover:text-slate-700">
               View all →
             </Link>
           )}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {childData.map(({ child, gpa, percentage, attendanceRate, uniqueCourses }) => (
             <div
               key={child.student_id}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300"
             >
               {/* Child header */}
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#EEF2FF] text-lg font-bold text-[#4F46E5]">
+                <div
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white"
+                  style={{ backgroundColor: "var(--role-primary)" }}
+                >
                   {child.full_name.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -201,11 +201,8 @@ export default async function ParentDashboardPage() {
       {/* Announcements */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Announcements</p>
-            <h2 className="text-xl font-semibold text-slate-900">Recent Announcements</h2>
-          </div>
-          <Link href="/parent/announcements" className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]">
+          <h2 className="text-base font-semibold text-slate-900">Recent Announcements</h2>
+          <Link href="/parent/announcements" className="text-sm font-medium text-slate-500 hover:text-slate-700">
             View all →
           </Link>
         </div>

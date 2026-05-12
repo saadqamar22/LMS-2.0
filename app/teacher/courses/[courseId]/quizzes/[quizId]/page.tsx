@@ -56,7 +56,7 @@ export default async function TeacherQuizManagePage({ params }: PageProps) {
         {/* Add Question Form */}
         {!quiz.is_published && (
           <div className="lg:col-span-1">
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
               <h2 className="mb-4 text-base font-semibold text-slate-900">Add Question</h2>
               <QuizManageClient quizId={quizId} courseId={courseId} isPublished={false} mode="add-question" gradingMode={quiz.grading_mode} />
             </div>
@@ -86,7 +86,7 @@ export default async function TeacherQuizManagePage({ params }: PageProps) {
               {questions.map((q, i) => (
                 <div
                   key={q.question_id}
-                  className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[var(--shadow-card)]"
+                  className="rounded-xl border border-slate-200 bg-white p-5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">

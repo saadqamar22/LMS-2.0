@@ -21,7 +21,7 @@ export default async function StudentAnnouncementsPage() {
   if (!announcementsResult.success) {
     return (
       <DashboardShell role="student">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {announcementsResult.error}
         </div>
       </DashboardShell>
@@ -33,10 +33,10 @@ export default async function StudentAnnouncementsPage() {
   return (
     <DashboardShell role="student">
       <section className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-medium text-slate-500">
           Announcements
         </p>
-        <h1 className="text-3xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-bold tabular-nums text-slate-900">
           Announcements
         </h1>
         <p className="mt-1 text-sm text-slate-500">

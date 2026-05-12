@@ -11,7 +11,7 @@ interface SubmissionStatusProps {
 export function SubmissionStatus({ submission }: SubmissionStatusProps) {
   if (!submission) {
     return (
-      <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
+      <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-yellow-600" />
           <p className="text-sm font-semibold text-yellow-800">
@@ -36,7 +36,7 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
   return (
     <div className="space-y-4">
       <div
-        className={`rounded-2xl border p-4 ${
+        className={`rounded-xl border p-4 ${
           isGraded
             ? "border-green-200 bg-green-50"
             : "border-blue-200 bg-blue-50"
@@ -72,12 +72,12 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
 
       {isGraded && (
         <>
-          <div className="rounded-2xl border border-slate-100 bg-white p-4">
+          <div className="rounded-xl border border-slate-100 bg-white p-4">
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-400" />
               <p className="text-sm font-semibold text-slate-900">Marks</p>
             </div>
-            <p className="mt-2 text-3xl font-bold text-[#4F46E5]">
+            <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900" style={{ color: "var(--role-primary)" }}>
               {submission.marks}%
             </p>
             {gradedAt && (
@@ -93,7 +93,7 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
           </div>
 
           {submission.feedback && (
-            <div className="rounded-2xl border border-slate-100 bg-white p-4">
+            <div className="rounded-xl border border-slate-100 bg-white p-4">
               <div className="mb-2 flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-slate-600" />
                 <p className="text-sm font-semibold text-slate-900">Feedback</p>
@@ -107,7 +107,7 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
       )}
 
       {submission.file_url && (
-        <div className="rounded-2xl border border-slate-100 bg-white p-4">
+        <div className="rounded-xl border border-slate-100 bg-white p-4">
           <div className="mb-2 flex items-center gap-2">
             <FileText className="h-5 w-5 text-slate-600" />
             <p className="text-sm font-semibold text-slate-900">
@@ -118,7 +118,7 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
             href={normalizeFileUrl(submission.file_url, "submissions") || submission.file_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-[#4F46E5] hover:bg-slate-100"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           >
             <FileText className="h-4 w-4" />
             View File
@@ -127,7 +127,7 @@ export function SubmissionStatus({ submission }: SubmissionStatusProps) {
       )}
 
       {submission.text_answer && (
-        <div className="rounded-2xl border border-slate-100 bg-white p-4">
+        <div className="rounded-xl border border-slate-100 bg-white p-4">
           <div className="mb-2 flex items-center gap-2">
             <FileText className="h-5 w-5 text-slate-600" />
             <p className="text-sm font-semibold text-slate-900">

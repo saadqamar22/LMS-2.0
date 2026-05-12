@@ -61,11 +61,11 @@ export function ChatClient({ role }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)] rounded-3xl border border-slate-100 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-10rem)] rounded-xl border border-slate-200 bg-white overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#4F46E5]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
             <Bot className="h-5 w-5" />
           </div>
           <div>
@@ -87,13 +87,13 @@ export function ChatClient({ role }: Props) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-              msg.role === "assistant" ? "bg-[#EEF2FF] text-[#4F46E5]" : "bg-slate-900 text-white"
+              msg.role === "assistant" ? "bg-slate-100 text-slate-500" : "bg-slate-900 text-white"
             }`}>
               {msg.role === "assistant" ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
             </div>
-            <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm ${
+            <div className={`max-w-[75%] rounded-xl px-4 py-3 text-sm ${
               msg.role === "user"
-                ? "bg-[#4F46E5] text-white rounded-tr-sm"
+                ? "bg-slate-800 text-white rounded-tr-sm"
                 : "bg-slate-50 text-slate-900 rounded-tl-sm"
             }`}>
               {msg.role === "assistant" ? (
@@ -108,10 +108,10 @@ export function ChatClient({ role }: Props) {
         ))}
         {loading && (
           <div className="flex gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4F46E5]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-slate-50 px-4 py-3">
+            <div className="flex items-center gap-2 rounded-xl rounded-tl-sm bg-slate-50 px-4 py-3">
               <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
               <span className="text-sm text-slate-400">Thinking…</span>
             </div>
@@ -122,7 +122,7 @@ export function ChatClient({ role }: Props) {
 
       {/* Input */}
       <div className="border-t border-slate-100 px-4 py-4">
-        <div className="flex items-end gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 focus-within:border-[#4F46E5]">
+        <div className="flex items-end gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 focus-within:border-slate-400">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -135,7 +135,7 @@ export function ChatClient({ role }: Props) {
           <button
             onClick={send}
             disabled={!input.trim() || loading}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#4F46E5] text-white disabled:opacity-40 hover:bg-[#4338CA]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-white disabled:opacity-40 hover:bg-slate-700"
           >
             <Send className="h-4 w-4" />
           </button>

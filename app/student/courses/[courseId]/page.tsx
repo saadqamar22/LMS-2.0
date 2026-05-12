@@ -28,7 +28,7 @@ export default async function StudentCourseDetailPage({
     }
     return (
       <DashboardShell role="student">
-        <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-xl bg-red-50 p-4 text-sm text-red-800">
           {courseResult.error}
         </div>
       </DashboardShell>
@@ -82,13 +82,13 @@ export default async function StudentCourseDetailPage({
 
   return (
     <DashboardShell role="student">
-      <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)]">
+      <section className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex-1">
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               {course.course_code}
             </p>
-            <h1 className="text-3xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-bold tabular-nums text-slate-900">
               {course.course_name}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-600">
@@ -127,7 +127,7 @@ export default async function StudentCourseDetailPage({
       <section className="mt-8">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium text-slate-500">
               Course content
             </p>
             <h2 className="text-xl font-semibold text-slate-900">
@@ -146,10 +146,10 @@ export default async function StudentCourseDetailPage({
             {modules.map((module) => (
               <div
                 key={module.module_id}
-                className="rounded-2xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+                className="rounded-xl border border-slate-200 bg-white p-5 transition"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                     <BookOpen className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
@@ -174,7 +174,7 @@ export default async function StudentCourseDetailPage({
             <section className="mt-8">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
+                  <p className="text-xs font-medium text-slate-500">
                     Due Assignments
                   </p>
                   <h2 className="text-xl font-semibold text-slate-900">
@@ -183,7 +183,7 @@ export default async function StudentCourseDetailPage({
                 </div>
                 <Link
                   href={`/student/courses/${courseId}/assignments`}
-                  className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA]"
+                  className="text-sm font-semibold text-slate-600 hover:text-slate-900"
                 >
                   View All →
                 </Link>
@@ -206,10 +206,10 @@ export default async function StudentCourseDetailPage({
           <section className="mt-8 grid gap-6 lg:grid-cols-3">
             <Link
               href={`/student/courses/${courseId}/assignments`}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                   <FileText className="h-5 w-5" />
                 </div>
                 <div>
@@ -222,10 +222,10 @@ export default async function StudentCourseDetailPage({
             </Link>
             <Link
               href={`/student/attendance?course=${courseId}`}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
                 <div>
@@ -238,10 +238,10 @@ export default async function StudentCourseDetailPage({
             </Link>
             <Link
               href={`/student/marks?course=${courseId}`}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                   <BookOpen className="h-5 w-5" />
                 </div>
                 <div>
@@ -254,10 +254,10 @@ export default async function StudentCourseDetailPage({
             </Link>
             <Link
               href={`/student/courses/${courseId}/materials`}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                   <FolderOpen className="h-5 w-5" />
                 </div>
                 <div>
@@ -270,10 +270,10 @@ export default async function StudentCourseDetailPage({
             </Link>
             <Link
               href={`/student/courses/${courseId}/quizzes`}
-              className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1"
+              className="rounded-xl border border-slate-200 bg-white p-5 transition"
             >
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-[#EEF2FF] p-2 text-[#4F46E5]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                   <ClipboardCheck className="h-5 w-5" />
                 </div>
                 <div>

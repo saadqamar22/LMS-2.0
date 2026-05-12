@@ -7,7 +7,7 @@ export default function AdminCoursesPage() {
     <DashboardShell role="admin">
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium text-slate-500">
             Catalog
           </p>
           <h1 className="text-2xl font-semibold text-slate-900">

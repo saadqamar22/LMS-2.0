@@ -9,7 +9,7 @@ interface ChildCardProps {
 
 export function ChildCard({ child }: ChildCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:shadow-lg">
+    <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300">
       <Link
         href={`/parent/child/${child.student_id}/marks`}
         className="block"
