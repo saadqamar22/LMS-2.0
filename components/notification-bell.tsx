@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Bell, Check, CheckCheck, X } from "lucide-react";
 import { markNotificationRead, markAllNotificationsRead } from "@/app/actions/notifications";
 import type { Notification } from "@/app/actions/notifications";
+import type { Role } from "@/lib/auth/session";
 
 const TYPE_LABEL: Record<Notification["type"], string> = {
   assignment_graded: "Assignment graded",
@@ -11,7 +13,7 @@ const TYPE_LABEL: Record<Notification["type"], string> = {
   quiz_published: "Quiz available",
   mark_posted: "Marks posted",
   announcement: "Announcement",
-  system: "System",
+  system: "Message",
 };
 
 const TYPE_DOT: Record<Notification["type"], string> = {
@@ -20,14 +22,16 @@ const TYPE_DOT: Record<Notification["type"], string> = {
   quiz_published: "bg-purple-500",
   mark_posted: "bg-yellow-500",
   announcement: "bg-orange-500",
-  system: "bg-slate-400",
+  system: "bg-blue-400",
 };
 
 interface Props {
   primaryColor: string;
+  role: Role;
 }
 
-export function NotificationBell({ primaryColor }: Props) {
+export function NotificationBell({ primaryColor, role }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -66,12 +70,16 @@ export function NotificationBell({ primaryColor }: Props) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  async function handleMarkRead(id: string) {
+  async function handleMarkRead(id: string, notification?: Notification) {
     await markNotificationRead(id);
     setNotifications((prev) =>
       prev.map((n) => (n.notification_id === id ? { ...n, is_read: true } : n)),
     );
     setUnreadCount((c) => Math.max(0, c - 1));
+    if (notification?.reference_type === "message" && notification.reference_id) {
+      setOpen(false);
+      router.push(`/${role}/messages/${notification.reference_id}`);
+    }
   }
 
   async function handleMarkAll() {
@@ -130,9 +138,14 @@ export function NotificationBell({ primaryColor }: Props) {
               notifications.map((n) => (
                 <div
                   key={n.notification_id}
+                  onClick={
+                    n.reference_type === "message" && n.reference_id
+                      ? () => handleMarkRead(n.notification_id, n)
+                      : undefined
+                  }
                   className={`flex items-start gap-3 px-4 py-3 transition ${
                     n.is_read ? "opacity-60" : "bg-blue-50/30"
-                  }`}
+                  } ${n.reference_type === "message" && n.reference_id ? "cursor-pointer hover:bg-slate-50" : ""}`}
                 >
                   <div className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${TYPE_DOT[n.type]}`} />
                   <div className="flex-1 min-w-0">
@@ -147,7 +160,7 @@ export function NotificationBell({ primaryColor }: Props) {
                   </div>
                   {!n.is_read && (
                     <button
-                      onClick={() => handleMarkRead(n.notification_id)}
+                      onClick={(e) => { e.stopPropagation(); handleMarkRead(n.notification_id, n); }}
                       className="mt-1 shrink-0 text-slate-300 hover:text-slate-500"
                       title="Mark as read"
                     >

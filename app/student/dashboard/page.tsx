@@ -115,8 +115,9 @@ export default async function StudentDashboardPage() {
           }
           subtitle="Click to toggle percentage"
           icon={<GraduationCap className="h-5 w-5" />}
+          className="h-full"
         />
-        <Link href="/student/attendance">
+        <Link href="/student/attendance" className="block">
           <DashboardCard
             title="Attendance"
             value={
@@ -126,6 +127,7 @@ export default async function StudentDashboardPage() {
             }
             subtitle={`${presentCount + lateCount} / ${totalAttendanceRecords} present`}
             icon={<Calendar className="h-5 w-5" />}
+            className="h-full"
           />
         </Link>
         <DashboardCard
@@ -133,6 +135,7 @@ export default async function StudentDashboardPage() {
           value={enrolledCourses.length.toString()}
           subtitle="Active enrollments"
           icon={<BookOpenCheck className="h-5 w-5" />}
+          className="h-full"
         />
       </section>
 

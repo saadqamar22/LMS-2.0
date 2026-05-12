@@ -13,6 +13,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Megaphone,
+  MessageSquare,
   PenTool,
   Settings,
   Users,
@@ -32,6 +33,7 @@ const ROLE_NAV: Record<
     { label: "Announcements", href: "/student/announcements", icon: Megaphone },
     { label: "Attendance", href: "/student/attendance", icon: ChartLine },
     { label: "Marks", href: "/student/marks", icon: BarChart3 },
+    { label: "Messages", href: "/student/messages", icon: MessageSquare },
   ],
   teacher: [
     { label: "Dashboard", href: "/teacher/dashboard", icon: LayoutDashboard },
@@ -42,11 +44,13 @@ const ROLE_NAV: Record<
     { label: "Attendance", href: "/teacher/attendance", icon: ChartLine },
     { label: "Marks", href: "/teacher/marks", icon: FileText },
     { label: "Quizzes", href: "/teacher/quizzes", icon: ClipboardList },
+    { label: "Messages", href: "/teacher/messages", icon: MessageSquare },
   ],
   parent: [
     { label: "Dashboard", href: "/parent/dashboard", icon: LayoutDashboard },
     { label: "Children", href: "/parent/children", icon: Users },
     { label: "Announcements", href: "/parent/announcements", icon: Megaphone },
+    { label: "Messages", href: "/parent/messages", icon: MessageSquare },
   ],
   admin: [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },

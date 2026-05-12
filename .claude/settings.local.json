@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(mkdir -p /Users/saadqamar/LMS-2.0/app/student/messages/[conversationId])",
+      "Bash(mkdir -p /Users/saadqamar/LMS-2.0/app/teacher/messages/[conversationId])",
+      "Bash(mkdir -p /Users/saadqamar/LMS-2.0/app/parent/messages/[conversationId])",
+      "Bash(mkdir -p \"/Users/saadqamar/LMS-2.0/app/student/messages/[conversationId]\")",
+      "Bash(mkdir -p \"/Users/saadqamar/LMS-2.0/app/teacher/messages/[conversationId]\")",
+      "Bash(mkdir -p \"/Users/saadqamar/LMS-2.0/app/parent/messages/[conversationId]\")"
     ]
   }
 }

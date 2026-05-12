@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Copy, Check, Download, GraduationCap } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Loader2, Copy, Check, Download, GraduationCap, Play, Square } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -34,6 +34,8 @@ interface Props {
   children: Child[];
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
 function scoreColor(pct: number) {
   if (pct >= 75) return "#22C55E";
   if (pct >= 60) return "#4F46E5";
@@ -48,37 +50,82 @@ function attendanceColor(rate: number | null) {
   return "text-red-500";
 }
 
-type MdProps = { children?: React.ReactNode };
+function splitSections(markdown: string): { title: string; content: string }[] {
+  const lines = markdown.split("\n");
+  const sections: { title: string; lines: string[] }[] = [];
+  let current: { title: string; lines: string[] } | null = null;
 
-const mdH2 = ({ children }: MdProps) => (
-  <div className="mb-5 mt-10 first:mt-0">
-    <div className="flex items-center gap-3">
-      <div className="h-4 w-1 rounded-full bg-[#4F46E5]" />
-      <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#4F46E5]">
-        {children}
-      </span>
-    </div>
-    <div className="mt-3 h-px bg-slate-100" />
-  </div>
-);
+  for (const line of lines) {
+    if (line.startsWith("## ")) {
+      if (current) sections.push(current);
+      current = { title: line.replace(/^## /, "").trim(), lines: [] };
+    } else if (current) {
+      current.lines.push(line);
+    }
+  }
+  if (current) sections.push(current);
+
+  return sections
+    .map((s) => ({ title: s.title, content: s.lines.join("\n").trim() }))
+    .filter((s) => s.title || s.content);
+}
+
+function toPlainText(title: string, content: string): string {
+  return [title, content]
+    .filter(Boolean)
+    .join(". ")
+    .replace(/\*\*([\s\S]*?)\*\*/g, "$1")
+    .replace(/\*([\s\S]*?)\*/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Split text into ≤180-char chunks at sentence/word boundaries for Google TTS
+function chunkText(text: string, maxLen = 180): string[] {
+  const chunks: string[] = [];
+  let remaining = text.trim();
+
+  while (remaining.length > maxLen) {
+    const slice = remaining.slice(0, maxLen);
+    // Prefer sentence-ending boundaries (includes Urdu ۔ and ، )
+    const sentenceEnd = Math.max(
+      slice.lastIndexOf(". "),
+      slice.lastIndexOf("! "),
+      slice.lastIndexOf("? "),
+      slice.lastIndexOf("۔ "),
+      slice.lastIndexOf("، "),
+    );
+    const splitAt = sentenceEnd > 40 ? sentenceEnd + 1 : slice.lastIndexOf(" ");
+    const cut = splitAt > 0 ? splitAt : maxLen;
+    chunks.push(remaining.slice(0, cut).trim());
+    remaining = remaining.slice(cut).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks.filter((c) => c.length > 0);
+}
+
+// ── Markdown components (for section bodies — no h2 needed) ──────────────────
+
+type MdProps = { children?: React.ReactNode };
 
 const mdH3 = ({ children }: MdProps) => (
   <h3 className="mb-2 mt-5 text-sm font-semibold text-slate-800">{children}</h3>
 );
-
 const mdP = ({ children }: MdProps) => (
   <p className="mb-4 text-[15px] leading-8 text-slate-600">{children}</p>
 );
-
 const mdUl = ({ children }: MdProps) => (
   <ul className="mb-5 space-y-2.5">{children}</ul>
 );
-
 const mdOl = ({ children }: MdProps) => (
   <ol className="mb-5 space-y-2.5">{children}</ol>
 );
-
-// `ordered` and `index` exist at runtime but are absent from react-markdown v10 types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mdLi = (props: any) => {
   const ordered = props["ordered"] as boolean | undefined;
@@ -86,29 +133,25 @@ const mdLi = (props: any) => {
   return (
     <li className="flex items-start gap-3">
       {ordered ? (
-        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[11px] font-bold text-[#4F46E5]">
+        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-600">
           {(index ?? 0) + 1}
         </span>
       ) : (
-        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#4F46E5]" />
+        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
       )}
       <span className="text-[15px] leading-8 text-slate-600">{props.children}</span>
     </li>
   );
 };
-
 const mdStrong = ({ children }: MdProps) => (
   <strong className="font-semibold text-slate-800">{children}</strong>
 );
-
-const mdHr = () => <div className="my-8 h-px bg-slate-100" />;
-
+const mdHr = () => <div className="my-6 h-px bg-slate-100" />;
 const mdEm = ({ children }: MdProps) => (
   <em className="not-italic text-slate-400">{children}</em>
 );
 
 const markdownComponents = {
-  h2: mdH2,
   h3: mdH3,
   p: mdP,
   ul: mdUl,
@@ -118,6 +161,8 @@ const markdownComponents = {
   hr: mdHr,
   em: mdEm,
 };
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export function ParentReportClient({ children }: Props) {
   const [selectedChild, setSelectedChild] = useState(children[0]?.student_id || "");
@@ -129,11 +174,38 @@ export function ParentReportClient({ children }: Props) {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // Translation
+  const [language, setLanguage] = useState<"en" | "ur">("en");
+  const [translatedReport, setTranslatedReport] = useState("");
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState("");
+
+  // TTS
+  const [playingSection, setPlayingSection] = useState<number | null>(null);
+  const [ttsLoading, setTtsLoading] = useState(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const stopRequestedRef = useRef(false);
+
+  // Stop all audio on unmount
+  useEffect(() => {
+    return () => {
+      stopRequestedRef.current = true;
+      currentAudioRef.current?.pause();
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
+
+  const activeReport = language === "ur" && translatedReport ? translatedReport : report;
+  const sections = activeReport ? splitSections(activeReport) : [];
+
   async function generateReport() {
     if (!selectedChild) return;
     setError("");
     setReport("");
     setChartData(null);
+    setTranslatedReport("");
+    setLanguage("en");
+    stopTTS();
     setLoading(true);
     try {
       const res = await fetch("/api/ai/parent-report", {
@@ -157,18 +229,123 @@ export function ParentReportClient({ children }: Props) {
     }
   }
 
+  async function handleTranslate() {
+    // Toggle back to English instantly (cached)
+    if (language === "ur") {
+      stopTTS();
+      setLanguage("en");
+      return;
+    }
+    // Switch to Urdu — use cache if available
+    if (translatedReport) {
+      stopTTS();
+      setLanguage("ur");
+      return;
+    }
+    // Fetch translation
+    setTranslating(true);
+    setTranslateError("");
+    stopTTS();
+    try {
+      const res = await fetch("/api/ai/translate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: report, targetLang: "ur" }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTranslatedReport(data.translatedText);
+        setLanguage("ur");
+      } else {
+        setTranslateError(data.error || "Translation failed.");
+      }
+    } catch {
+      setTranslateError("Translation failed. Please try again.");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
+  function stopTTS() {
+    stopRequestedRef.current = true;
+    currentAudioRef.current?.pause();
+    currentAudioRef.current = null;
+    window.speechSynthesis?.cancel();
+    setPlayingSection(null);
+    setTtsLoading(false);
+  }
+
+  async function handlePlaySection(index: number, title: string, content: string) {
+    // Stop if already playing this section
+    if (playingSection === index || ttsLoading) {
+      stopTTS();
+      return;
+    }
+
+    stopTTS();
+    const text = toPlainText(title, content);
+
+    // ── English: use browser speech synthesis ───────────────────────────────
+    if (language === "en") {
+      if (typeof window === "undefined" || !window.speechSynthesis) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 0.92;
+      const match = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("en"));
+      if (match) utterance.voice = match;
+      utterance.onend = () => setPlayingSection(null);
+      utterance.onerror = () => setPlayingSection(null);
+      setPlayingSection(index);
+      window.speechSynthesis.speak(utterance);
+      return;
+    }
+
+    // ── Urdu: use Google Translate TTS via proxy ────────────────────────────
+    const chunks = chunkText(text);
+    if (!chunks.length) return;
+
+    stopRequestedRef.current = false;
+    setTtsLoading(true);
+    setPlayingSection(index);
+
+    for (const chunk of chunks) {
+      if (stopRequestedRef.current) break;
+
+      await new Promise<void>((resolve) => {
+        const audio = new Audio(
+          `/api/tts?text=${encodeURIComponent(chunk)}&lang=ur`
+        );
+        currentAudioRef.current = audio;
+        audio.oncanplaythrough = () => {
+          if (stopRequestedRef.current) { resolve(); return; }
+          setTtsLoading(false);
+          audio.play().catch(resolve);
+        };
+        audio.onended = () => resolve();
+        audio.onerror = () => resolve(); // skip bad chunk, keep going
+        audio.load();
+      });
+    }
+
+    if (!stopRequestedRef.current) {
+      setPlayingSection(null);
+      setTtsLoading(false);
+    }
+  }
+
   async function copyReport() {
-    await navigator.clipboard.writeText(report);
+    await navigator.clipboard.writeText(activeReport);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   function downloadReport() {
-    const blob = new Blob([report], { type: "text/plain" });
+    const langSuffix = language === "ur" ? "_urdu" : "";
+    const blob = new Blob([activeReport], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${studentName}_progress_report.txt`;
+    a.download = `${studentName}_progress_report${langSuffix}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -187,7 +364,14 @@ export function ParentReportClient({ children }: Props) {
           {children.map((child) => (
             <button
               key={child.student_id}
-              onClick={() => { setSelectedChild(child.student_id); setReport(""); setChartData(null); }}
+              onClick={() => {
+                setSelectedChild(child.student_id);
+                setReport("");
+                setChartData(null);
+                setTranslatedReport("");
+                setLanguage("en");
+                stopTTS();
+              }}
               className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
                 selectedChild === child.student_id
                   ? "border-slate-400 bg-slate-100"
@@ -256,10 +440,10 @@ export function ParentReportClient({ children }: Props) {
                   Generated {reportDate}
                 </p>
               </div>
-              <div className="flex shrink-0 gap-2">
+              <div className="flex shrink-0 flex-wrap gap-2">
                 <button
                   onClick={copyReport}
-                  className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     copied
                       ? "bg-green-600 text-white"
                       : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -270,7 +454,7 @@ export function ParentReportClient({ children }: Props) {
                 </button>
                 <button
                   onClick={downloadReport}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Download
@@ -280,17 +464,17 @@ export function ParentReportClient({ children }: Props) {
 
             {/* Summary Stats */}
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
+              <div className="rounded-lg border border-slate-100 bg-white px-4 py-3">
                 <p className="text-xs text-slate-400">Attendance Rate</p>
                 <p className={`mt-0.5 text-xl font-bold ${attendanceColor(chartData.summary.attendanceRate)}`}>
                   {chartData.summary.attendanceRate !== null ? `${chartData.summary.attendanceRate}%` : "N/A"}
                 </p>
               </div>
-              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
+              <div className="rounded-lg border border-slate-100 bg-white px-4 py-3">
                 <p className="text-xs text-slate-400">Courses Enrolled</p>
                 <p className="mt-0.5 text-xl font-bold text-slate-900">{chartData.summary.totalCourses}</p>
               </div>
-              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
+              <div className="rounded-lg border border-slate-100 bg-white px-4 py-3">
                 <p className="text-xs text-slate-400">Top Subject</p>
                 <p className="mt-0.5 truncate text-sm font-bold text-slate-800">
                   {chartData.summary.bestCourse || "N/A"}
@@ -299,7 +483,7 @@ export function ParentReportClient({ children }: Props) {
                   <p className="text-xs text-slate-400">{chartData.summary.bestCoursePct}%</p>
                 )}
               </div>
-              <div className="rounded-lg bg-white px-4 py-3 border border-slate-100">
+              <div className="rounded-lg border border-slate-100 bg-white px-4 py-3">
                 <p className="text-xs text-slate-400">Sessions Tracked</p>
                 <p className="mt-0.5 text-xl font-bold text-slate-900">{chartData.summary.totalRecords}</p>
               </div>
@@ -323,7 +507,7 @@ export function ParentReportClient({ children }: Props) {
                         labelFormatter={(label) =>
                           chartData.coursePerformance.find((c) => c.course === label)?.courseName || label
                         }
-                        contentStyle={{ borderRadius: "1rem", border: "1px solid #E2E8F0" }}
+                        contentStyle={{ borderRadius: "0.5rem", border: "1px solid #E2E8F0" }}
                       />
                       <Bar dataKey="pct" radius={[6, 6, 0, 0]}>
                         {chartData.coursePerformance.map((entry, i) => (
@@ -352,7 +536,7 @@ export function ParentReportClient({ children }: Props) {
                       <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                       <XAxis dataKey="month" stroke="#94A3B8" tick={{ fontSize: 12 }} />
                       <YAxis stroke="#94A3B8" tick={{ fontSize: 12 }} />
-                      <Tooltip contentStyle={{ borderRadius: "1rem", border: "1px solid #E2E8F0" }} />
+                      <Tooltip contentStyle={{ borderRadius: "0.5rem", border: "1px solid #E2E8F0" }} />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: "12px" }} />
                       <Bar dataKey="present" name="Present" stackId="a" fill="#22C55E" />
                       <Bar dataKey="late" name="Late" stackId="a" fill="#F59E0B" />
@@ -375,21 +559,129 @@ export function ParentReportClient({ children }: Props) {
             )}
           </div>
 
-          {/* Written Report */}
+          {/* Written Report — section by section */}
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-100 bg-slate-50/60 px-8 py-4">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/60 px-6 py-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                 Detailed Assessment
               </p>
+
+              {/* Language toggle */}
+              <div className="flex items-center gap-1 overflow-hidden rounded-lg border border-slate-200 bg-white">
+                <button
+                  onClick={() => {
+                    if (language === "ur") {
+                      window.speechSynthesis?.cancel();
+                      setPlayingSection(null);
+                      setLanguage("en");
+                    }
+                  }}
+                  className={`px-3 py-1.5 text-xs font-semibold transition ${
+                    language === "en"
+                      ? "bg-slate-800 text-white"
+                      : "text-slate-500 hover:bg-slate-50"
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={handleTranslate}
+                  disabled={translating}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition ${
+                    language === "ur"
+                      ? "bg-slate-800 text-white"
+                      : "text-slate-500 hover:bg-slate-50"
+                  } disabled:opacity-50`}
+                >
+                  {translating && <Loader2 className="h-3 w-3 animate-spin" />}
+                  اردو
+                </button>
+              </div>
             </div>
 
-            <div className="px-8 py-10">
-              <ReactMarkdown components={markdownComponents}>{report}</ReactMarkdown>
+            {translating && (
+              <div className="flex items-center gap-2 border-b border-slate-100 bg-amber-50 px-6 py-2.5 text-xs text-amber-700">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Translating to Urdu… this may take a moment.
+              </div>
+            )}
+
+            {translateError && (
+              <div className="border-b border-slate-100 bg-red-50 px-6 py-2.5 text-xs text-red-700">
+                {translateError}
+              </div>
+            )}
+
+            {/* Sections */}
+            <div dir={language === "ur" ? "rtl" : "ltr"} className="divide-y divide-slate-50">
+              {sections.length === 0 ? (
+                <div className="px-8 py-10">
+                  <ReactMarkdown components={markdownComponents}>{activeReport}</ReactMarkdown>
+                </div>
+              ) : (
+                sections.map((section, i) => {
+                  const isPlaying = playingSection === i;
+                  return (
+                    <div key={i} className={`px-8 py-8 transition-colors ${isPlaying ? "bg-emerald-50/40" : ""}`}>
+                      {/* Section header row */}
+                      <div className="mb-4 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className="h-4 w-1 shrink-0 rounded-full"
+                            style={{ backgroundColor: "var(--role-primary)" }}
+                          />
+                          <span
+                            className="text-[11px] font-bold uppercase tracking-[0.15em] truncate"
+                            style={{ color: "var(--role-primary)" }}
+                          >
+                            {section.title}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => handlePlaySection(i, section.title, section.content)}
+                          className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                            isPlaying
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+                          }`}
+                        >
+                          {isPlaying && ttsLoading ? (
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              Loading…
+                            </>
+                          ) : isPlaying ? (
+                            <>
+                              <Square className="h-3 w-3 fill-current" />
+                              Stop
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-3 w-3 fill-current" />
+                              Listen
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="mb-5 h-px bg-slate-100" />
+
+                      <ReactMarkdown components={markdownComponents}>
+                        {section.content}
+                      </ReactMarkdown>
+                    </div>
+                  );
+                })
+              )}
             </div>
 
+            {/* Footer */}
             <div className="border-t border-slate-100 bg-slate-50/60 px-8 py-4">
               <p className="text-center text-xs text-slate-400">
                 Generated {reportDate} · AI-Assisted Academic Progress Report
+                {language === "ur" && " · اردو ترجمہ"}
               </p>
             </div>
           </div>

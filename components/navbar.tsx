@@ -40,7 +40,7 @@ export function Navbar({
       </div>
 
       <div className="flex items-center gap-3">
-        <NotificationBell primaryColor={colors.primary} />
+        <NotificationBell primaryColor={colors.primary} role={role} />
 
         <Link
           href="/ai/chat-assistant"
